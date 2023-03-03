@@ -1,7 +1,7 @@
 {
-    "key": "my-app",
-    "name": "My app",
-    "description": "My very first app",
+    "key": "zengpt-confluence",
+    "name": "Zen GPT for Confluence",
+    "description": "GPT based assistant for Confluence",
     "baseUrl": "{{localBaseUrl}}",
     "authentication": {
         "type": "jwt"
