@@ -1,0 +1,67 @@
+{{!< layout}}
+
+<div class='container'>
+  <div class='approval-container'>
+    <h1>AI Aide</h1>
+    <p class='current-approvals'>This page has <b class='number-approvals'>{{numberApprovedBy}} approvals</b>.</p>
+    <button class='aui-button' id='approve-page'>
+      <span class='aui-icon aui-icon-small aui-iconfont-approve'></span> Approve
+    </button>
+  </div>
+</div>
+
+<script>
+  $(function(){
+    var currUsers = JSON.parse('{{{allApprovals}}}');
+    var currentApprovalNumber = {{numberApprovedBy}};
+    var currUser;
+
+    console.log(propertyExists, currUsers);
+
+    AP.user.getCurrentUser(function(user){
+      currUser = user.id;
+      if(currUsers.indexOf(currUser) !== -1){
+        //  We already have the user,
+        //  update our UI accordingly.
+        $('p.your-approval').text('You have already approved this page!');
+        $('button#approve-page').prop('disabled', true);
+      }
+    });
+
+    $('#approve-page').on('click', function(){
+
+      //  Send request to Confluence API, and update our DOM.
+      AP.require(['confluence'], function(confluence){
+
+        //  Add current user's approval to list.
+        currUsers.push(currUser);
+
+        //  Get the correct version for our 'approvals' content property.
+        confluence.getContentProperty('approvals', function(property){
+
+          var version = 1;
+          if (property && property.version && property.version.number) {
+            version = property.version.number + 1;
+          }
+
+          //  Setup our updated approvals object.
+          var updatedApprovals = {
+            'key':     'approvals',
+            'value':   { 'approvedBy': currUsers },
+            'version': { 'number': version }
+          };
+
+          //  Update approvals list.
+          confluence.setContentProperty(updatedApprovals, function(){
+            // Dynamically update our dialog to have an accurate amount of approvals
+            // visible to the user.
+            $('p.your-approval').text('You have approved this page.');
+            $('b.number-approvals').text((currentApprovalNumber+1) + ' approvals');
+            $('button#approve-page').prop('disabled', true);
+          });
+
+        });
+      });
+    });
+  });
+</script>

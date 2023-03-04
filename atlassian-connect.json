@@ -16,6 +16,25 @@
         "signed-install": true
     },
     "modules": {
+        "contentBylineItems": [
+            {
+                "context": "addon",
+                "target": {
+                    "type": "inlinedialog"
+                },
+                "tooltip": {
+                    "value": "AI Aide"
+                },
+                "icon": {
+                    "url": "/images/ai-aide-logo.png"
+                },
+                "name": {
+                    "value": "Aide"
+                },
+                "key": "byline-item",
+                "url": "/ai-aide?contentId={content.id}"
+            }
+        ],
         "generalPages": [
             {
                 "key": "hello-world-page-jira",

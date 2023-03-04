@@ -21,4 +21,32 @@ export default function routes(app, addon) {
     });
 
     // Add additional route handlers here...
+    app.get('/ai-aide', addon.authenticate(), function (req, res) {
+
+        //  Get the ACE HTTP Client which interfaces with our Confluence instance.
+        var httpClient = addon.httpClient(req);
+        var contentId  = req.query['contentId'];
+
+        //  Using the client, check if the page we are currently viewing has a
+        //  content property with a key of 'approvals'.
+        //  We use the /rest/api/content/{contentId}/property/{key} endpoint here.
+        httpClient.get({
+            url: '/rest/api/content/' + contentId + '/property/ai-aide'
+        }, function(err, responseApproval, approvalObj){
+
+            approvalObj = JSON.parse(approvalObj);
+
+            //  Setup all the parameters we need to pass through to our client.
+            var propertyExists = approvalObj.statusCode !== 404;
+            var allApprovals   = (propertyExists ? approvalObj.value.approvedBy : []);
+            var version        = (propertyExists ? approvalObj.version.number   : null);
+
+            //  Render.
+            return res.render('ai-aide', {
+                numberApprovedBy: allApprovals.length,
+                allApprovals: JSON.stringify(allApprovals)
+            });
+
+        });
+    });
 }
