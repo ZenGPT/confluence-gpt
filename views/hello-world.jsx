@@ -18,7 +18,33 @@ import Form, {
   ValidMessage,
 } from '@atlaskit/form';
 
-const FormDefaultExample = () => (
+const FormDefaultExample = () => {
+  const [messages, setMessages] = React.useState([]);
+  let onSubmit = async (data) => {
+    // try fetch data from server, if error, set error message, if success, set success message
+    try {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: 'foo',
+          body: 'bar',
+          userId: 1,
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      });
+      const respJson = await response.json();
+      console.log('data', respJson);
+      console.log('setMessages', respJson.body);
+      setMessages(respJson.body);
+    } catch (e) {
+      console.log('setMessages', 'error');
+      setMessages('An error occurred, please try again later.');
+    }
+    console.log('form data', data);
+  };
+  return (
     <div
         style={{
           display: 'flex',
@@ -29,12 +55,7 @@ const FormDefaultExample = () => (
         }}
     >
       <Form
-      onSubmit={(data) => {
-      console.log('form data', data);
-      return new Promise((resolve) => setTimeout(resolve, 2000)).then(() =>
-          data.username === 'error' ? { username: 'IN_USE' } : undefined,
-      );
-    }}
+      onSubmit={onSubmit}
       >
       {({ formProps, submitting }) => (
           <form {...formProps}>
@@ -71,7 +92,8 @@ const FormDefaultExample = () => (
           </form>
       )}
     </Form>
+    message: {messages}
 </div>
-);
+)};
 
 export default FormDefaultExample;

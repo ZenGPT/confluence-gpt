@@ -32,7 +32,7 @@
                     "value": "Aide"
                 },
                 "key": "byline-item",
-                "url": "/ai-aide?contentId={content.id}"
+                "url": "/hello-world?contentId={content.id}"
             }
         ],
         "generalPages": [
