@@ -1,6 +1,6 @@
 {
-    "key": "zengpt-confluence",
-    "name": "Zen GPT for Confluence",
+    "key": "gptdock-confluence",
+    "name": "GPTDock for Confluence",
     "description": "GPT based assistant for Confluence",
     "baseUrl": "{{localBaseUrl}}",
     "authentication": {
