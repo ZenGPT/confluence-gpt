@@ -7,10 +7,13 @@
         "type": "jwt"
     },
     "lifecycle": {
-        "installed": "/installed"
+        "installed": "/installed",
+        "uninstalled": "/uninstalled"
     },
+    "enableLicensing": true,
     "scopes": [
-        "READ"
+        "READ",
+        "WRITE"
     ],
     "apiMigrations":{
         "signed-install": true
