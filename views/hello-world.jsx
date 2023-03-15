@@ -1,25 +1,99 @@
-import SectionMessage from '@atlaskit/section-message';
-import React from 'react';
+import React, { Fragment } from 'react';
 
-export default function HelloWorld() {
-  const [excitementLevel, setExcitementLevel] = React.useState(0);
-  return <SectionMessage
-      title={`Hello, world${excitementLevel ? new Array(excitementLevel).fill('!').join('') : '.'}`}
-      actions={[
-        {
-          key: '1',
-          href: 'https://atlassian.design/components/',
-          text: 'Browse more components to add to your app',
+import ButtonGroup from '@atlaskit/button/button-group';
+import LoadingButton from '@atlaskit/button/loading-button';
+import Button from '@atlaskit/button/standard-button';
+import { Checkbox } from '@atlaskit/checkbox';
+import TextField from '@atlaskit/textfield';
+
+import TextArea from '@atlaskit/textarea';
+import Form, {
+  CheckboxField,
+  ErrorMessage,
+  Field,
+  FormFooter,
+  FormHeader,
+  FormSection,
+  HelperMessage,
+  ValidMessage,
+} from '@atlaskit/form';
+
+const FormDefaultExample = () => {
+  const [messages, setMessages] = React.useState([]);
+  let onSubmit = async (data) => {
+    // try fetch data from server, if error, set error message, if success, set success message
+    try {
+      const response = await fetch('https://ai.gptdock.com/api/', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: 'foo',
+          body: 'bar',
+          userId: 1,
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
         },
-        {
-          key: '2',
-          onClick: () => setExcitementLevel(excitementLevel + 1),
-          text: 'Get excited!',
-        }
-      ]}
+      });
+      const respJson = await response.json();
+      console.log('data', respJson);
+      console.log('setMessages', respJson.body);
+      setMessages(respJson.body);
+    } catch (e) {
+      console.log('setMessages', 'error');
+      setMessages('An error occurred, please try again later.');
+    }
+    console.log('form data', data);
+  };
+  return (
+    <div
+        style={{
+          display: 'flex',
+          width: '400px',
+          maxWidth: '100%',
+          margin: '0 auto',
+          flexDirection: 'column',
+        }}
     >
-      <p>
-        Congratulations! You have successfully created an Atlassian Connect app using the <a href={'https://bitbucket.org/atlassian/atlassian-connect-express'}>atlassian-connect-express</a> client library.
-      </p>
-    </SectionMessage>;
-}
+      <Form
+      onSubmit={onSubmit}
+      >
+      {({ formProps, submitting }) => (
+          <form {...formProps}>
+            <FormHeader
+                title="Queries"
+            />
+            <FormSection>
+              <Field label="Enter your request here:" name="query">
+                {({ fieldProps }) => (
+                    <Fragment>
+                      <TextArea
+                          placeholder="e.g. Write a Job Description for Senior DevOps Engineer"
+                          {...fieldProps}
+                      />
+                      <HelperMessage>
+                        Go to <a href={`https://www.gptdock.com/how-to-ask-questions`}>How to ask questions</a> for more information.
+                      </HelperMessage>
+                    </Fragment>
+                )}
+              </Field>
+            </FormSection>
+
+            <FormFooter>
+              <ButtonGroup>
+                <LoadingButton
+                    type="submit"
+                    appearance="primary"
+                    isLoading={submitting}
+                >
+                  Submit
+                </LoadingButton>
+              </ButtonGroup>
+            </FormFooter>
+          </form>
+      )}
+    </Form>
+    message: {messages}
+</div>
+)};
+
+export default FormDefaultExample;

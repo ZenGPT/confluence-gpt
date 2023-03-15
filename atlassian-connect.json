@@ -1,16 +1,19 @@
 {
-    "key": "zengpt-confluence",
-    "name": "Zen GPT for Confluence",
+    "key": "gptdock-confluence",
+    "name": "GPTDock for Confluence",
     "description": "GPT based assistant for Confluence",
     "baseUrl": "{{localBaseUrl}}",
     "authentication": {
         "type": "jwt"
     },
     "lifecycle": {
-        "installed": "/installed"
+        "installed": "/installed",
+        "uninstalled": "/uninstalled"
     },
+    "enableLicensing": true,
     "scopes": [
-        "READ"
+        "READ",
+        "WRITE"
     ],
     "apiMigrations":{
         "signed-install": true
@@ -32,7 +35,7 @@
                     "value": "Aide"
                 },
                 "key": "byline-item",
-                "url": "/ai-aide?contentId={content.id}"
+                "url": "/hello-world?contentId={content.id}"
             }
         ],
         "generalPages": [
