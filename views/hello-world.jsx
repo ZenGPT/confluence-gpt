@@ -23,7 +23,7 @@ const FormDefaultExample = () => {
   let onSubmit = async (data) => {
     // try fetch data from server, if error, set error message, if success, set success message
     try {
-      const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+      const response = await fetch('https://ai.gptdock.com/api/', {
         method: 'POST',
         body: JSON.stringify({
           title: 'foo',
@@ -63,7 +63,7 @@ const FormDefaultExample = () => {
                 title="Queries"
             />
             <FormSection>
-              <Field label="Enter your request here:" name="example-text">
+              <Field label="Enter your request here:" name="query">
                 {({ fieldProps }) => (
                     <Fragment>
                       <TextArea
@@ -71,7 +71,7 @@ const FormDefaultExample = () => {
                           {...fieldProps}
                       />
                       <HelperMessage>
-                        Go to <a href={`https://www.zengpt.com/how-to-ask-questions`}>How to ask questions</a> for more information.
+                        Go to <a href={`https://www.gptdock.com/how-to-ask-questions`}>How to ask questions</a> for more information.
                       </HelperMessage>
                     </Fragment>
                 )}
