@@ -1,16 +1,23 @@
-# Atlassian Connect App using Express
+Installing GPT for Confluence:
 
-Congratulations!
-You've successfully created an Atlassian Connect App using the Express web application framework.
+-   Log into your Confluence instance as **administrator**.
+-   Click the **Apps** dropdown and choose **Find new apps**. The _Find new apps_ screen loads.
+-   Search for **GPT for Confluence** and click on the app tile.The _App Details_ screen loads.
+-   Click **Try it free** to start installing your app.
+-   You're all set!Click **Close** in the _Installed and ready to go_ dialog.
 
-## What's next?
+Using GPT for Confluence as a user:
 
-[Read the docs](https://bitbucket.org/atlassian/atlassian-connect-express/src/master/README.md).
+- Step 1: Once the installation is complete, go to the Confluence page where you want to generate text. 
+- Step 2: Click on the "Aide" link at the top of your article (byline). 
+- Step 3: A dialog box will appear, prompting you to enter some details about the text you want to generate. 
+- Step 4: Enter the necessary details, such as the type of content you want to generate, the language, and any other relevant information. 
+- Step 5: Click "Generate", and the text will appear on the page. 
+- Step 6: Review the generated text and make any necessary edits or adjustments. 
+- Step 7: Copy the text as needed as use it anywhere in Confluence.
 
-## Releasing new changes
+Tips for using GPT for Confluence:
 
-See all branches: https://bitbucket.org/atlassian/atlassian-connect-express-template/branches/
-
-`master` branch is for products jira, jira-service-desk, and confluence; `bitbucket` branch is for product bitbucket. When updating `master`, please also update `bitbucket` if neccessary.
-
-The branches will be downloaded by: https://bitbucket.org/atlassian/atlas-connect
+-   Keep your requests as specific as possible to get the most accurate results.
+-   Don't rely solely on generated text - always review and edit to ensure it meets your needs.
+-   Experiment with different types of content and formats to fully take advantage of the tool's flexibility.
