@@ -5,6 +5,9 @@ import LoadingButton from '@atlaskit/button/loading-button';
 import Button from '@atlaskit/button/standard-button';
 import { Checkbox } from '@atlaskit/checkbox';
 import TextField from '@atlaskit/textfield';
+import Clipboard from 'clipboard';
+import CopyIcon from '@atlaskit/icon/glyph/copy';
+import InlineDialog from '@atlaskit/inline-dialog';
 
 import TextArea from '@atlaskit/textarea';
 import Form, {
@@ -19,7 +22,11 @@ import Form, {
 } from '@atlaskit/form';
 
 const FormDefaultExample = () => {
+  // TODO: redefine the message.
   const [messages, setMessages] = React.useState([]);
+  const [copied, setCopyied] = React.useState(false);
+  const copyBtnRef = React.createRef();
+
   let onSubmit = async (data) => {
     // try fetch data from server, if error, set error message, if success, set success message
     try {
@@ -44,36 +51,52 @@ const FormDefaultExample = () => {
     }
     console.log('form data', data);
   };
+
+  React.useEffect(() => {
+    const clipboard = new Clipboard(copyBtnRef.current, {
+      text: () => messages,
+    });
+    clipboard.on('success', () => {
+      setCopyied(true);
+    });
+    clipboard.on('error', (e) => {
+      console.log('copy error');
+    });
+    return () => {
+      clipboard.destroy();
+    };
+  }, []);
+
   return (
     <div
-        style={{
-          display: 'flex',
-          width: '400px',
-          maxWidth: '100%',
-          margin: '0 auto',
-          flexDirection: 'column',
-        }}
+      style={{
+        display: 'flex',
+        width: '400px',
+        maxWidth: '100%',
+        margin: '0 auto',
+        flexDirection: 'column',
+      }}
     >
-      <Form
-      onSubmit={onSubmit}
-      >
-      {({ formProps, submitting }) => (
+      <Form onSubmit={onSubmit}>
+        {({ formProps, submitting }) => (
           <form {...formProps}>
-            <FormHeader
-                title="Queries"
-            />
+            <FormHeader title='Queries' />
             <FormSection>
-              <Field label="Enter your request here:" name="query">
+              <Field label='Enter your request here:' name='query'>
                 {({ fieldProps }) => (
-                    <Fragment>
-                      <TextArea
-                          placeholder="e.g. Write a Job Description for Senior DevOps Engineer"
-                          {...fieldProps}
-                      />
-                      <HelperMessage>
-                        Go to <a href={`https://www.gptdock.com/how-to-ask-questions`}>How to ask questions</a> for more information.
-                      </HelperMessage>
-                    </Fragment>
+                  <Fragment>
+                    <TextArea
+                      placeholder='e.g. Write a Job Description for Senior DevOps Engineer'
+                      {...fieldProps}
+                    />
+                    <HelperMessage>
+                      Go to{' '}
+                      <a href={`https://www.gptdock.com/how-to-ask-questions`}>
+                        How to ask questions
+                      </a>{' '}
+                      for more information.
+                    </HelperMessage>
+                  </Fragment>
                 )}
               </Field>
             </FormSection>
@@ -81,8 +104,8 @@ const FormDefaultExample = () => {
             <FormFooter>
               <ButtonGroup>
                 <LoadingButton
-                    type="submit"
-                    appearance="primary"
+                    type='submit'
+                    appearance='primary'
                     isLoading={submitting}
                 >
                   Submit
@@ -92,8 +115,27 @@ const FormDefaultExample = () => {
           </form>
       )}
     </Form>
-    message: {messages}
-</div>
-)};
+      <hr style={{ borderBottom: '1px solid black' }} />
+      {messages}
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        {messages && (
+          <InlineDialog
+            onClose={() => setCopyied(false)}
+            content='Copied Successful'
+            isOpen={copied}
+          >
+            <Button
+              ref={copyBtnRef}
+              iconBefore={<CopyIcon label='' size='medium' />}
+              appearance='primary'
+            >
+              Copy
+            </Button>
+          </InlineDialog>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default FormDefaultExample;
