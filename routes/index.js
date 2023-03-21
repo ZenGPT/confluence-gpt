@@ -15,7 +15,7 @@ export default function routes(app, addon) {
           {
             title: 'Atlassian Connect'
             //, issueId: req.query['issueId']
-            //, browserOnly: true // you can set this to disable server-side rendering for react views
+            , browserOnly: true // you can set this to disable server-side rendering for react views
           }
         );
     });

@@ -5,6 +5,7 @@ import LoadingButton from '@atlaskit/button/loading-button';
 import Button from '@atlaskit/button/standard-button';
 import { Checkbox } from '@atlaskit/checkbox';
 import TextField from '@atlaskit/textfield';
+import ReactMarkdown from 'react-markdown';
 
 import TextArea from '@atlaskit/textarea';
 import Form, {
@@ -93,6 +94,8 @@ const FormDefaultExample = () => {
       )}
     </Form>
     message: {messages}
+    {/* TODO: integrate with the API response */}
+    <ReactMarkdown children={`# Just a link: [confluence-gpt](https://github.com/ZenGPT/confluence-gpt.)`}/>
 </div>
 )};
 
