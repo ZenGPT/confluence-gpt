@@ -1,0 +1,80 @@
+openapi: "3.0.0"
+info:
+  title: "ACE Services"
+  version: "1.0.0"
+servers:
+  - url: "https://ace.gptdock.com"
+paths:
+  /conversations:
+    post:
+      summary: "Start or continue a conversation by send messages as a user"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: "The action to perform. Hardcoded as 'next' in v1."
+                  example: "next"
+                messages:
+                  type: array
+                  description: "The messages to OpenAI"
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: "The ID of the message"
+                        example: "b059aadc-e7b8-4b58-9aa8-c73a855df536"
+                      author:
+                        type: object
+                        properties:
+                          role:
+                            type: string
+                            description: "The role of the message author. Hardcoded as 'user' in v1."
+                            example: "user"
+                      role:
+                        type: string
+                        description: "The role of the user"
+                        example: "user"
+                      content:
+                        type: object
+                        properties:
+                          content_type:
+                            type: string
+                            description: "The type of the message content. Hardcoded as 'text' in v1."
+                            example: "text"
+                          parts:
+                            type: array
+                            description: "The parts of the message content"
+                            items:
+                              type: string
+                              example: "Hello"
+                parent_message_id:
+                  type: string
+                  description: "The ID of the parent message. Hardcoded as 'null' in v1."
+                  example: "d53b8c5b-8cc9-4d06-a164-cef3cd8571e5"
+                model:
+                  type: string
+                  description: "The GPT model to use for rendering. Hardcoded as 'text-davinci-002' in v1."
+                  example: "text-davinci-002"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: "The resonse in stream"
+                example: "This is your answer."
+        "400":
+          description: "Bad Request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+        "500":
+          description: "Internal Server Error"
