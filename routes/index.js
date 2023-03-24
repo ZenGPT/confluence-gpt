@@ -1,3 +1,5 @@
+const fetch = require('node-fetch')
+
 export default function routes(app, addon) {
     // Redirect root path to /atlassian-connect.json,
     // which will be served by atlassian-connect-express.
@@ -11,35 +13,61 @@ export default function routes(app, addon) {
         // Rendering a template is easy; the render method takes two params: the name of the component or template file, and its props.
         // Handlebars and jsx are both supported, but please note that jsx changes require `npm run watch-jsx` in order to be picked up by the server.
         res.render(
-          'hello-world.jsx', // change this to 'hello-world.jsx' to use the Atlaskit & React version
-          {
-            title: 'Atlassian Connect'
-            //, issueId: req.query['issueId']
-            //, browserOnly: true // you can set this to disable server-side rendering for react views
-          }
+            'hello-world.jsx', // change this to 'hello-world.jsx' to use the Atlaskit & React version
+            {
+                title: 'Atlassian Connect',
+                //, issueId: req.query['issueId']
+                browserOnly: true // you can set this to disable server-side rendering for react views
+            }
         );
     });
+
+    app.post('/conversations', async (req, res) => {
+        const {messages} = req.body
+
+        if (!messages) {
+            res.status(422).end()
+            return
+        }
+
+        // TODO: improve the logic to pick value.
+        const question = messages[0].content.parts[0]
+
+        // TODO: remote the hard-code host
+        const response = await fetch('http://localhost:5001/v1/ask', {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                "question": question,
+                "user_id": "1", // TODO: replace to variable
+                "client_id": "1", // TODO: replace to variable
+                "stream": false
+            })
+        })
+        const result = await response.text()
+        res.send(result)
+    })
 
     // Add additional route handlers here...
     app.get('/ai-aide', addon.authenticate(), function (req, res) {
 
         //  Get the ACE HTTP Client which interfaces with our Confluence instance.
         var httpClient = addon.httpClient(req);
-        var contentId  = req.query['contentId'];
+        var contentId = req.query['contentId'];
 
         //  Using the client, check if the page we are currently viewing has a
         //  content property with a key of 'approvals'.
         //  We use the /rest/api/content/{contentId}/property/{key} endpoint here.
         httpClient.get({
-            url: '/rest/api/content/' + contentId + '/property/ai-aide'
-        }, function(err, responseApproval, approvalObj){
+            url: '/rest/api/content/ ' + contentId + '/property/ai-aide'
+        }, function (err, responseApproval, approvalObj) {
 
             approvalObj = JSON.parse(approvalObj);
 
             //  Setup all the parameters we need to pass through to our client.
             var propertyExists = approvalObj.statusCode !== 404;
-            var allApprovals   = (propertyExists ? approvalObj.value.approvedBy : []);
-            var version        = (propertyExists ? approvalObj.version.number   : null);
+            var allApprovals = (propertyExists ? approvalObj.value.approvedBy : []);
+            var version = (propertyExists ? approvalObj.version.number : null);
 
             //  Render.
             return res.render('ai-aide', {
