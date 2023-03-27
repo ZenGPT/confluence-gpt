@@ -21,6 +21,8 @@ const Wrapper = styled.div`
   display: flex;
   max-width: 768px;
   margin: 0 auto;
+  max-height: 768px;
+  overflow-y: auto;
 `;
 
 const ChatBox = styled.div`
