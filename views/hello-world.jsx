@@ -179,8 +179,7 @@ const FormDefaultExample = () => {
           )}
         </Form>
         {/* TODO: integrate with the API response */}
-        <ReactMarkdown children={messages}/>
-        <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+        <div style={{display: 'flex', justifyContent: 'flex-start'}}>
           {messages && (
             <InlineDialog
               onClose={() => setCopied(false)}
@@ -195,6 +194,7 @@ const FormDefaultExample = () => {
             </InlineDialog>
           )}
         </div>
+        <ReactMarkdown children={messages}/>
       </ChatBox>
     </Wrapper>
   );

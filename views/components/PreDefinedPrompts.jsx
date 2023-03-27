@@ -9,6 +9,9 @@ const ListWrapper = styled.div`
   max-width: 220px;
   border-right: 1px solid #eeeeee;
   padding-right: 16px;
+  position: sticky;
+  top: 16px;
+  align-self: flex-start;
 `;
 
 const StyledHeading = styled.h3`
