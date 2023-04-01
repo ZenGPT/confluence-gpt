@@ -62,4 +62,4 @@ jobs:
         with:
           python-version: '3.10'
       - run: pip3 install pluploader
-      - run: pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://ace.gptdock.com/atlassian-connect.json
+      - run: pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://ace-staging.gptdock.com/atlassian-connect.json
