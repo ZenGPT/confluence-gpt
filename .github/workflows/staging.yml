@@ -5,7 +5,10 @@ on:
     tags-ignore:
       - '**' # do not run on tags
     branches:
-      - 'staging'
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   test:
