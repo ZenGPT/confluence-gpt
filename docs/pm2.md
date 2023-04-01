@@ -11,3 +11,11 @@ sudo LOCAL_BASE_URL='https://ace.gptdock.com' DATABASE_URL='postgres://admin:p@s
 sudo pm2 startup
 sudo pm2 save
 ```
+
+# Change the command line (e.g. update ENV variables)
+
+```shell
+sudo pm2 delete app
+sudo LOCAL_BASE_URL='https://ace.gptdock.com' DATABASE_URL='postgres://admin:p@ssw0rd@localhost:5432/gptdock' PORT=80 NODE_ENV=production pm2 start app.js --node-args="-r esm"
+sudo pm2 save
+```
