@@ -66,7 +66,7 @@ export default function routes(app, addon) {
             //  Setup all the parameters we need to pass through to our client.
             var propertyExists = approvalObj.statusCode !== 404;
             var allApprovals = (propertyExists ? approvalObj.value.approvedBy : []);
-            var version = (propertyExists ? approvalObj.version.number : null);
+            // var version = (propertyExists ? approvalObj.version.number : null);
 
             //  Render.
             return res.render('ai-aide', {
