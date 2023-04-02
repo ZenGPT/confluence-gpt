@@ -84,6 +84,11 @@ const FormDefaultExample = () => {
 
         for (let i in strArr) {
           if (strArr[i]) {
+            // if strArr[i] is '[DONE]', then it is the last message. Set done to true.
+            if (strArr[i] === '[DONE]') {
+              done = true
+              break
+            }
             const json = JSON.parse(strArr[i])
             if (json) {
               if (json.choices[0].delta) {
