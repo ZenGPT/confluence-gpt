@@ -22,13 +22,16 @@ export default function routes(app, addon) {
         );
     });
 
-    app.post('/conversations', async (req, res) => {
-        const { messages } = req.body
+    app.post('/conversations', 
+        // Require a valid token to access this resource
+        addon.checkValidToken(),
+        async (req, res) => {
+            const {messages} = req.body
 
-        if (!messages) {
-            res.status(422).end()
-            return
-        }
+            if (!messages) {
+                res.status(422).end()
+                return
+            }
 
         // TODO: improve the logic to pick value.
         const question = messages[0].content.parts[0]
@@ -40,6 +43,7 @@ export default function routes(app, addon) {
                 "question": question,
                 "user_id": "1234", // TODO: replace to variable
                 "client_id": "1234", // TODO: replace to variable
+                "product_id": 1,
                 "stream": true
             })
         })

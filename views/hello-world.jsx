@@ -39,11 +39,18 @@ const FormDefaultExample = () => {
   const copyBtnRef = React.useRef();
   const inputRef = React.useRef();
 
+  const getToken = () => new Promise((resolv) => {
+    AP.context.getToken((token) => {
+      resolv(token);
+    });
+  });
+
   let onSubmit = async (data) => {
     setMessages('')
     // try fetch data from server, if error, set error message, if success, set success message
     try {
-      const response = await fetch('/conversations', {
+      const token = await getToken();
+      const response = await fetch(`/conversations?jwt=${token}`, {
         method: 'POST',
         body: JSON.stringify({
           action: 'next',
@@ -64,7 +71,7 @@ const FormDefaultExample = () => {
           model: 'text-davinci-002',
         }),
         headers: {
-          'Content-type': 'application/json',
+          'Content-type': 'application/json; charset=UTF-8'
         },
       });
 
