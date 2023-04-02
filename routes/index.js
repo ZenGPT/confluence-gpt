@@ -33,23 +33,23 @@ export default function routes(app, addon) {
                 return
             }
 
-        // TODO: improve the logic to pick value.
-        const question = messages[0].content.parts[0]
-        // TODO: remote the hard-code host
-        const response = await fetch('http://localhost:5001/v1/ask', {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                "question": question,
-                "user_id": "1234", // TODO: replace to variable
-                "client_id": "1234", // TODO: replace to variable
-                "product_id": 1,
-                "stream": true
+            // TODO: improve the logic to pick value.
+            const question = messages[0].content.parts[0]
+            // TODO: remote the hard-code host
+            const response = await fetch('http://localhost:5001/v1/ask', {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    "question": question,
+                    "user_id": "1234", // TODO: replace to variable
+                    "client_id": "1234", // TODO: replace to variable
+                    "product_id": 1,
+                    "stream": true
+                })
             })
-        })
 
-        response.body.pipe(res)
-    })
+            response.body.pipe(res)
+        });
 
     // Add additional route handlers here...
     app.get('/ai-aide', addon.authenticate(), function (req, res) {
