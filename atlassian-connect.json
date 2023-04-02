@@ -23,7 +23,10 @@
             {
                 "context": "addon",
                 "target": {
-                    "type": "inlinedialog"
+                    "type": "inlinedialog",
+                    "options": {
+                        "width": "576"
+                    }
                 },
                 "tooltip": {
                     "value": "AI Aide"

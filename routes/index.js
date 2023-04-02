@@ -23,7 +23,7 @@ export default function routes(app, addon) {
     });
 
     app.post('/conversations', async (req, res) => {
-        const {messages} = req.body
+        const { messages } = req.body
 
         if (!messages) {
             res.status(422).end()
@@ -32,20 +32,19 @@ export default function routes(app, addon) {
 
         // TODO: improve the logic to pick value.
         const question = messages[0].content.parts[0]
-
         // TODO: remote the hard-code host
         const response = await fetch('http://localhost:5001/v1/ask', {
             method: "POST",
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 "question": question,
-                "user_id": "1", // TODO: replace to variable
-                "client_id": "1", // TODO: replace to variable
-                "stream": false
+                "user_id": "1234", // TODO: replace to variable
+                "client_id": "1234", // TODO: replace to variable
+                "stream": true
             })
         })
-        const result = await response.text()
-        res.send(result)
+
+        response.body.pipe(res)
     })
 
     // Add additional route handlers here...
