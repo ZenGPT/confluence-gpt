@@ -1,14 +1,51 @@
 import React from 'react';
 
 class DebugComponent extends React.Component {
-  render() {
-    const showDebug = localStorage.getItem('gptdock-debug') === 'true';
+  isInIframe() {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
+  }
 
-    return showDebug ? (
-        <div style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999 }}>
-          {window.location.href}
+  reloadIframe() {
+    window.location.reload();
+  }
+
+  shouldShowDebug() {
+    const localStorageFlag = localStorage.getItem('gptdock-debug') === 'true';
+    const url = window.location.href;
+    const queryParams = new URLSearchParams(window.location.search);
+
+    return (
+        localStorageFlag ||
+        url.includes('ngrok') ||
+        url.includes('localhost') ||
+        queryParams.get('debug') === 'true'
+    );
+  }
+
+  displayUrl() {
+    const url = window.location.href;
+    return url.length > 250 ? `${url.slice(0, 250)}...` : url;
+  }
+
+  render() {
+    if (!this.shouldShowDebug()) return null;
+
+    const inIframe = this.isInIframe();
+
+    return (
+        <div style={{ zIndex: 9999 }}>
+          {this.displayUrl()}
+          {inIframe && (
+              <button onClick={this.reloadIframe} style={{ marginLeft: '10px' }}>
+                Reload iFrame
+              </button>
+          )}
         </div>
-    ) : null;
+    );
   }
 }
 
