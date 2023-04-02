@@ -38,7 +38,7 @@ export default function routes(app, addon) {
             // TODO: remote the hard-code host
             const response = await fetch('http://localhost:5001/v1/ask', {
                 method: "POST",
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer localhost' },
                 body: JSON.stringify({
                     "question": question,
                     "user_id": "1234", // TODO: replace to variable

@@ -84,7 +84,7 @@ const FormDefaultExample = () => {
         const strArr = chunkValue.split(`\n`).map(item => item.replace('data: ', ''))
 
         for (let i in strArr) {
-          if (strArr[i]) {
+          if (strArr[i] && strArr[i] !== '[DONE]') {
             const json = JSON.parse(strArr[i])
             if (json) {
               if (json.choices[0].delta) {
