@@ -16,6 +16,7 @@ import Form, {
 } from '@atlaskit/form';
 import PreDefinedPrompts from './components/PreDefinedPrompts';
 import styled from 'styled-components'
+import DebugComponent from "./components/DebugComponent";
 
 const Wrapper = styled.div`
   display: flex;
@@ -81,7 +82,7 @@ const FormDefaultExample = () => {
         const chunkValue = decoder.decode(value);
         resultStrArr.concat()
         const strArr = chunkValue.split(`\n`).map(item => item.replace('data: ', ''))
-
+        console.debug('strArr', strArr);
         for (let i in strArr) {
           if (strArr[i]) {
             // if strArr[i] is '[DONE]', then it is the last message. Set done to true.
@@ -142,6 +143,7 @@ const FormDefaultExample = () => {
 
   return (
     <Wrapper>
+      <DebugComponent/>
       <PreDefinedPrompts onSelect={handleSelect}/>
       <ChatBox>
         <Form onSubmit={onSubmit}>
