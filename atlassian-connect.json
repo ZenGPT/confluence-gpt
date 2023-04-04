@@ -19,13 +19,27 @@
         "signed-install": true
     },
     "modules": {
+        "dialogs": [
+            {
+                "url": "/hello-world?contentId={content.id}",
+                "options": {
+                    "height": "100%",
+                    "width": "100%",
+                    "chrome": false,
+                    "header": {
+                        "value": "AI Aide Dialog"
+                    }
+                },
+                "key": "ai-aide-dialog-key"
+            }
+        ],
         "contentBylineItems": [
             {
                 "context": "addon",
                 "target": {
-                    "type": "inlinedialog",
+                    "type": "dialogmodule",
                     "options": {
-                        "width": "576"
+                        "key": "ai-aide-dialog-key"
                     }
                 },
                 "tooltip": {
@@ -37,8 +51,7 @@
                 "name": {
                     "value": "Aide"
                 },
-                "key": "byline-item",
-                "url": "/hello-world?contentId={content.id}"
+                "key": "byline-item"
             }
         ],
         "generalPages": [

@@ -16,6 +16,16 @@ import Form, {
 } from '@atlaskit/form';
 import PreDefinedPrompts from './components/PreDefinedPrompts';
 import styled from 'styled-components'
+import DebugComponent from "./components/DebugComponent";
+
+const Page = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  height: 100vh;
+  width: 100vw;
+`;
 
 const Wrapper = styled.div`
   display: flex;
@@ -82,9 +92,14 @@ const FormDefaultExample = () => {
         const chunkValue = decoder.decode(value);
         resultStrArr.concat()
         const strArr = chunkValue.split(`\n`).map(item => item.replace('data: ', ''))
-
+        console.debug('strArr', strArr);
         for (let i in strArr) {
-          if (strArr[i] && strArr[i] !== '[DONE]') {
+          if (strArr[i]) {
+            // if strArr[i] is '[DONE]', then it is the last message. Set done to true.
+            if (strArr[i] === '[DONE]') {
+              done = true
+              break
+            }
             const json = JSON.parse(strArr[i])
             if (json) {
               if (json.choices[0].delta) {
@@ -137,69 +152,72 @@ const FormDefaultExample = () => {
   }
 
   return (
-    <Wrapper>
-      <PreDefinedPrompts onSelect={handleSelect}/>
-      <ChatBox>
-        <Form onSubmit={onSubmit}>
-          {({formProps, submitting}) => (
-            <form {...formProps}>
-              <FormHeader title='Queries'/>
-              <FormSection>
-                <Field label='Enter your request here:' name='query'>
-                  {({fieldProps}) => (
-                    <Fragment>
-                      <TextArea
-                        ref={inputRef}
-                        placeholder='e.g. Write a Job Description for Senior DevOps Engineer'
-                        {...fieldProps}
-                      />
-                      <HelperMessage>
-                        Go to{' '}
-                        <a
-                          href={`https://www.gptdock.com/how-to-ask-questions`}
-                        >
-                          How to ask questions
-                        </a>{' '}
-                        for more information.
-                      </HelperMessage>
-                    </Fragment>
-                  )}
-                </Field>
-              </FormSection>
+    <Page>
+      <DebugComponent/>
+      <Wrapper>
+        <PreDefinedPrompts onSelect={handleSelect}/>
+        <ChatBox>
+          <Form onSubmit={onSubmit}>
+            {({formProps, submitting}) => (
+              <form {...formProps}>
+                <FormHeader title='Queries'/>
+                <FormSection>
+                  <Field label='Enter your request here:' name='query'>
+                    {({fieldProps}) => (
+                      <Fragment>
+                        <TextArea
+                          ref={inputRef}
+                          placeholder='e.g. Write a Job Description for Senior DevOps Engineer'
+                          {...fieldProps}
+                        />
+                        <HelperMessage>
+                          Go to{' '}
+                          <a
+                            href={`https://www.gptdock.com/how-to-ask-questions`}
+                          >
+                            How to ask questions
+                          </a>{' '}
+                          for more information.
+                        </HelperMessage>
+                      </Fragment>
+                    )}
+                  </Field>
+                </FormSection>
 
-              <FormFooter>
-                <ButtonGroup>
-                  <LoadingButton
-                    type='submit'
-                    appearance='primary'
-                    isLoading={submitting}
-                  >
-                    Submit
-                  </LoadingButton>
-                </ButtonGroup>
-              </FormFooter>
-            </form>
-          )}
-        </Form>
-        {/* TODO: integrate with the API response */}
-        <div style={{display: 'flex', justifyContent: 'flex-start'}}>
-          {messages && (
-            <InlineDialog
-              onClose={() => setCopied(false)}
-              content='Copied Successful'
-              isOpen={copied}
-            >
-              <Button
-                ref={copyBtnRef}
-                onClick={handleCopy}
-                iconBefore={<CopyIcon label='' size='medium'/>}
-              />
-            </InlineDialog>
-          )}
-        </div>
-        <ReactMarkdown children={messages}/>
-      </ChatBox>
-    </Wrapper>
+                <FormFooter>
+                  <ButtonGroup>
+                    <LoadingButton
+                      type='submit'
+                      appearance='primary'
+                      isLoading={submitting}
+                    >
+                      Submit
+                    </LoadingButton>
+                  </ButtonGroup>
+                </FormFooter>
+              </form>
+            )}
+          </Form>
+          {/* TODO: integrate with the API response */}
+          <div style={{display: 'flex', justifyContent: 'flex-start'}}>
+            {messages && (
+              <InlineDialog
+                onClose={() => setCopied(false)}
+                content='Copied Successful'
+                isOpen={copied}
+              >
+                <Button
+                  ref={copyBtnRef}
+                  onClick={handleCopy}
+                  iconBefore={<CopyIcon label='' size='medium'/>}
+                />
+              </InlineDialog>
+            )}
+          </div>
+          <ReactMarkdown children={messages}/>
+        </ChatBox>
+      </Wrapper>
+    </Page>
   );
 };
 

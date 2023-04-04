@@ -22,7 +22,7 @@ export default function routes(app, addon) {
         );
     });
 
-    app.post('/conversations', 
+    app.post('/conversations',
         // Require a valid token to access this resource
         addon.checkValidToken(),
         async (req, res) => {
@@ -41,9 +41,9 @@ export default function routes(app, addon) {
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer localhost' },
                 body: JSON.stringify({
                     "question": question,
+                    "product_id": "1234", // TODO: replace to variable
                     "user_id": "1234", // TODO: replace to variable
                     "client_id": "1234", // TODO: replace to variable
-                    "product_id": 1,
                     "stream": true
                 })
             })
