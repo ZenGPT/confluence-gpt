@@ -22,30 +22,34 @@ export default function routes(app, addon) {
         );
     });
 
-    app.post('/conversations', async (req, res) => {
-        const { messages } = req.body
+    app.post('/conversations', 
+        // Require a valid token to access this resource
+        addon.checkValidToken(),
+        async (req, res) => {
+            const {messages} = req.body
 
-        if (!messages) {
-            res.status(422).end()
-            return
-        }
+            if (!messages) {
+                res.status(422).end()
+                return
+            }
 
-        // TODO: improve the logic to pick value.
-        const question = messages[0].content.parts[0]
-        // TODO: remote the hard-code host
-        const response = await fetch('http://localhost:5001/v1/ask', {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                "question": question,
-                "user_id": "1234", // TODO: replace to variable
-                "client_id": "1234", // TODO: replace to variable
-                "stream": true
+            // TODO: improve the logic to pick value.
+            const question = messages[0].content.parts[0]
+            // TODO: remote the hard-code host
+            const response = await fetch('http://localhost:5001/v1/ask', {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer localhost' },
+                body: JSON.stringify({
+                    "question": question,
+                    "user_id": "1234", // TODO: replace to variable
+                    "client_id": "1234", // TODO: replace to variable
+                    "product_id": 1,
+                    "stream": true
+                })
             })
-        })
 
-        response.body.pipe(res)
-    })
+            response.body.pipe(res)
+        });
 
     // Add additional route handlers here...
     app.get('/ai-aide', addon.authenticate(), function (req, res) {

@@ -6,6 +6,7 @@
     "development": {
         // Port the Express server will listen on.
         "port": 3000,
+        "localBaseUrl": "$LOCAL_BASE_URL",
         // Use views/unauthorized.hbs for error page.
         "errorTemplate": true,
         // atlassian-connect-express currently integrates with Sequelize for

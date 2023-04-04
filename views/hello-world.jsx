@@ -43,7 +43,8 @@ const FormDefaultExample = () => {
     setMessages('')
     // try fetch data from server, if error, set error message, if success, set success message
     try {
-      const response = await fetch('/conversations', {
+      const token = await AP.context.getToken();
+      const response = await fetch(`/conversations?jwt=${token}`, {
         method: 'POST',
         body: JSON.stringify({
           action: 'next',
@@ -64,7 +65,7 @@ const FormDefaultExample = () => {
           model: 'text-davinci-002',
         }),
         headers: {
-          'Content-type': 'application/json',
+          'Content-type': 'application/json; charset=UTF-8'
         },
       });
 
@@ -83,7 +84,7 @@ const FormDefaultExample = () => {
         const strArr = chunkValue.split(`\n`).map(item => item.replace('data: ', ''))
 
         for (let i in strArr) {
-          if (strArr[i]) {
+          if (strArr[i] && strArr[i] !== '[DONE]') {
             const json = JSON.parse(strArr[i])
             if (json) {
               if (json.choices[0].delta) {
