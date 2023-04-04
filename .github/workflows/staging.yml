@@ -22,23 +22,29 @@ jobs:
         with:
           node-version: "16"
           cache: npm
-      - run: npm install
-      - run: npm run lint
+      - name: Install dependencies
+        run: npm install
+      - name: Test
+        run: npm run lint
 
   staging-deploy:
     needs: test
     name: Deploy to staging
     runs-on: ubuntu-latest
+    environment: staging
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: "16"
           cache: npm
-      - run: npm install
-      - run: npm run build
-      - name: Deploy to Server
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Deploy to server
         uses: easingthemes/ssh-deploy@v4.1.8
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
@@ -47,19 +53,53 @@ jobs:
           TARGET: /home/${{ secrets.HOST_USER }}/ace-server/
           EXCLUDE: "/.cache/, /.github/, /.vscode/, /.git/, /node_modules/"
           SCRIPT_AFTER: |
+            sudo pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
             cd /home/${{ secrets.HOST_USER }}/ace-server/
             npm install --production
 
   staging-install:
     needs: staging-deploy
     name: Install staging to Confluence
-    environment:
-      name: staging-full
+    environment: staging
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - run: pip3 install pluploader
-      - run: pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://ace-staging.gptdock.com/atlassian-connect.json
+      - name: Install
+        run: |
+          pip3 install pluploader
+          pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://ace-staging.gptdock.com/atlassian-connect.json
+
+  draft-release:
+    name: Create Draft release
+    needs: staging-install
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Set properties
+        id: properties
+        run: echo "version=$(date +'%Y.%m.%d%H%M')" >> $GITHUB_OUTPUT
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.properties.outputs.version }}
+          release_name: v${{ steps.properties.outputs.version }}
+          body: 'New release'
+          draft: true
