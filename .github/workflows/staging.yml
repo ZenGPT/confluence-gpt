@@ -77,7 +77,7 @@ jobs:
   draft-release:
     name: Create Draft release
     needs: staging-install
-    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/fix-release-workflow') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
