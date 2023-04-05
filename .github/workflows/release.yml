@@ -26,9 +26,9 @@ jobs:
         uses: easingthemes/ssh-deploy@v4.1.8
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.HOST_IP }}
-          REMOTE_USER: ${{ secrets.HOST_USER }}
-          TARGET: /home/${{ secrets.HOST_USER }}/ace-server/
+          REMOTE_HOST: ${{ vars.HOST_IP }}
+          REMOTE_USER: ${{ vars.HOST_USER }}
+          TARGET: /home/${{ vars.HOST_USER }}/ace-server/
           EXCLUDE: "/.cache/, /.github/, /.vscode/, /.git/, /node_modules/"
           SCRIPT_AFTER: |
             sudo pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
