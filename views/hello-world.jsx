@@ -24,18 +24,23 @@ const Page = styled.div`
   align-items: center;
   justify-content: start;
   height: 100vh;
-  width: 100vw;
+  width: 1024px;
+  margin: 0 20px;
 `;
 
 const Wrapper = styled.div`
   display: flex;
-  max-width: 768px;
+  height: 100%;
+  width: 100%;
   margin: 0 auto;
-  max-height: 768px;
   overflow-y: auto;
 `;
 
 const ChatBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
   width: 100%;
   margin: 0 auto;
   padding-left: 16px;
@@ -193,28 +198,31 @@ const FormDefaultExample = () => {
                     >
                       Submit
                     </LoadingButton>
+                    <Button type={'button'} appearance={'subtle'} onClick={() => {AP.dialog.close()}}>Close</Button>
                   </ButtonGroup>
                 </FormFooter>
               </form>
             )}
           </Form>
           {/* TODO: integrate with the API response */}
-          <div style={{display: 'flex', justifyContent: 'flex-start'}}>
+          <div style={{width: '100%', display: 'flex', flexDirection: 'flex-row', justifyContent: 'flex-start', overflowY: 'hidden'}}>
+            <div className={'content'} style={{flexGrow: 1, overflowY: 'scroll'}}>
+              <ReactMarkdown children={messages}/>
+            </div>
             {messages && (
-              <InlineDialog
-                onClose={() => setCopied(false)}
-                content='Copied Successful'
-                isOpen={copied}
-              >
-                <Button
-                  ref={copyBtnRef}
-                  onClick={handleCopy}
-                  iconBefore={<CopyIcon label='' size='medium'/>}
-                />
-              </InlineDialog>
+                <InlineDialog
+                    onClose={() => setCopied(false)}
+                    content='Copied Successful'
+                    isOpen={copied}
+                >
+                  <Button
+                      ref={copyBtnRef}
+                      onClick={handleCopy}
+                      iconBefore={<CopyIcon label='' size='medium'/>}
+                  />
+                </InlineDialog>
             )}
           </div>
-          <ReactMarkdown children={messages}/>
         </ChatBox>
       </Wrapper>
     </Page>
