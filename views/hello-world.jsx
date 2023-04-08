@@ -105,13 +105,16 @@ const FormDefaultExample = () => {
               done = true
               break
             }
-            const json = JSON.parse(strArr[i])
-            if (json) {
-              if (json.choices[0].delta) {
-                const text = json.choices[0].delta.content || ''
-                setMessages(prev => prev + text)
+            try {
+              const json = JSON.parse(strArr[i])
+              if (json) {
+                if (json.choices[0].delta) {
+                  const text = json.choices[0].delta.content || ''
+                  setMessages(prev => prev + text)
+                }
               }
-
+            } catch (e) {
+              console.error(e);
             }
           }
         }
