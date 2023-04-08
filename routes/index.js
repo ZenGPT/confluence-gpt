@@ -1,5 +1,9 @@
 const fetch = require('node-fetch')
 
+// TODO: remote the hard-code host
+const ASK_API_URL = 'http://localhost:5001/v1/ask';
+const ASK_API_AUTH_TOKEN = 'Bearer localhost';
+
 export default function routes(app, addon) {
     // Redirect root path to /atlassian-connect.json,
     // which will be served by atlassian-connect-express.
@@ -35,17 +39,20 @@ export default function routes(app, addon) {
 
             // TODO: improve the logic to pick value.
             const question = messages[0].content.parts[0]
-            // TODO: remote the hard-code host
-            const response = await fetch('http://localhost:5001/v1/ask', {
+            
+            const data = {
+                "question": question,
+                "product_id": req.context.addonKey, // e.g. 'gptdock-confluence'
+                "user_id": req.context.userAccountId, // e.g. '557058:3731f189-7e58-46c0-b5c7-697c5a021aee'
+                "client_id": req.context.clientKey, // e.g. 'aa4a743a-201f-38c4-b7fd-d7f8f68ec685'
+                "license": req.context.license, // could be undefined in local dev env
+                "stream": true
+            };
+            console.log(`Calling ${ASK_API_URL} with`, data);
+            const response = await fetch(ASK_API_URL, {
                 method: "POST",
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer localhost' },
-                body: JSON.stringify({
-                    "question": question,
-                    "product_id": "1234", // TODO: replace to variable
-                    "user_id": "1234", // TODO: replace to variable
-                    "client_id": "1234", // TODO: replace to variable
-                    "stream": true
-                })
+                headers: { 'Content-Type': 'application/json', 'Authorization': ASK_API_AUTH_TOKEN },
+                body: JSON.stringify(data)
             })
 
             response.body.pipe(res)
