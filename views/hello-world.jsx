@@ -84,42 +84,39 @@ const FormDefaultExample = () => {
         },
       });
 
-      // TODO: abstract to a lib function
-      const decoder = new TextDecoder()
+      const decoder = new TextDecoder();
       const reader = response.body.getReader();
 
       let done = false;
-      const resultStrArr = []
+      let buffer = "";
 
       while (!done) {
-        const {value, done: doneReading} = await reader.read();
+        const { value, done: doneReading } = await reader.read();
         done = doneReading;
         const chunkValue = decoder.decode(value);
-        resultStrArr.concat()
-        const strArr = chunkValue.split(`\n`).map(item => item.replace('data: ', ''))
-        console.debug('strArr', strArr);
-        for (let i in strArr) {
-          if (strArr[i]) {
-            // if strArr[i] is '[DONE]', then it is the last message. Set done to true.
-            if (strArr[i] === '[DONE]') {
-              done = true
-              break
-            }
+        buffer += chunkValue;
+
+        const lines = buffer.split("\n");
+        while (lines.length > 1) {
+          const line = lines.shift();
+          if (line.startsWith("data: ")) {
+            const jsonString = line.replace("data: ", "");
             try {
-              const json = JSON.parse(strArr[i])
-              if (json) {
-                if (json.choices[0].delta) {
-                  const text = json.choices[0].delta.content || ''
-                  setMessages(prev => prev + text)
-                }
+              const json = JSON.parse(jsonString);
+              if (json && json.choices && json.choices[0] && json.choices[0].delta) {
+                const text = json.choices[0].delta.content || "";
+                setMessages((prev) => prev + text);
               }
             } catch (e) {
-              console.error(e);
-              console.debug(chunkValue);
+              // If JSON is incomplete or invalid, add the line back to the buffer
+              // and wait for the next chunk.
+              buffer = line;
+              break;
             }
           }
         }
       }
+
     } catch (e) {
       console.warn(e)
       // TODO: should not set the error message.
