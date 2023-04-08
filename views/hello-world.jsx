@@ -97,7 +97,7 @@ const FormDefaultExample = () => {
         buffer += chunkValue;
 
         const lines = buffer.split("\n");
-        while (lines.length > 1) {
+        while (lines.length > 0) {
           const line = lines.shift();
           if (line.startsWith("data: ")) {
             const jsonString = line.replace("data: ", "");
