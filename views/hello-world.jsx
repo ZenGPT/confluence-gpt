@@ -198,6 +198,7 @@ const FormDefaultExample = () => {
                     >
                       Submit
                     </LoadingButton>
+                    <Button type={'button'} appearance={'subtle'} onClick={() => {AP.dialog.close()}}>Close</Button>
                   </ButtonGroup>
                 </FormFooter>
               </form>
