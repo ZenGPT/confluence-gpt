@@ -158,7 +158,7 @@ const FormDefaultExample = () => {
 
   return (
     <Page>
-      {/*<DebugComponent/>*/}
+      <DebugComponent/>
       <Wrapper>
         <PreDefinedPrompts onSelect={handleSelect}/>
         <ChatBox>
