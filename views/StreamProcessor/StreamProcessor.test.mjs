@@ -1,46 +1,76 @@
-// processStream.test.js
-import { processStream } from './StreamProcessor';
+// processStream.test.mjs
+import { processStream } from './StreamProcessor.mjs';
 
-// A mock ReadableStreamDefaultReader for testing
-class MockReader {
-  constructor(chunks) {
-    this.chunks = chunks;
-    this.index = 0;
-  }
 
-  async read() {
-    if (this.index < this.chunks.length) {
-      return { value: this.chunks[this.index++], done: false };
-    } else {
-      return { value: undefined, done: true };
-    }
-  }
-}
-
-describe('processStream1', function () {
-  it('processStream receives messages correctly', async () => {
-    // Test data
-    const streamData = [
-      "data: {\"id\": \"chatcmpl-72vOaELB8DHU8lf4W8I6Odxv2XsGh\", \"object\": \"chat.completion.chunk\", \"created\": 1680931640, \"model\": \"gpt-3.5-turbo-0301\", \"choices\": [{\"delta\": {\"content\": \" idea\"}, \"index\": 0, \"finish_reason\": null}]}\n",
-      "data: {\"id\": \"chatcmpl-72vOaELB8DHU8lf4W8I6Odxv2XsGh\", \"object\": \"chat.completion.chunk\", \"created\": 1680931640, \"model\": \"gpt-3.5-turbo-0301\", \"choices\": [{\"delta\": {\"content\": \" of\"}, \"index\": 0, \"finish_reason\": null}]}\n",
-      "data: {\"id\": \"chatcmpl-72vOaELB8DHU8lf4W8I6Odxv2XsGh\", \"object\": \"chat.completion.chunk\", \"created\": 1680931640, \"model\": \"gpt-3.5-turbo-0301\", \"choices\": [{\"delta\": {\"content\": \" the\"}, \"index\": 0, \"finish_reason\": null}]}\n",
-      "data: {\"id\": \"chatcmpl-72vOaELB8DHU8lf4W8I6Odxv2XsGh\", \"object\": \"chat.completion.chunk\", \"created\": 1680931640, \"model\": \"gpt-3.5-turbo-0301\", \"choices\": [{\"delta\": {\"content\": \" main\"}, \"index\": 0, \"finish_reason\": null}]}\n",
+test('processStream handles incomplete data correctly', async () => {
+  const createMockReader = () => {
+    const testData = [
+      'data: {"id": "chatcmpl-72vOaELB8DHU8lf4W8I6Odxv2XsGh", "object": "chat.completion.chunk", "created": 1680931640, "model": "gpt-3.5-turbo-0301", "choices": [{"delta": {"content": " where"}, "index": 0, "finish_reason": null}]}\n' +
+      'data: {"id": "chatcmpl-72vOaELB8DHU8lf4W8I6Odxv2XsGh", "object": "chat.completion.chunk", "created": 1680931640, "model": "gpt-3.5-turbo-0301", "choices": [{"delta": {"content": " are"}, "index": 0, "finish_reason": null}]}\n' +
+      'data: {"id": "chatcmpl-72vOaELB8DHU8lf4W8I6Odxv2XsGh"',
+      ', "object": "chat.completion.chunk", "created": 1680931640, "model": "gpt-3.5-turbo-0301", "choices": [{"delta": {"content": " you"}, "index": 0, "finish_reason": null}]}\n',
     ];
 
-    // Create the mock reader with test data
-    const reader = new MockReader(streamData.map((chunk) => new TextEncoder().encode(chunk)));
+    let readIndex = 0;
 
-    // Initialize an empty array to store the received messages
-    const messages = [];
+    return {
+      read: async () => {
+        if (readIndex < testData.length) {
+          const value = new TextEncoder().encode(testData[readIndex]);
+          readIndex += 1;
+          return { value, done: false };
+        } else {
+          return { value: undefined, done: true };
+        }
+      },
+    };
+  };
 
-    // Call the processStream function with the mock reader and a callback to store received messages
-    await processStream(reader, (message) => {
-      messages.push(message);
-    });
+  const mockReader = createMockReader();
+  let receivedText = '';
 
-    // Verify that the expected messages were received
-    const expectedMessages = [" idea", " of", " the", " main"];
-    expect(messages).toEqual(expectedMessages);
-  })
+  const messageCallback = (text) => {
+    receivedText += text;
+  };
+
+  await processStream(mockReader, messageCallback);
+
+  expect(receivedText).toBe(' where are you');
 });
 
+test('data closed with [DONE]', async () => {
+  console.log('data closed with [DONE]');
+  const createMockReader = () => {
+    const testData = [
+      'data: {"id": "chatcmpl-72vOaELB8DHU8lf4W8I6Odxv2XsGh", "object": "chat.completion.chunk", "created": 1680931640, "model": "gpt-3.5-turbo-0301", "choices": [{"delta": {"content": " where"}, "index": 0, "finish_reason": null}]}\n' +
+      'data: {"id": "chatcmpl-72vOaELB8DHU8lf4W8I6Odxv2XsGh", "object": "chat.completion.chunk", "created": 1680931640, "model": "gpt-3.5-turbo-0301", "choices": [{"delta": {"content": " are"}, "index": 0, "finish_reason": null}]}\n' +
+      'data: [DONE]\n',
+    ];
+
+    let readIndex = 0;
+
+    return {
+      read: async () => {
+        if (readIndex < testData.length) {
+          const value = new TextEncoder().encode(testData[readIndex]);
+          readIndex += 1;
+          return { value, done: false };
+        } else {
+          return { value: undefined, done: true };
+        }
+      },
+    };
+  };
+
+
+  const mockReader = createMockReader();
+  let receivedText = '';
+
+  const messageCallback = (text) => {
+    receivedText += text;
+  };
+
+  await processStream(mockReader, messageCallback);
+
+  expect(receivedText).toBe(' where are you');
+});
