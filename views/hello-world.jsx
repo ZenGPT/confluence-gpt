@@ -115,6 +115,7 @@ const FormDefaultExample = () => {
               }
             } catch (e) {
               console.error(e);
+              console.debug(chunkValue);
             }
           }
         }
