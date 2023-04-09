@@ -8,3 +8,4 @@ credentials.json
 views/*.js
 views/*.js.map
 views/node
+coverage
