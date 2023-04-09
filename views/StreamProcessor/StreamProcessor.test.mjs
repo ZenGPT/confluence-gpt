@@ -1,22 +1,6 @@
 // processStream.test.mjs
 import {processStream} from './StreamProcessor.mjs';
-
-const createMockReader = (data) => {
-  let readIndex = 0;
-
-  return {
-    // The test data will be sent one record per read
-    read: async () => {
-      if (readIndex < data.length) {
-        const value = new TextEncoder().encode(data[readIndex]);
-        readIndex += 1;
-        return { value, done: false };
-      } else {
-        return { value: undefined, done: true };
-      }
-    },
-  };
-};
+import {createMockReader} from './MockReader.mjs';
 
 test('processStream handles incomplete data correctly', async () => {
   const testData = [
