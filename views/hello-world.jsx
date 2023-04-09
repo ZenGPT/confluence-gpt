@@ -92,37 +92,6 @@ const FormDefaultExample = () => {
       await processStream(reader, (text) => {
         setMessages(prev => prev + text)
       });
-      // let done = false;
-      // const resultStrArr = []
-      //
-      // while (!done) {
-      //   const {value, done: doneReading} = await reader.read();
-      //   done = doneReading;
-      //   const chunkValue = decoder.decode(value);
-      //   resultStrArr.concat()
-      //   const strArr = chunkValue.split(`\n`).map(item => item.replace('data: ', ''))
-      //   console.debug('strArr', strArr);
-      //   for (let i in strArr) {
-      //     if (strArr[i]) {
-      //       // if strArr[i] is '[DONE]', then it is the last message. Set done to true.
-      //       if (strArr[i] === '[DONE]') {
-      //         done = true
-      //         break
-      //       }
-      //       try {
-      //         const json = JSON.parse(strArr[i])
-      //         if (json) {
-      //           if (json.choices[0].delta) {
-      //             const text = json.choices[0].delta.content || ''
-      //             setMessages(prev => prev + text)
-      //           }
-      //         }
-      //       } catch (e) {
-      //         console.error(e);
-      //       }
-      //     }
-      //   }
-      // }
     } catch (e) {
       console.warn(e)
       // TODO: should not set the error message.
