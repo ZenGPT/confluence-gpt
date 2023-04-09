@@ -18,6 +18,7 @@ import PreDefinedPrompts from './components/PreDefinedPrompts';
 import styled from 'styled-components'
 import DebugComponent from "./components/DebugComponent";
 import {processStream} from "./StreamProcessor/StreamProcessor.mjs";
+import remarkGfm from "remark-gfm";
 
 const Page = styled.div`
   display: flex;
@@ -91,37 +92,6 @@ const FormDefaultExample = () => {
       await processStream(reader, (text) => {
         setMessages(prev => prev + text)
       });
-      // let done = false;
-      // const resultStrArr = []
-      //
-      // while (!done) {
-      //   const {value, done: doneReading} = await reader.read();
-      //   done = doneReading;
-      //   const chunkValue = decoder.decode(value);
-      //   resultStrArr.concat()
-      //   const strArr = chunkValue.split(`\n`).map(item => item.replace('data: ', ''))
-      //   console.debug('strArr', strArr);
-      //   for (let i in strArr) {
-      //     if (strArr[i]) {
-      //       // if strArr[i] is '[DONE]', then it is the last message. Set done to true.
-      //       if (strArr[i] === '[DONE]') {
-      //         done = true
-      //         break
-      //       }
-      //       try {
-      //         const json = JSON.parse(strArr[i])
-      //         if (json) {
-      //           if (json.choices[0].delta) {
-      //             const text = json.choices[0].delta.content || ''
-      //             setMessages(prev => prev + text)
-      //           }
-      //         }
-      //       } catch (e) {
-      //         console.error(e);
-      //       }
-      //     }
-      //   }
-      // }
     } catch (e) {
       console.warn(e)
       // TODO: should not set the error message.
@@ -213,7 +183,7 @@ const FormDefaultExample = () => {
           {/* TODO: integrate with the API response */}
           <div style={{width: '100%', display: 'flex', flexDirection: 'flex-row', justifyContent: 'flex-start', overflowY: 'hidden'}}>
             <div className={'content'} style={{flexGrow: 1, overflowY: 'scroll'}}>
-              <ReactMarkdown children={messages}/>
+              <ReactMarkdown children={messages} remarkPlugins={[remarkGfm]}/>
             </div>
             {messages && (
                 <InlineDialog
