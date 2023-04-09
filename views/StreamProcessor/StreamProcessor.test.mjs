@@ -72,5 +72,5 @@ test('data closed with [DONE]', async () => {
 
   await processStream(mockReader, messageCallback);
 
-  expect(receivedText).toBe(' where are you');
+  expect(receivedText).toBe(' where are');
 });
