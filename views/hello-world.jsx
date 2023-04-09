@@ -18,6 +18,7 @@ import PreDefinedPrompts from './components/PreDefinedPrompts';
 import styled from 'styled-components'
 import DebugComponent from "./components/DebugComponent";
 import {processStream} from "./StreamProcessor/StreamProcessor.mjs";
+import remarkGfm from "remark-gfm";
 
 const Page = styled.div`
   display: flex;
@@ -213,7 +214,7 @@ const FormDefaultExample = () => {
           {/* TODO: integrate with the API response */}
           <div style={{width: '100%', display: 'flex', flexDirection: 'flex-row', justifyContent: 'flex-start', overflowY: 'hidden'}}>
             <div className={'content'} style={{flexGrow: 1, overflowY: 'scroll'}}>
-              <ReactMarkdown children={messages}/>
+              <ReactMarkdown children={messages} remarkPlugins={[remarkGfm]}/>
             </div>
             {messages && (
                 <InlineDialog
