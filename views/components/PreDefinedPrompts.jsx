@@ -18,7 +18,7 @@ const PreDefinedPrompts = ({ onSelect }) => {
     <ListWrapper>
       <StyledHeading level='h400'>Predefined Prompts</StyledHeading>
       {PRE_DEFINED_PROMPTS.map((prompt) => (
-        <PromptCard key={prompt} content={prompt} onClick={onSelect}/>
+        <PromptCard key={prompt.title} title = {prompt.title} content={prompt.prompt} onClick={onSelect}/>
       ))}
     </ListWrapper>
   );

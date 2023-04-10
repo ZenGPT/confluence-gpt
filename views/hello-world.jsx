@@ -211,6 +211,7 @@ const FormDefaultExample = () => {
                       <Fragment>
                         <TextArea
                           ref={inputRef}
+                          resize="auto"
                           placeholder='e.g. Write a Job Description for Senior DevOps Engineer'
                           {...fieldProps}
                         />
