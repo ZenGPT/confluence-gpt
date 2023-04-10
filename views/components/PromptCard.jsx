@@ -13,10 +13,10 @@ const CardWrapper = styled.div`
   }
 `;
 
-const PromptCard = ({ content, onClick }) => {
+const PromptCard = ({title, content, onClick }) => {
   return (
     <CardWrapper onClick={() => onClick(content)}>
-      { content }
+      { title }
     </CardWrapper>
   )
 };

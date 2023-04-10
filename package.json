@@ -63,7 +63,7 @@
     "eslint": "^7.10.0",
     "eslint-plugin-react": "^7.21.3",
     "longjohn": "^0.2.12",
-    "ngrok": "^3.4.1",
+    "ngrok": "^4.3.3",
     "nodemon": "^2.0.4",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-externals": "^0.5.1",
