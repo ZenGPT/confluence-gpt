@@ -153,8 +153,8 @@ const FormDefaultExample = () => {
                         />
                         <HelperMessage>
                           Go to{' '}
-                          <a
-                            href={`https://github.com/ZenGPT/confluence-gpt/wiki/Crafting-Effective-Prompts-for-the-GPT-Powered-Confluence-Add-On---GPT-Dock-for-Confluence`}
+                          <a target='_blank' rel="noreferrer"
+                            href={`https://github.com/ZenGPT/confluence-gpt/wiki/Crafting-Effective-Prompts`}
                           >
                             Crafting Effective Prompts
                           </a>{' '}
