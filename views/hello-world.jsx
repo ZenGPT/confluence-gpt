@@ -141,9 +141,9 @@ const FormDefaultExample = () => {
           <Form onSubmit={onSubmit}>
             {({formProps, submitting}) => (
               <form {...formProps}>
-                <FormHeader title='Queries'/>
+                <FormHeader title='Your Prompts'/>
                 <FormSection>
-                  <Field label='Enter your request here:' name='query'>
+                  <Field name='query'>
                     {({fieldProps}) => (
                       <Fragment>
                         <TextArea
@@ -153,10 +153,10 @@ const FormDefaultExample = () => {
                         />
                         <HelperMessage>
                           Go to{' '}
-                          <a
-                            href={`https://www.gptdock.com/how-to-ask-questions`}
+                          <a target='_blank' rel="noreferrer"
+                            href={`https://github.com/ZenGPT/confluence-gpt/wiki/Crafting-Effective-Prompts`}
                           >
-                            How to ask questions
+                            Crafting Effective Prompts
                           </a>{' '}
                           for more information.
                         </HelperMessage>
