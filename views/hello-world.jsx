@@ -164,6 +164,9 @@ const FormDefaultExample = () => {
     inputRef.current.value = prompt
     // TODO: form query does not update
     setCurrentPrompt(prompt)
+    inputRef.current.style.height = 'auto';
+    const scrollHeight = inputRef.current.scrollHeight
+    inputRef.current.style.height =  scrollHeight + 'px';
   }
 
   const getTokenUsageRatio = async () => {
@@ -211,7 +214,8 @@ const FormDefaultExample = () => {
                       <Fragment>
                         <TextArea
                           ref={inputRef}
-                          resize="auto"
+                          resize='smart'
+                          value={currentPrompt}
                           placeholder='e.g. Write a Job Description for Senior DevOps Engineer'
                           {...fieldProps}
                         />
