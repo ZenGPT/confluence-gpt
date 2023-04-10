@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, useEffect} from 'react';
 import ButtonGroup from '@atlaskit/button/button-group';
 import LoadingButton from '@atlaskit/button/loading-button';
 import Button from '@atlaskit/button/standard-button';
@@ -7,6 +7,7 @@ import CopyIcon from '@atlaskit/icon/glyph/copy';
 import InlineDialog from '@atlaskit/inline-dialog';
 import ReactMarkdown from 'react-markdown';
 import TextArea from '@atlaskit/textarea';
+import ProgressBar from '@atlaskit/progress-bar';
 import Form, {
   Field,
   FormFooter,
@@ -19,6 +20,10 @@ import styled from 'styled-components'
 import DebugComponent from "./components/DebugComponent";
 import {processStream} from "./StreamProcessor/StreamProcessor.mjs";
 import remarkGfm from "remark-gfm";
+import SectionMessage, { SectionMessageAction } from '@atlaskit/section-message';
+import * as clientApi from '../libs/api';
+
+const WARNING_USAGE = 0.15
 
 const Page = styled.div`
   display: flex;
@@ -39,11 +44,16 @@ const Wrapper = styled.div`
 `;
 
 const LeftBox = styled.div`
-  max-width: 320px;
+  max-width: 520px;
+  min-width: 260px;
   padding-left: 16px;
   padding-right: 16px;
   border-right: 1px solid #eeeeee;
 `
+
+const QuotaBox = styled.div`
+  margin-top: 30px;
+`;
 
 const ChatBox = styled.div`
   display: flex;
@@ -72,12 +82,15 @@ const FormDefaultExample = () => {
   // TODO: redefine the message.
   const [messages, setMessages] = React.useState('');
   const [currentPrompt, setCurrentPrompt] = React.useState('');
+  const [tokenUsageRatio, setTokenUsageRatio] = React.useState()
   const [copied, setCopied] = React.useState(false);
   const copyBtnRef = React.useRef();
   const inputRef = React.useRef();
+  const hasError = messages.startsWith('An error occurred')
 
   let onSubmit = async (data) => {
     setMessages('')
+    // TODO: move this part to /libs/api
     // try fetch data from server, if error, set error message, if success, set success message
     try {
       const token = await AP.context.getToken();
@@ -112,6 +125,7 @@ const FormDefaultExample = () => {
       await processStream(reader, (text) => {
         setMessages(prev => prev + text)
       });
+      await getTokenUsageRatio()
     } catch (e) {
       console.warn(e)
       // TODO: should not set the error message.
@@ -152,12 +166,39 @@ const FormDefaultExample = () => {
     setCurrentPrompt(prompt)
   }
 
+  const getTokenUsageRatio = async () => {
+    const quotaData = await clientApi.queryTokenUsage()
+    if (quotaData) {
+      const { max_quota, quota_used } = quotaData
+      setTokenUsageRatio((quota_used / max_quota).toFixed(2))
+    }
+  }
+
+  useEffect(() => {
+    (async () => {
+      await getTokenUsageRatio()
+    })()
+  }, [])
+
   return (
     <Page>
       <DebugComponent/>
       <Wrapper>
         <LeftBox>
           <PreDefinedPrompts onSelect={handleSelect}/>
+          {
+            1 - tokenUsageRatio <= WARNING_USAGE && <QuotaBox>
+              <SectionMessage
+                appearance="warning"
+                // TODO: add topup action button
+                actions={[]}>
+                <div>
+                  <p style={{marginBottom: '6px'}}>Token usage below {(1 - tokenUsageRatio) * 100}%</p>
+                  <ProgressBar ariaLabel={`Remains {(1 - tokenUsageRatio) * 100}%`} value={1 - tokenUsageRatio} />
+                </div>
+              </SectionMessage>
+            </QuotaBox>
+          }
         </LeftBox>
         <ChatBox>
           <Form onSubmit={onSubmit}>
@@ -202,12 +243,11 @@ const FormDefaultExample = () => {
               </form>
             )}
           </Form>
-          {/* TODO: integrate with the API response */}
           <div style={{width: '100%', display: 'flex', flexDirection: 'flex-row', justifyContent: 'flex-start', overflowY: 'hidden'}}>
             <div className={'content'} style={{flexGrow: 1, overflowY: 'scroll'}}>
               <StyledMarkdown children={messages} remarkPlugins={[remarkGfm]}/>
             </div>
-            {messages && (
+            {messages && !hasError && (
                 <InlineDialog
                     onClose={() => setCopied(false)}
                     content='Copied Successful'
