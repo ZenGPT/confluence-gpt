@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 const CardWrapper = styled.div`
-  box-shadow: 0 2px 3px rgba(0,0,0,0.2);
-  padding: 8px;
+  box-shadow: var(--ds-shadow-raised,0 1px 1px rgba(9,30,66,0.25),0 0 1px rgba(9,30,66,0.31));
+  padding: 16px;
   border-radius: 3px;
   cursor: pointer;
   margin-bottom: 8px;

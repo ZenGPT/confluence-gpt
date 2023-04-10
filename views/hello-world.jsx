@@ -27,16 +27,23 @@ const Page = styled.div`
   justify-content: start;
   height: 100vh;
   width: 1024px;
-  margin: 0 20px;
+  margin: 0 auto;
 `;
 
 const Wrapper = styled.div`
   display: flex;
-  height: 100%;
+  height: auto;
   width: 100%;
   margin: 0 auto;
   overflow-y: auto;
 `;
+
+const LeftBox = styled.div`
+  max-width: 320px;
+  padding-left: 16px;
+  padding-right: 16px;
+  border-right: 1px solid #eeeeee;
+`
 
 const ChatBox = styled.div`
   display: flex;
@@ -46,6 +53,19 @@ const ChatBox = styled.div`
   width: 100%;
   margin: 0 auto;
   padding-left: 16px;
+  padding-top: 16px;
+
+  h2 {
+    line-height: 1;
+  }
+`;
+
+const StyledMarkdown = styled(ReactMarkdown)`
+  margin-top: 16px;
+
+  tr {
+    border-bottom: 1px solid  #eee;
+  }
 `;
 
 const FormDefaultExample = () => {
@@ -136,7 +156,9 @@ const FormDefaultExample = () => {
     <Page>
       <DebugComponent/>
       <Wrapper>
-        <PreDefinedPrompts onSelect={handleSelect}/>
+        <LeftBox>
+          <PreDefinedPrompts onSelect={handleSelect}/>
+        </LeftBox>
         <ChatBox>
           <Form onSubmit={onSubmit}>
             {({formProps, submitting}) => (
@@ -183,7 +205,7 @@ const FormDefaultExample = () => {
           {/* TODO: integrate with the API response */}
           <div style={{width: '100%', display: 'flex', flexDirection: 'flex-row', justifyContent: 'flex-start', overflowY: 'hidden'}}>
             <div className={'content'} style={{flexGrow: 1, overflowY: 'scroll'}}>
-              <ReactMarkdown children={messages} remarkPlugins={[remarkGfm]}/>
+              <StyledMarkdown children={messages} remarkPlugins={[remarkGfm]}/>
             </div>
             {messages && (
                 <InlineDialog
