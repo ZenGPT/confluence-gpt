@@ -3,6 +3,7 @@ const fetch = require('node-fetch')
 // TODO: remote the hard-code host
 const ASK_API_URL = 'http://localhost:5001/v1/ask';
 const ASK_API_AUTH_TOKEN = 'Bearer localhost';
+const CLIENT_INFO_API_URL = 'http://localhost:5001/v1/client/info'
 
 export default function routes(app, addon) {
     // Redirect root path to /atlassian-connect.json,
@@ -25,6 +26,17 @@ export default function routes(app, addon) {
             }
         );
     });
+
+    app.get('/client/info', addon.checkValidToken(), async (req, res) => {
+        const product_id =  req.context.addonKey
+        const client_id = req.context.clientKey
+
+        const response = await fetch(`${CLIENT_INFO_API_URL}?client_id=${client_id}&product_id=${product_id}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'Authorization': ASK_API_AUTH_TOKEN }
+        })
+        response.body.pipe(res)
+    })
 
     app.post('/conversations',
         // Require a valid token to access this resource
