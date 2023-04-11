@@ -194,7 +194,9 @@ const FormDefaultExample = () => {
               <SectionMessage
                 appearance="warning"
                 // TODO: add topup action button
-                actions={[]}>
+                actions={[
+                  <SectionMessageAction key='topup' onClick={() => window.open('https://zenuml.atlassian.net/servicedesk/customer/portals', '_blank', 'noreferrer')}>Top Up</SectionMessageAction>
+                ]}>
                 <div>
                   <p style={{marginBottom: '6px'}}>Token usage below {(1 - tokenUsageRatio) * 100}%</p>
                   <ProgressBar ariaLabel={`Remains {(1 - tokenUsageRatio) * 100}%`} value={1 - tokenUsageRatio} />
