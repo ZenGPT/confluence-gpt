@@ -5,7 +5,6 @@ import Button from '@atlaskit/button/standard-button';
 import Clipboard from 'clipboard';
 import CopyIcon from '@atlaskit/icon/glyph/copy';
 import InlineDialog from '@atlaskit/inline-dialog';
-import ReactMarkdown from 'react-markdown';
 import TextArea from '@atlaskit/textarea';
 import ProgressBar from '@atlaskit/progress-bar';
 import Form, {
@@ -19,9 +18,9 @@ import PreDefinedPrompts from './components/PreDefinedPrompts';
 import styled from 'styled-components'
 import DebugComponent from "./components/DebugComponent";
 import {processStream} from "./StreamProcessor/StreamProcessor.mjs";
-import remarkGfm from "remark-gfm";
 import SectionMessage, { SectionMessageAction } from '@atlaskit/section-message';
 import * as clientApi from '../libs/api';
+import MarkdownRenderer from "./components/MarkdownRenderer";
 
 const WARNING_USAGE = 0.15
 
@@ -67,14 +66,6 @@ const ChatBox = styled.div`
 
   h2 {
     line-height: 1;
-  }
-`;
-
-const StyledMarkdown = styled(ReactMarkdown)`
-  margin-top: 16px;
-
-  tr {
-    border-bottom: 1px solid  #eee;
   }
 `;
 
@@ -252,7 +243,7 @@ const FormDefaultExample = () => {
           </Form>
           <div style={{width: '100%', display: 'flex', flexDirection: 'flex-row', justifyContent: 'flex-start', overflowY: 'hidden'}}>
             <div className={'content'} style={{flexGrow: 1, overflowY: 'scroll'}}>
-              <StyledMarkdown children={messages} remarkPlugins={[remarkGfm]}/>
+              <MarkdownRenderer content={messages} />
             </div>
             {messages && !hasError && (
                 <InlineDialog
