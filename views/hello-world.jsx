@@ -22,6 +22,8 @@ import {processStream} from "./StreamProcessor/StreamProcessor.mjs";
 import remarkGfm from "remark-gfm";
 import SectionMessage, { SectionMessageAction } from '@atlaskit/section-message';
 import * as clientApi from '../libs/api';
+import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/prism-light';
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const WARNING_USAGE = 0.15
 
@@ -252,7 +254,24 @@ const FormDefaultExample = () => {
           </Form>
           <div style={{width: '100%', display: 'flex', flexDirection: 'flex-row', justifyContent: 'flex-start', overflowY: 'hidden'}}>
             <div className={'content'} style={{flexGrow: 1, overflowY: 'scroll'}}>
-              <StyledMarkdown children={messages} remarkPlugins={[remarkGfm]}/>
+              <StyledMarkdown children={messages} remarkPlugins={[remarkGfm]} components={{
+                code({_, inline, className, children, ...props}) {
+                  const match = /language-(\w+)/.exec(className || '')
+                  return !inline && match ? (
+                    <SyntaxHighlighter
+                      {...props}
+                      children={String(children).replace(/\n$/, '')}
+                      style={oneLight}
+                      language={match[1]}
+                      PreTag="div"
+                    />
+                  ) : (
+                    <code {...props} className={className}>
+                      {children}
+                    </code>
+                  )
+                }
+              }}/>
             </div>
             {messages && !hasError && (
                 <InlineDialog
