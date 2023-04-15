@@ -1,26 +1,34 @@
 import React from 'react';
-import PromptCard from './PromptCard';
 import { PRE_DEFINED_PROMPTS } from '../constant/prompt';
 import styled from 'styled-components';
+import {ButtonItem, MenuGroup, Section} from "@atlaskit/menu";
+import MediaServicesDocumentIcon from '@atlaskit/icon/glyph/media-services/document'
 
-const ListWrapper = styled.div`
-  padding-top: 16px;
-  position: sticky;
-`;
 
-const StyledHeading = styled.h3`
-  margin-bottom: 10px;
-  font-size: 16px;
-`;
+const Title = styled.h4`
+  margin-left: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  display: flex;
+  align-items: center;
+`
 
 const PreDefinedPrompts = ({ onSelect }) => {
   return (
-    <ListWrapper>
-      <StyledHeading level='h400'>Predefined Prompts</StyledHeading>
-      {PRE_DEFINED_PROMPTS.map((prompt) => (
-        <PromptCard key={prompt.title} title = {prompt.title} content={prompt.prompt} onClick={onSelect}/>
-      ))}
-    </ListWrapper>
+    <MenuGroup
+      maxWidth={400}
+      minWidth={320}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <Section >
+        <Title><MediaServicesDocumentIcon/>&nbsp; Predefined Prompts</Title>
+      </Section>
+      <Section hasSeparator>
+        {PRE_DEFINED_PROMPTS.map((prompt) => (
+          <ButtonItem key={prompt.title} onClick={() => onSelect(prompt.prompt)}>{prompt.title}</ButtonItem>
+        ))}
+      </Section>
+    </MenuGroup>
   );
 };
 
