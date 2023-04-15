@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>GPTDocker Editor</title>
+  <meta charset="utf-8">
+  <script type="text/javascript" src="https://connect-cdn.atl-paas.net/all.js"></script>
+</head>
+
+<script>
+  function closeDialog() {
+    AP.dialog.close();
+  }
+
+  function saveMacro() {
+    AP.confluence.saveMacro({updatedAt: new Date()}, 'example');
+    AP.dialog.close();
+  }
+</script>
+<body>
+<h1>GPTDocker Editor</h1>
+
+<div>
+  <button onclick="closeDialog()"><h1> Close </h1></button>
+  <button onclick="saveMacro()"><h1> Save </h1></button>
+</div>
+
+</body>
+</html>
