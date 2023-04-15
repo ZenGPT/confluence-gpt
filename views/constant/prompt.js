@@ -23,12 +23,13 @@ The Task model should have the following fields:
 `
   },
   {
-    title: 'Compare Azure and GCP.', prompt: `Compare Azure Functions and Google Cloud Functions in terms of the following aspects:
+    title: 'Compare Azure and GCP', prompt: `Compare Azure Functions and Google Cloud Functions in terms of the following aspects:
 - Pricing
 - Performance
 - Scalability
 - Deployment options
 - Supported programming languages
+Please create a table.
 `
   },
 ]
