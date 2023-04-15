@@ -248,7 +248,7 @@ const FormDefaultExample = () => {
             {messages && !hasError && (
                 <InlineDialog
                     onClose={() => setCopied(false)}
-                    content='Copied Successful'
+                    content='Copied!'
                     isOpen={copied}
                 >
                   <Button
