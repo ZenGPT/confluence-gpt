@@ -164,6 +164,8 @@ const FormDefaultExample = () => {
     const quotaData = await clientApi.queryTokenUsage()
     if (quotaData) {
       const { max_quota, quota_used } = quotaData
+      console.debug('max_quota', max_quota);
+      console.debug('quota_used', quota_used);
       setTokenUsageRatio((quota_used / max_quota).toFixed(2))
     }
   }
@@ -189,7 +191,7 @@ const FormDefaultExample = () => {
                   <SectionMessageAction key='topup' onClick={() => window.open('https://zenuml.atlassian.net/servicedesk/customer/portals', '_blank', 'noreferrer')}>Top Up</SectionMessageAction>
                 ]}>
                 <div>
-                  <p style={{marginBottom: '6px'}}>Token usage below {(1 - tokenUsageRatio) * 100}%</p>
+                  <p style={{marginBottom: '6px'}}>Tokens Remaining: {(1 - tokenUsageRatio).toFixed(2) * 100}%</p>
                   <ProgressBar ariaLabel={`Remains {(1 - tokenUsageRatio) * 100}%`} value={1 - tokenUsageRatio} />
                 </div>
               </SectionMessage>
