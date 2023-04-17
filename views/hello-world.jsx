@@ -1,28 +1,9 @@
-import React, {Fragment, useEffect} from 'react';
-import ButtonGroup from '@atlaskit/button/button-group';
-import LoadingButton from '@atlaskit/button/loading-button';
-import Button from '@atlaskit/button/standard-button';
-import Clipboard from 'clipboard';
-import CopyIcon from '@atlaskit/icon/glyph/copy';
-import InlineDialog from '@atlaskit/inline-dialog';
-import TextArea from '@atlaskit/textarea';
-import ProgressBar from '@atlaskit/progress-bar';
-import Form, {
-  Field,
-  FormFooter,
-  FormHeader,
-  FormSection,
-  HelperMessage,
-} from '@atlaskit/form';
-import PreDefinedPrompts from './components/PreDefinedPrompts';
 import styled from 'styled-components'
 import DebugComponent from "./components/DebugComponent";
 import {processStream} from "./StreamProcessor/StreamProcessor.mjs";
-import SectionMessage, { SectionMessageAction } from '@atlaskit/section-message';
-import * as clientApi from '../libs/api';
-import MarkdownRenderer from "./components/MarkdownRenderer";
-
-const WARNING_USAGE = 0.15
+import Conversations from "./components/Conversations";
+import MessageSender from "./components/MessageSender";
+import { v4 as uuidv4 } from 'uuid';
 
 const Page = styled.div`
   display: flex;
@@ -30,57 +11,39 @@ const Page = styled.div`
   align-items: center;
   justify-content: start;
   height: 100vh;
-  width: 1024px;
   margin: 0 auto;
+  overflow: hidden;
 `;
 
 const Wrapper = styled.div`
   display: flex;
-  height: auto;
-  width: 100%;
-  margin: 0 auto;
-  overflow-y: auto;
-`;
-
-const LeftBox = styled.div`
-  max-width: 520px;
-  min-width: 260px;
-  padding-left: 16px;
-  padding-right: 16px;
-  border-right: 1px solid #eeeeee;
-`
-
-const QuotaBox = styled.div`
-  margin-top: 30px;
-`;
-
-const ChatBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
   height: 100%;
   width: 100%;
   margin: 0 auto;
-  padding-left: 16px;
-  padding-top: 16px;
-
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+  overflow: hidden;
   h2 {
     line-height: 1;
   }
 `;
 
 const FormDefaultExample = () => {
-  // TODO: redefine the message.
-  const [messages, setMessages] = React.useState('');
-  const [currentPrompt, setCurrentPrompt] = React.useState('');
-  const [tokenUsageRatio, setTokenUsageRatio] = React.useState()
-  const [copied, setCopied] = React.useState(false);
-  const copyBtnRef = React.useRef();
-  const inputRef = React.useRef();
-  const hasError = messages.startsWith('An error occurred')
+  const [sessions, setSessions] = React.useState([]);
 
-  let onSubmit = async (data) => {
-    setMessages('')
+  const handleSubmit = React.useCallback(async (prompt) => {
+    const chat = {
+      type: 'user',
+      message: prompt,
+      id: uuidv4(),
+    }
+
+    setSessions(prev => [...prev, chat])
+    const chatId = uuidv4()
+    const newMessage = { type: 'gpt', message: '', id: chatId, loading: true};
+
+    setSessions(prev => [...prev, newMessage])
     // TODO: move this part to /libs/api
     // try fetch data from server, if error, set error message, if success, set success message
     try {
@@ -98,7 +61,7 @@ const FormDefaultExample = () => {
               role: 'user',
               content: {
                 content_type: 'text',
-                parts: [data.query || currentPrompt],
+                parts: [prompt],
               },
             },
           ],
@@ -111,155 +74,38 @@ const FormDefaultExample = () => {
       });
 
       // TODO: abstract to a lib function
-      // const decoder = new TextDecoder()
       const reader = response.body.getReader();
       await processStream(reader, (text) => {
-        setMessages(prev => prev + text)
+        setSessions(prev => {
+          const updatedSessions = prev.map(chat => {
+            if (chat.id === chatId) {
+              return { ...chat, message: chat.message + text, loading: false };
+            }
+            return chat;
+          });
+          return updatedSessions;
+        });
       });
-      await getTokenUsageRatio()
+      //   refresh qutta
     } catch (e) {
-      console.warn(e)
-      // TODO: should not set the error message.
-      setMessages('An error occurred, please try again later.');
-    }
-  };
-
-  const handleError = React.useCallback(() => {
-    console.warn('Copy failed.');
-  }, []);
-
-  const handleSuccess = React.useCallback(() => {
-    setCopied(true);
-  }, []);
-
-  const handleCopy = React.useCallback(
-    (event) => {
-      const clipboard = new Clipboard(copyBtnRef.current, {
-        text: () => messages,
+      setSessions(prev => {
+        const updatedSessions = prev.map(chat => {
+          if (chat.id === chatId) {
+            return { ...chat, message: 'An error occurred, please try again later.', loading: false };
+          }
+          return chat;
+        });
+        return updatedSessions;
       });
-
-      clipboard.on('success', handleSuccess);
-
-      clipboard.on('error', handleError);
-
-      clipboard.onClick(event);
-
-      return () => {
-        clipboard.destroy();
-      };
-    },
-    [messages, handleError, handleSuccess]
-  );
-
-  const handleSelect = (prompt) => {
-    inputRef.current.value = prompt
-    // TODO: form query does not update
-    setCurrentPrompt(prompt)
-    inputRef.current.style.height = 'auto';
-    const scrollHeight = inputRef.current.scrollHeight
-    inputRef.current.style.height =  scrollHeight + 'px';
-  }
-
-  const getTokenUsageRatio = async () => {
-    const quotaData = await clientApi.queryTokenUsage()
-    if (quotaData) {
-      const { max_quota, quota_used } = quotaData
-      setTokenUsageRatio((quota_used / max_quota).toFixed(2))
     }
-  }
-
-  useEffect(() => {
-    (async () => {
-      await getTokenUsageRatio()
-    })()
-  }, [])
+  }, [sessions]);
 
   return (
     <Page>
       <DebugComponent/>
       <Wrapper>
-        <LeftBox>
-          <PreDefinedPrompts onSelect={handleSelect}/>
-          {
-            1 - tokenUsageRatio <= WARNING_USAGE && <QuotaBox>
-              <SectionMessage
-                appearance="warning"
-                // TODO: add topup action button
-                actions={[
-                  <SectionMessageAction key='topup' onClick={() => window.open('https://zenuml.atlassian.net/servicedesk/customer/portals', '_blank', 'noreferrer')}>Top Up</SectionMessageAction>
-                ]}>
-                <div>
-                  <p style={{marginBottom: '6px'}}>Token usage below {(1 - tokenUsageRatio) * 100}%</p>
-                  <ProgressBar ariaLabel={`Remains {(1 - tokenUsageRatio) * 100}%`} value={1 - tokenUsageRatio} />
-                </div>
-              </SectionMessage>
-            </QuotaBox>
-          }
-        </LeftBox>
-        <ChatBox>
-          <Form onSubmit={onSubmit}>
-            {({formProps, submitting}) => (
-              <form {...formProps}>
-                <FormHeader title='Your Prompts'/>
-                <FormSection>
-                  <Field name='query'>
-                    {({fieldProps}) => (
-                      <Fragment>
-                        <TextArea
-                          ref={inputRef}
-                          resize='smart'
-                          value={currentPrompt}
-                          placeholder='e.g. Write a Job Description for Senior DevOps Engineer'
-                          {...fieldProps}
-                        />
-                        <HelperMessage>
-                          Go to{' '}
-                          <a target='_blank' rel="noreferrer"
-                            href={`https://github.com/ZenGPT/confluence-gpt/wiki/Crafting-Effective-Prompts`}
-                          >
-                            Crafting Effective Prompts
-                          </a>{' '}
-                          for more information.
-                        </HelperMessage>
-                      </Fragment>
-                    )}
-                  </Field>
-                </FormSection>
-
-                <FormFooter>
-                  <ButtonGroup>
-                    <LoadingButton
-                      type='submit'
-                      appearance='primary'
-                      isLoading={submitting}
-                    >
-                      Submit
-                    </LoadingButton>
-                    <Button type={'button'} appearance={'subtle'} onClick={() => {AP.dialog.close()}}>Close</Button>
-                  </ButtonGroup>
-                </FormFooter>
-              </form>
-            )}
-          </Form>
-          <div style={{width: '100%', display: 'flex', flexDirection: 'flex-row', justifyContent: 'flex-start', overflowY: 'hidden'}}>
-            <div className={'content'} style={{flexGrow: 1, overflowY: 'scroll'}}>
-              <MarkdownRenderer content={messages} />
-            </div>
-            {messages && !hasError && (
-                <InlineDialog
-                    onClose={() => setCopied(false)}
-                    content='Copied!'
-                    isOpen={copied}
-                >
-                  <Button
-                      ref={copyBtnRef}
-                      onClick={handleCopy}
-                      iconBefore={<CopyIcon label='' size='medium'/>}
-                  />
-                </InlineDialog>
-            )}
-          </div>
-        </ChatBox>
+        <Conversations sessions={sessions} />
+        <MessageSender onSubmit={handleSubmit} />
       </Wrapper>
     </Page>
   );
