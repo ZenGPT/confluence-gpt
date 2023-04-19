@@ -103,7 +103,7 @@ const MessageSender = ({ onSubmit }) => {
     const quotaData = await clientApi.queryTokenUsage();
     if (quotaData) {
       const { max_quota, quota_used } = quotaData;
-      setTokenUsageRatio((quota_used / max_quota).toFixed(2));
+      setTokenUsageRatio(quota_used / max_quota);
     }
   }
 

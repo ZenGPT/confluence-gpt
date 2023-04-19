@@ -14,16 +14,27 @@ const Wrapper = styled.div`
 
 const WARNING_USAGE = 0.15;
 
-const QuotaWarning = (tokenUsageRatio) => {
+const QuotaWarning = ({ tokenUsageRatio }) => {
+  if (isNaN(tokenUsageRatio) || tokenUsageRatio < 0 || tokenUsageRatio > 1) {
+    console.error('Invalid tokenUsageRatio value:', tokenUsageRatio);
+    return null;
+  }
+
   if (1 - tokenUsageRatio <= WARNING_USAGE) {
     return (
       <Wrapper>
-        <span><WarningIcon size='small' primaryColor='var(--ds-icon-warning, #FF8B00)' /> Token usage below 15%</span><a href='https://zenuml.atlassian.net/servicedesk/customer/portals' target='_blank' rel='noreferrer'>Top up</a>
+        <span>
+          <WarningIcon size="small" primaryColor="var(--ds-icon-warning, #FF8B00)" />
+          Token Remaining: {((1 - tokenUsageRatio) * 100).toFixed(0)}%
+        </span>
+        <a href="https://zenuml.atlassian.net/servicedesk/customer/portals" target="_blank" rel="noreferrer">
+          Top up
+        </a>
       </Wrapper>
-    )
+    );
   }
 
-  return null
+  return null;
 };
 
 export default QuotaWarning;
