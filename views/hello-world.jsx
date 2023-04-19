@@ -1,9 +1,13 @@
+import React from 'react';
 import styled from 'styled-components'
 import DebugComponent from "./components/DebugComponent";
 import {processStream} from "./StreamProcessor/StreamProcessor.mjs";
 import Conversations from "./components/Conversations";
 import MessageSender from "./components/MessageSender";
 import { v4 as uuidv4 } from 'uuid';
+import Button from '@atlaskit/button';
+import EditorCloseIcon from '@atlaskit/icon/glyph/editor/close';
+import Tooltip from '@atlaskit/tooltip';
 
 const Page = styled.div`
   display: flex;
@@ -27,6 +31,14 @@ const Wrapper = styled.div`
   h2 {
     line-height: 1;
   }
+`;
+
+const StyledButton = styled(Button)`
+  && {
+    position: fixed;
+  }
+  top: 16px;
+  right: 16px;
 `;
 
 const FormDefaultExample = () => {
@@ -106,6 +118,11 @@ const FormDefaultExample = () => {
       <Wrapper>
         <Conversations sessions={sessions} />
         <MessageSender onSubmit={handleSubmit} />
+        <Tooltip content='Close the dialog'>
+          {(tooltipProps) => (
+            <StyledButton {...tooltipProps} type='button' appearance='primary' onClick={() => {AP.dialog.close()}} iconBefore={<EditorCloseIcon />} />
+          )}
+        </Tooltip>
       </Wrapper>
     </Page>
   );
