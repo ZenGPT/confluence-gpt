@@ -50,9 +50,18 @@ const StyledTextArea = styled(TextArea)`
 
 const ButtonBox = styled.div`
   display: flex;
+  align-items: center;
   justify-content: space-between;
   margin-top: 6px;
 `
+
+const ToolBtnBox = styled.span`
+  opacity: 0.6;
+  cursor: pointer;
+  &:hover {
+    opacity: 1;
+  }
+`;
 
 const MessageSender = ({ onSubmit }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -74,6 +83,12 @@ const MessageSender = ({ onSubmit }) => {
     inputRef.current.style.height = scrollHeight + 'px';
   }
 
+  const handleInputKeyDown = (event) => {
+    if (event.which === 13 && !event.shiftKey) {
+      event.target.form.dispatchEvent(new Event('submit', {cancelable: true}));
+    }
+  }
+
   const handleSubmit = async (data, formApi) => {
     if (!data.query) return;
     inputRef.current.value = '';
@@ -83,7 +98,6 @@ const MessageSender = ({ onSubmit }) => {
     formApi.reset();
     await getTokenUsageRatio();
   }
-
 
   const getTokenUsageRatio = async () => {
     const quotaData = await clientApi.queryTokenUsage();
@@ -108,6 +122,7 @@ const MessageSender = ({ onSubmit }) => {
               {({fieldProps}) => <StyledTextArea
                 ref={inputRef}
                 resize='smart'
+                onKeyDown={handleInputKeyDown}
                 placeholder='e.g. Write a Job Description for Senior DevOps Engineer'
                 {...fieldProps}
               />}
@@ -119,9 +134,9 @@ const MessageSender = ({ onSubmit }) => {
                 content={() => <PreDefinedPrompts onSelect={handleSelect}/>}
                 placement="bottom-start"
                 trigger={(triggerProps) => (
-                  <span {...triggerProps} onClick={() => setIsOpen(!isOpen)}>
-                      <LightbulbFilledIcon label='Predefined prompts'/>
-                    </span>
+                  <ToolBtnBox {...triggerProps} onClick={() => setIsOpen(!isOpen)}>
+                    <LightbulbFilledIcon label='Predefined prompts'/>
+                  </ToolBtnBox>
                 )}
               />
               <LoadingButton
