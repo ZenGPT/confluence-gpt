@@ -1,6 +1,6 @@
 {
     "key": "gptdock-confluence",
-    "name": "GPTDock for Confluence",
+    "name": "GPT for Confluence (AI Aide)",
     "description": "GPT based assistant for Confluence",
     "baseUrl": "{{localBaseUrl}}",
     "authentication": {
