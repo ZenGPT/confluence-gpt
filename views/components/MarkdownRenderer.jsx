@@ -7,19 +7,43 @@ import ReactMarkdown from 'react-markdown';
 import CopyIcon from '@atlaskit/icon/glyph/copy';
 import Button from '@atlaskit/button/standard-button';
 import Clipboard from 'clipboard';
+import InlineDialog from "@atlaskit/inline-dialog";
+import Spinner from '@atlaskit/spinner';
 
-const StyledMarkdown = styled(ReactMarkdown)`
-  margin-top: 16px;
+const MarkdownBox = styled.div`
+  width: 768px;
+  margin: 12px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: ${props => props.isGPT ? 'flex-end' : 'flex-start'};
+
+  &:hover {
+    .chat-footer {
+      visibility: visible;
+    }
+  }
+`;
+
+// eslint-disable-next-line no-unused-vars,react/no-children-prop
+const StyledMarkdown = styled(({primaryBg, isGPT, children, ...restProps}) => <ReactMarkdown {...restProps} children={children}/>)`
+  width: auto;
+  max-width: 520px;
+  border: 1px solid var(--ds-border, #DFE1E6);
+  padding: 6px 12px;
+  box-sizing: border-box;
+  background-color: ${props => props.isGPT ? 'var(--ds-background-neutral, rgba(9, 30, 66, 0.04))' : '#0052CC'};
+  margin-bottom: 10px;
+  color: ${props => props.isGPT ? 'var(--ds-text, #172b4d)' : '#fff'};
+  border-radius: 3px;
 
   tr {
     border-bottom: 1px solid #eee;
   }
-  
+
   p {
     font-size: 1em;
     line-height: 1.714;
     font-weight: normal;
-    margin-top: 0.75rem;
     margin-bottom: 0px;
     letter-spacing: -0.005em;
   }
@@ -44,9 +68,16 @@ const StyledButton = styled(Button)`
 `
 
 const InlineCode = styled.code`
-  background: var(--ds--code--bg-color,var(--ds-background-neutral, #F4F5F7));
+  background-color: var(--ds-background-neutral, #DFE1E6);
+  color: var(--ds-text-subtle, #42526E);
   border-radius: 3px;
   padding: 2px 0.5ch;
+`
+
+const MarkdownFooter = styled.div.attrs({className: 'chat-footer'})`
+  display: flex;
+  justify-content: flex-end;
+  visibility: hidden;
 `
 
 
@@ -80,11 +111,10 @@ const CodeBlock = ({_, inline, className, children, ...props}) => {
       />
       <SyntaxHighlighter
         {...props}
-        children={content}
         style={oneLight}
         language={match[1]}
         PreTag='div'
-      />
+      >{content}</SyntaxHighlighter>
     </CodeBlockBox>
   ) : (
     <InlineCode {...props} className={className}>
@@ -93,11 +123,65 @@ const CodeBlock = ({_, inline, className, children, ...props}) => {
   )
 }
 
-const MarkdownRenderer = ({content}) => {
+const MarkdownRenderer = ({content, loading, isGPT}) => {
+  const hasError = content.startsWith('An error occurred')
+  const copyBtnRef = React.useRef();
+  const [copied, setCopied] = React.useState(false);
+
+  const handleError = React.useCallback(() => {
+    console.warn('Copy failed.');
+  }, []);
+
+  const handleSuccess = React.useCallback(() => {
+    setCopied(true);
+  }, []);
+
+  const handleCopy = React.useCallback(
+    (event) => {
+      const clipboard = new Clipboard(copyBtnRef.current, {
+        text: () => content,
+      });
+
+      clipboard.on('success', handleSuccess);
+
+      clipboard.on('error', handleError);
+
+      clipboard.onClick(event);
+
+      return () => {
+        clipboard.destroy();
+      };
+    },
+    [content, handleError, handleSuccess]
+  );
+
   return (
-    <StyledMarkdown children={content} remarkPlugins={[remarkGfm]} components={{
-      code: CodeBlock
-    }}/>
+    <MarkdownBox isGPT={isGPT}>
+      {
+        loading ? <Spinner/> : <>
+          <StyledMarkdown isGPT={isGPT} chatMode remarkPlugins={[remarkGfm]} components={{
+            code: CodeBlock
+          }}>
+            {content}
+          </StyledMarkdown>
+          <MarkdownFooter>
+            {content && !hasError && (
+              <InlineDialog
+                onClose={() => setCopied(false)}
+                content='Copied Successful'
+                isOpen={copied}
+              >
+                <Button
+                  ref={copyBtnRef}
+                  onClick={handleCopy}
+                  iconBefore={<CopyIcon label='copy'/>}
+                />
+              </InlineDialog>
+            )}
+          </MarkdownFooter></>
+      }
+
+    </MarkdownBox>
   )
 }
 

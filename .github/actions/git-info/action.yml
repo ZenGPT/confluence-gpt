@@ -1,0 +1,11 @@
+name: 'Generate a git info file'
+description: 'Generate a git info file'
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: |
+        echo "Commit SHA: $GITHUB_SHA" > git-info.txt
+        echo "Author name: $GITHUB_ACTOR" >> git-info.txt
+        echo "Event path: $GITHUB_EVENT_PATH" >> git-info.txt
+        echo "Date and time: $(date)" >> git-info.txt
