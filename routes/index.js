@@ -49,6 +49,12 @@ export default function routes(app, addon) {
                 return
             }
 
+            if(req.context.license === 'none') {
+                //TODO: Think about frontend behaviour
+                res.send('Invalid license');
+                return;
+            }
+
             // TODO: improve the logic to pick value.
             const question = messages[0].content.parts[0]
             
