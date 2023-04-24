@@ -54,9 +54,9 @@ jobs:
           TARGET: /home/${{ secrets.HOST_USER }}/ace-server/
           EXCLUDE: "/.cache/, /.github/, /.vscode/, /.git/, /node_modules/"
           SCRIPT_AFTER: |
-            sudo pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
             cd /home/${{ secrets.HOST_USER }}/ace-server/
             npm install --production
+            sudo pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
 
   staging-install:
     name: Install staging to Confluence
