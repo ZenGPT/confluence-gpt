@@ -2,6 +2,10 @@
     "key": "gptdock-confluence",
     "name": "GPT for Confluence (AI Aide)",
     "description": "GPT based assistant for Confluence",
+    "vendor": {
+        "name": "P&D Vision",
+        "url": "https://www.zenuml.com"
+    },
     "baseUrl": "{{localBaseUrl}}",
     "authentication": {
         "type": "jwt"
