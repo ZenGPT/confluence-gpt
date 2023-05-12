@@ -31,10 +31,10 @@ class DebugComponent extends React.Component {
     const queryParams = new URLSearchParams(window.location.search);
 
     return (
-        localStorageFlag ||
-        url.includes('ngrok') ||
-        url.includes('localhost') ||
-        queryParams.get('debug') === 'true'
+      localStorageFlag ||
+      url.includes('ngrok') ||
+      url.includes('localhost') ||
+      queryParams.get('debug') === 'true'
     );
   }
 
@@ -49,14 +49,14 @@ class DebugComponent extends React.Component {
     const inIframe = this.isInIframe();
 
     return (
-        <Wrapper>
-          {inIframe && (
-              <button onClick={this.reloadIframe} style={{ marginRight: '10px' }}>
-                Reload iFrame
-              </button>
-          )}
-          {this.displayUrl()}
-        </Wrapper>
+      <Wrapper>
+        {inIframe && (
+          <button onClick={this.reloadIframe} style={{ marginRight: '10px' }}>
+            Reload iFrame
+          </button>
+        )}
+        {this.displayUrl()}
+      </Wrapper>
     );
   }
 }

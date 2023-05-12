@@ -47,7 +47,7 @@ morgan.token('url', redactJwtTokens);
 
 // Configure Handlebars
 const viewsDir = path.join(__dirname, 'views');
-const handlebarsEngine = hbs.express4({partialsDir: viewsDir});
+const handlebarsEngine = hbs.express4({ partialsDir: viewsDir });
 app.engine('hbs', handlebarsEngine);
 app.set('view engine', 'hbs');
 app.set('views', viewsDir);
@@ -58,17 +58,21 @@ addServerSideRendering(app, handlebarsEngine);
 // Atlassian security policy requirements
 // http://go.atlassian.com/security-requirements-for-cloud-apps
 // HSTS must be enabled with a minimum age of at least one year
-app.use(helmet.hsts({
-  maxAge: 31536000,
-  includeSubDomains: false
-}));
-app.use(helmet.referrerPolicy({
-  policy: ['origin']
-}));
+app.use(
+  helmet.hsts({
+    maxAge: 31536000,
+    includeSubDomains: false,
+  })
+);
+app.use(
+  helmet.referrerPolicy({
+    policy: ['origin'],
+  })
+);
 
 // Include request parsers
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Gzip responses when appropriate

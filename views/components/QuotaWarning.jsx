@@ -5,7 +5,7 @@ import WarningIcon from '@atlaskit/icon/glyph/warning';
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  background-color: var(--ds-background-warning, #FFFAE6);
+  background-color: var(--ds-background-warning, #fffae6);
   border-radius: 3px;
   padding: 4px 8px;
   margin: 8px 0 8px 0;
@@ -24,10 +24,17 @@ const QuotaWarning = ({ tokenUsageRatio }) => {
     return (
       <Wrapper>
         <span>
-          <WarningIcon size="small" primaryColor="var(--ds-icon-warning, #FF8B00)" />
+          <WarningIcon
+            size="small"
+            primaryColor="var(--ds-icon-warning, #FF8B00)"
+          />
           Token Remaining: {((1 - tokenUsageRatio) * 100).toFixed(0)}%
         </span>
-        <a href="https://zenuml.atlassian.net/servicedesk/customer/portals" target="_blank" rel="noreferrer">
+        <a
+          href="https://zenuml.atlassian.net/servicedesk/customer/portals"
+          target="_blank"
+          rel="noreferrer"
+        >
           Top up
         </a>
       </Wrapper>

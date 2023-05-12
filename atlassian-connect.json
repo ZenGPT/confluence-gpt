@@ -1,63 +1,60 @@
 {
-    "key": "gptdock-confluence",
-    "name": "GPT for Confluence (AI Aide)",
-    "description": "GPT based assistant for Confluence",
-    "vendor": {
-        "name": "P&D Vision",
-        "url": "https://www.zenuml.com"
-    },
-    "baseUrl": "{{localBaseUrl}}",
-    "authentication": {
-        "type": "jwt"
-    },
-    "lifecycle": {
-        "installed": "/installed",
-        "uninstalled": "/uninstalled"
-    },
-    "enableLicensing": true,
-    "scopes": [
-        "READ",
-        "WRITE"
+  "key": "gptdock-confluence",
+  "name": "GPT for Confluence (AI Aide)",
+  "description": "GPT based assistant for Confluence",
+  "vendor": {
+    "name": "P&D Vision",
+    "url": "https://www.zenuml.com"
+  },
+  "baseUrl": "{{localBaseUrl}}",
+  "authentication": {
+    "type": "jwt"
+  },
+  "lifecycle": {
+    "installed": "/installed",
+    "uninstalled": "/uninstalled"
+  },
+  "enableLicensing": true,
+  "scopes": ["READ", "WRITE"],
+  "apiMigrations": {
+    "signed-install": true
+  },
+  "modules": {
+    "dialogs": [
+      {
+        "url": "/hello-world?contentId={content.id}",
+        "options": {
+          "height": "100%",
+          "width": "100%",
+          "chrome": false,
+          "header": {
+            "value": "AI Aide Dialog"
+          }
+        },
+        "key": "ai-aide-dialog-key"
+      }
     ],
-    "apiMigrations":{
-        "signed-install": true
-    },
-    "modules": {
-        "dialogs": [
-            {
-                "url": "/hello-world?contentId={content.id}",
-                "options": {
-                    "height": "100%",
-                    "width": "100%",
-                    "chrome": false,
-                    "header": {
-                        "value": "AI Aide Dialog"
-                    }
-                },
-                "key": "ai-aide-dialog-key"
-            }
-        ],
-        "contentBylineItems": [
-            {
-                "context": "addon",
-                "target": {
-                    "type": "dialogmodule",
-                    "options": {
-                        "key": "ai-aide-dialog-key"
-                    }
-                },
-                "tooltip": {
-                    "value": "AI Aide"
-                },
-                "icon": {
-                    "url": "/images/ai-aide-logo.png"
-                },
-                "name": {
-                    "value": "Aide"
-                },
-                "key": "byline-item"
-            }
-        ],
-        "generalPages": [ ]
-    }
+    "contentBylineItems": [
+      {
+        "context": "addon",
+        "target": {
+          "type": "dialogmodule",
+          "options": {
+            "key": "ai-aide-dialog-key"
+          }
+        },
+        "tooltip": {
+          "value": "AI Aide"
+        },
+        "icon": {
+          "url": "/images/ai-aide-logo.png"
+        },
+        "name": {
+          "value": "Aide"
+        },
+        "key": "byline-item"
+      }
+    ],
+    "generalPages": []
+  }
 }

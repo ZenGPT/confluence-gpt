@@ -2,4 +2,4 @@
 module.exports = {
   testEnvironment: 'jest-environment-node',
   testMatch: ['**/?(*.)+(spec|test).+(js|mjs)'],
-}
+};
