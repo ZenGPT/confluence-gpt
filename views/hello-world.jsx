@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components'
 import DebugComponent from "./components/DebugComponent";
 import {processStream} from "./StreamProcessor/StreamProcessor.mjs";
@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Button from '@atlaskit/button';
 import EditorCloseIcon from '@atlaskit/icon/glyph/editor/close';
 import Tooltip from '@atlaskit/tooltip';
+import {observeDomChanges} from '../utils'
 
 const Page = styled.div`
   display: flex;
@@ -111,6 +112,11 @@ const FormDefaultExample = () => {
       });
     }
   }, [sessions]);
+
+  useEffect(() => {
+    // there is a margin on document.body, perhaps added by Confluence since I didn't found related logic in our code, remove it because it causes a unwanted scrollbar
+    observeDomChanges(document.body, () => document.body.style.margin = '0')
+  }, [])
 
   return (
     <Page>
