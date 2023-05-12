@@ -4,10 +4,12 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
   z-index: 9999;
   position: fixed;
-  bottom: 0;
+  top: 20px;
+  left: 20px;
   display: flex;
   flex-wrap: nowrap;
   font-size: 12px;
+  max-width: calc(100vw - 80px);
 `;
 
 class DebugComponent extends React.Component {
@@ -49,7 +51,7 @@ class DebugComponent extends React.Component {
     return (
         <Wrapper>
           {inIframe && (
-              <button onClick={this.reloadIframe} style={{ marginLeft: '10px' }}>
+              <button onClick={this.reloadIframe} style={{ marginRight: '10px' }}>
                 Reload iFrame
               </button>
           )}
