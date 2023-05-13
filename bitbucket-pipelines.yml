@@ -2,6 +2,6 @@ image: node:12
 
 pipelines:
   default:
-  - step:
-      script:
-      - npm ci
+    - step:
+        script:
+          - npm ci

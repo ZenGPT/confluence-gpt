@@ -31,7 +31,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_IP }}
           REMOTE_USER: ${{ secrets.HOST_USER }}
           TARGET: /home/${{ secrets.HOST_USER }}/ace-server/
-          EXCLUDE: "/.cache/, /.github/, /.vscode/, /.git/, /node_modules/"
+          EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/'
           SCRIPT_AFTER: |
             cd /home/${{ secrets.HOST_USER }}/ace-server/
             npm install --production

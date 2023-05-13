@@ -4,9 +4,9 @@ on:
   push:
     tags-ignore:
       - '**' # do not run on tags
-    branches: [ "main", "staging/**" ]
+    branches: ['main', 'staging/**']
   pull_request:
-    branches: [ "main", "staging/**" ]
+    branches: ['main', 'staging/**']
 
 jobs:
   test:
@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: '16'
           cache: npm
       - name: Install dependencies
         run: npm install
@@ -37,7 +37,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: '16'
           cache: npm
       - name: Install dependencies
         run: npm install
@@ -52,7 +52,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_IP }}
           REMOTE_USER: ${{ secrets.HOST_USER }}
           TARGET: /home/${{ secrets.HOST_USER }}/ace-server/
-          EXCLUDE: "/.cache/, /.github/, /.vscode/, /.git/, /node_modules/"
+          EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/'
           SCRIPT_AFTER: |
             cd /home/${{ secrets.HOST_USER }}/ace-server/
             npm install --production
@@ -89,7 +89,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: '16'
           cache: npm
       - name: Install dependencies
         run: npm install

@@ -4,10 +4,12 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
   z-index: 9999;
   position: fixed;
-  bottom: 0;
+  top: 20px;
+  left: 20px;
   display: flex;
   flex-wrap: nowrap;
   font-size: 12px;
+  max-width: calc(100vw - 80px);
 `;
 
 class DebugComponent extends React.Component {
@@ -29,10 +31,10 @@ class DebugComponent extends React.Component {
     const queryParams = new URLSearchParams(window.location.search);
 
     return (
-        localStorageFlag ||
-        url.includes('ngrok') ||
-        url.includes('localhost') ||
-        queryParams.get('debug') === 'true'
+      localStorageFlag ||
+      url.includes('ngrok') ||
+      url.includes('localhost') ||
+      queryParams.get('debug') === 'true'
     );
   }
 
@@ -47,14 +49,14 @@ class DebugComponent extends React.Component {
     const inIframe = this.isInIframe();
 
     return (
-        <Wrapper>
-          {inIframe && (
-              <button onClick={this.reloadIframe} style={{ marginLeft: '10px' }}>
-                Reload iFrame
-              </button>
-          )}
-          {this.displayUrl()}
-        </Wrapper>
+      <Wrapper>
+        {inIframe && (
+          <button onClick={this.reloadIframe} style={{ marginRight: '10px' }}>
+            Reload iFrame
+          </button>
+        )}
+        {this.displayUrl()}
+      </Wrapper>
     );
   }
 }

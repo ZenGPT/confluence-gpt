@@ -1,8 +1,8 @@
 import express from 'express';
-import path from "path";
+import path from 'path';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { ServerStyleSheet } from 'styled-components'
+import { ServerStyleSheet } from 'styled-components';
 
 export function addServerSideRendering(app, handlebarsEngine) {
   const devEnv = app.get('env') === 'development';
@@ -11,8 +11,11 @@ export function addServerSideRendering(app, handlebarsEngine) {
   app.use(express.static(viewsDir));
   const ssrEngine = function (viewFile, options, callback) {
     // Allow specifying the template by the name of the source file or the transpiled file
-    const viewFilePath = viewFile.replace(/\.jsx$/,'.js');
-    const relativeViewFilePath = path.join('/', path.relative(viewsDir, viewFilePath));
+    const viewFilePath = viewFile.replace(/\.jsx$/, '.js');
+    const relativeViewFilePath = path.join(
+      '/',
+      path.relative(viewsDir, viewFilePath)
+    );
     // The `build` script produces a nodejs-friendly and a browser-friendly version of the view.
     const nodeViewPath = path.join(viewsDir, 'node', relativeViewFilePath);
     const props = { ...options };
@@ -30,7 +33,7 @@ export function addServerSideRendering(app, handlebarsEngine) {
     try {
       const ssrOptions = {
         body: '',
-        styleTags: ''
+        styleTags: '',
       };
       // Provide an option for skipping server-side rendering in case it causes issues or is simply not necessary.
       if (!options.browserOnly) {
@@ -40,7 +43,10 @@ export function addServerSideRendering(app, handlebarsEngine) {
         // Dynamically require the component file that was requested. Assume the root component is the default export.
         // Ensure we pick up the latest version if we're running in dev mode.
         if (devEnv) delete require.cache[nodeViewPath];
-        const rootElement = React.createElement(require(nodeViewPath).default, props);
+        const rootElement = React.createElement(
+          require(nodeViewPath).default,
+          props
+        );
         ssrOptions.body = renderToString(sheet.collectStyles(rootElement));
         ssrOptions.styleTags = sheet.getStyleTags();
       }
@@ -48,21 +54,27 @@ export function addServerSideRendering(app, handlebarsEngine) {
         ...options,
         ...ssrOptions,
         // React is configured as an "external" so we can share a cached, CDN-delivered version between pages.
-        reactSource: `//unpkg.com/react@16/umd/react.${devEnv ? 'development' : 'production.min'}.js`,
-        reactDomSource: `//unpkg.com/react-dom@16/umd/react-dom.${devEnv ? 'development' : 'production.min'}.js`,
+        reactSource: `//unpkg.com/react@16/umd/react.${
+          devEnv ? 'development' : 'production.min'
+        }.js`,
+        reactDomSource: `//unpkg.com/react-dom@16/umd/react-dom.${
+          devEnv ? 'development' : 'production.min'
+        }.js`,
         rootComponentSource: relativeViewFilePath,
         // Supply props for rendering / hydration
-        props: JSON.stringify(props)
+        props: JSON.stringify(props),
       };
       const layoutTemplate = path.join(viewsDir, 'react-layout.hbs');
-      return handlebarsEngine(
-        layoutTemplate,
-        viewOptions,
-        callback
-      );
+      return handlebarsEngine(layoutTemplate, viewOptions, callback);
     } catch (e) {
       if (e && e.code === 'MODULE_NOT_FOUND') {
-        return callback(new Error(`Could not load the component ${path.basename(viewFile)}. Did you run \`npm build\` to compile your jsx files?`));
+        return callback(
+          new Error(
+            `Could not load the component ${path.basename(
+              viewFile
+            )}. Did you run \`npm build\` to compile your jsx files?`
+          )
+        );
       }
       return callback(e);
     } finally {
@@ -72,4 +84,3 @@ export function addServerSideRendering(app, handlebarsEngine) {
   app.engine('.js', ssrEngine);
   app.engine('.jsx', ssrEngine);
 }
-
