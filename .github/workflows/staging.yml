@@ -80,6 +80,9 @@ jobs:
     needs: staging-install
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -96,11 +99,10 @@ jobs:
         id: properties
         run: echo "version=$(date +'%Y.%m.%d%H%M')" >> $GITHUB_OUTPUT
       - name: Create release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.properties.outputs.version }}
-          release_name: v${{ steps.properties.outputs.version }}
           body: 'New release'
           draft: true
