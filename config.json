@@ -49,7 +49,10 @@
       "dialect": "sqlite3",
       "logging": false,
       "type": "memory"
-    }
+    },
+    "allowedBaseUrls" : [
+        "https://confluence-plugin.pages.dev/"
+    ]
   },
   // Configuration for production, which is enabled by setting
   // the NODE_ENV=production environment variable.
@@ -74,6 +77,9 @@
       "*.atlassian.net",
       "*.atlassian.com",
       "*.jira.com"
+    ],
+    "allowedBaseUrls" : [
+        "https://confluence-plugin.pages.dev/"
     ]
   },
   "product": "confluence"
