@@ -1,7 +1,7 @@
 import remarkGfm from 'remark-gfm';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/prism-light';
 import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-import React, { useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import ReactMarkdown from 'react-markdown';
 import CopyIcon from '@atlaskit/icon/glyph/copy';
@@ -25,13 +25,12 @@ const MarkdownBox = styled.div`
 `;
 
 // eslint-disable-next-line no-unused-vars,react/no-children-prop
-const StyledMarkdown = styled(
-  ({ primaryBg, isGPT, children, ...restProps }) => (
-    <ReactMarkdown {...restProps} children={children} />
-  )
-)`
+const StyledMarkdown = styled(({ children, ...restProps }) => (
+  <ReactMarkdown {...restProps}>{children}</ReactMarkdown>
+))`
   width: auto;
   max-width: 520px;
+  min-height: 38px;
   border: 1px solid var(--ds-border, #dfe1e6);
   padding: 6px 12px;
   box-sizing: border-box;
@@ -87,12 +86,16 @@ const MarkdownFooter = styled.div.attrs({ className: 'chat-footer' })`
   visibility: hidden;
 `;
 
+const ErrorMessage = styled('div')`
+  color: var(--ds-text-danger, #ae2a19);
+`;
+
 const CodeBlock = ({ _, inline, className, children, ...props }) => {
   const match = /language-(\w+)/.exec(className || '');
   const content = String(children).replace(/\n$/, '');
   const copyBtnRef = useRef();
 
-  const handleCopy = React.useCallback(
+  const handleCopy = useCallback(
     (event) => {
       const clipboard = new Clipboard(copyBtnRef.current, {
         text: () => content,
@@ -130,20 +133,19 @@ const CodeBlock = ({ _, inline, className, children, ...props }) => {
   );
 };
 
-const MarkdownRenderer = ({ content, loading, isGPT }) => {
-  const hasError = content.startsWith('An error occurred');
-  const copyBtnRef = React.useRef();
-  const [copied, setCopied] = React.useState(false);
+const MarkdownRenderer = ({ content, loading, isGPT, error }) => {
+  const copyBtnRef = useRef();
+  const [copied, setCopied] = useState(false);
 
-  const handleError = React.useCallback(() => {
+  const handleError = useCallback(() => {
     console.warn('Copy failed.');
   }, []);
 
-  const handleSuccess = React.useCallback(() => {
+  const handleSuccess = useCallback(() => {
     setCopied(true);
   }, []);
 
-  const handleCopy = React.useCallback(
+  const handleCopy = useCallback(
     (event) => {
       const clipboard = new Clipboard(copyBtnRef.current, {
         text: () => content,
@@ -168,18 +170,29 @@ const MarkdownRenderer = ({ content, loading, isGPT }) => {
         <Spinner />
       ) : (
         <>
-          <StyledMarkdown
-            isGPT={isGPT}
-            chatMode
-            remarkPlugins={[remarkGfm]}
-            components={{
-              code: CodeBlock,
-            }}
-          >
-            {content}
-          </StyledMarkdown>
+          {content && (
+            <StyledMarkdown
+              isGPT={isGPT}
+              chatMode
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code: CodeBlock,
+              }}
+            >
+              {content}
+            </StyledMarkdown>
+          )}
+          {error && (
+            <ErrorMessage>
+              An error occurred. Please try again laster, or submit a ticket at{' '}
+              <a href="https://zenuml.atlassian.net/servicedesk/customer/portals">
+                our portal
+              </a>
+              .
+            </ErrorMessage>
+          )}
           <MarkdownFooter>
-            {content && !hasError && (
+            {content && (
               <InlineDialog
                 onClose={() => setCopied(false)}
                 content="Copied Successful"

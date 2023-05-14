@@ -1,5 +1,5 @@
 import Form, { Field, HelperMessage } from '@atlaskit/form';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Popup from '@atlaskit/popup';
 import PreDefinedPrompts from './PreDefinedPrompts';
 import LightbulbFilledIcon from '@atlaskit/icon/glyph/lightbulb-filled';
@@ -68,12 +68,12 @@ const ToolBtnBox = styled.span`
 `;
 
 const MessageSender = ({ onSubmit }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [currentPrompt, setCurrentPrompt] = React.useState('');
-  const [tokenUsageRatio, setTokenUsageRatio] = React.useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentPrompt, setCurrentPrompt] = useState('');
+  const [tokenUsageRatio, setTokenUsageRatio] = useState('');
 
-  const inputRef = React.useRef();
-  const formRef = React.useRef();
+  const inputRef = useRef();
+  const formRef = useRef();
   const handleSelect = (prompt) => {
     inputRef.current.value = prompt;
     setCurrentPrompt(prompt);
@@ -113,7 +113,7 @@ const MessageSender = ({ onSubmit }) => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       await getTokenUsageRatio();
     })();

@@ -1,7 +1,7 @@
-import React from 'react';
+import { useEffect } from 'react';
 
 function useAutoScroll(ref) {
-  React.useEffect(() => {
+  useEffect(() => {
     const element = ref.current;
     if (element) {
       element.scrollTop = element.scrollHeight;

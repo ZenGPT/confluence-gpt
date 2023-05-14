@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React, { FC, useRef } from 'react';
 import MarkdownRenderer from './MarkdownRenderer';
 import styled from 'styled-components';
-import useScrollToBttom from '../hooks/useScrollToBottom';
+import useScrollToBottom from '../hooks/useScrollToBottom';
+import { Chat } from '../../type';
 
 const ConversationWrapper = styled.div`
   padding: 60px 0;
@@ -17,10 +18,10 @@ const PlaceholderBox = styled.div`
   flex-direction: column;
 `;
 
-const Conversations = ({ sessions = [] }) => {
-  const boxRef = React.createRef();
+const Conversations: FC<{ sessions: Chat[] }> = ({ sessions = [] }) => {
+  const boxRef = useRef<HTMLDivElement>(null);
 
-  useScrollToBttom(boxRef);
+  useScrollToBottom(boxRef);
 
   if (sessions.length === 0) {
     return (
@@ -33,13 +34,14 @@ const Conversations = ({ sessions = [] }) => {
 
   return (
     <ConversationWrapper ref={boxRef}>
-      {sessions.map((chat, index) => {
+      {sessions.map((chat) => {
         return (
           <MarkdownRenderer
             key={chat.id}
             loading={chat.loading}
             isGPT={chat.type === 'gpt'}
             content={chat.message}
+            error={chat.error}
           />
         );
       })}

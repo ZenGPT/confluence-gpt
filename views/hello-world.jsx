@@ -1,14 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import DebugComponent from './components/DebugComponent';
 import { processStream } from './StreamProcessor/StreamProcessor.mjs';
 import Conversations from './components/Conversations';
 import MessageSender from './components/MessageSender';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 import Button from '@atlaskit/button';
 import EditorCloseIcon from '@atlaskit/icon/glyph/editor/close';
 import Tooltip from '@atlaskit/tooltip';
 import { observeDomChanges } from '../utils';
+import { conversations } from '../libs/api';
 
 const Page = styled.div`
   display: flex;
@@ -43,54 +44,29 @@ const StyledButton = styled(Button)`
 `;
 
 const FormDefaultExample = () => {
-  const [sessions, setSessions] = React.useState([]);
+  const [sessions, setSessions] = useState([]);
 
-  const handleSubmit = React.useCallback(
+  const handleSubmit = useCallback(
     async (prompt) => {
       const chat = {
         type: 'user',
         message: prompt,
-        id: uuidv4(),
+        id: uuidV4(),
       };
 
       setSessions((prev) => [...prev, chat]);
-      const chatId = uuidv4();
+      const chatId = uuidV4();
       const newMessage = {
         type: 'gpt',
         message: '',
         id: chatId,
         loading: true,
       };
-
       setSessions((prev) => [...prev, newMessage]);
-      // TODO: move this part to /libs/api
       // try fetch data from server, if error, set error message, if success, set success message
       try {
         const token = await AP.context.getToken();
-        const response = await fetch(`/conversations?jwt=${token}`, {
-          method: 'POST',
-          body: JSON.stringify({
-            action: 'next',
-            messages: [
-              {
-                id: 'b059aadc-e7b8-4b58-9aa8-c73a855df536',
-                author: {
-                  role: 'user',
-                },
-                role: 'user',
-                content: {
-                  content_type: 'text',
-                  parts: [prompt],
-                },
-              },
-            ],
-            parent_message_id: 'd53b8c5b-8cc9-4d06-a164-cef3cd8571e5',
-            model: 'text-davinci-002',
-          }),
-          headers: {
-            'Content-type': 'application/json; charset=UTF-8',
-          },
-        });
+        const response = await conversations(token, prompt);
 
         // TODO: abstract to a lib function
         const reader = response.body.getReader();
@@ -109,14 +85,15 @@ const FormDefaultExample = () => {
             return updatedSessions;
           });
         });
-        //   refresh qutta
+        //   refresh quota
       } catch (e) {
+        console.error(e);
         setSessions((prev) => {
           const updatedSessions = prev.map((chat) => {
             if (chat.id === chatId) {
               return {
                 ...chat,
-                message: 'An error occurred, please try again later.',
+                error: e,
                 loading: false,
               };
             }
