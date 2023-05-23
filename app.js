@@ -30,6 +30,8 @@ import nocache from 'nocache';
 import routes from './routes';
 import { addServerSideRendering } from './server-side-rendering';
 
+import monitor from './monitor';
+
 // Bootstrap Express and atlassian-connect-express
 const app = express();
 const addon = ace(app);
@@ -94,6 +96,8 @@ if (devEnv) app.use(errorHandler());
 
 // Wire up routes
 routes(app, addon);
+
+monitor(app);
 
 // Boot the HTTP server
 http.createServer(app).listen(port, () => {

@@ -1,0 +1,21 @@
+{
+
+    "development": {
+        "monitor":{
+            "enable": true,
+            "env": "Dev",
+            "axiomIngestApiUrl": "https://api.axiom.co/v1/datasets/gptdock/ingest",
+            "axiomApiToken": "$axiomApiToken",
+            "platform": "ACE-Server"
+        }
+    },
+    "production": {
+        "monitor":{
+            "enable": true,
+            "env": "Production",
+            "axiomIngestApiUrl": "https://api.axiom.co/v1/datasets/gptdockapiserverdb/ingest",
+            "axiomApiToken": "$axiomApiToken",
+            "platform": "ACE-Server"
+        }
+    }
+}
