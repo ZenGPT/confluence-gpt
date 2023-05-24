@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 // TODO: remote the hard-code host
 const ASK_API_URL = 'http://localhost:5001/v1/ask';

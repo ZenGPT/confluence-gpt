@@ -1,5 +1,5 @@
-const fetch = require('node-fetch')
-const config = require('./monitor.json');
+import fetch from 'node-fetch';
+import config from './monitor.json';
 let env=null;
 let monitorEnable=null;
 let axiomApiToken=null;
