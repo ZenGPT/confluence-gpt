@@ -23,9 +23,10 @@ Tips for using GPT for Confluence:
 - Experiment with different types of content and formats to fully take advantage of the tool's flexibility.
 
 Develop:
--   VSCode + node v16.13.2
--   configure **ngrok** in VSCode. reference: https://ngrok.com/blog-post/integrating-vscode-and-ngrok
--   Crends **Credentials.json** based on **Credentials.json.sample**. reference: https://id.atlassian.com/manage-profile/security/api-tokens
+-   VSCode (recommended)
+-   node v16.\*
+-   Set up Ngrok: use [VSCode extendsion](https://ngrok.com/blog-post/integrating-vscode-and-ngrok) or ngrok command to setup your own API key
+-   Crends **Credentials.json** based on **Credentials.json.sample**. [api-token Reference](https://id.atlassian.com/manage-profile/security/api-tokens)
 -   > npm install
 -   > npm run build
 -   > npm run start
