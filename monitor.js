@@ -1,16 +1,16 @@
 const fetch = require('node-fetch')
 const config = require('./monitor.json');
-var env=null;
-var monitorEnable=null;
-var axiomApiToken=null;
-var axiomIngestApiUrl=null;
-var platform=null;
+let env=null;
+let monitorEnable=null;
+let axiomApiToken=null;
+let axiomIngestApiUrl=null;
+let platform=null;
 
 export default function monitor(app) {
     const monitorConfig=config[app.get("env")].monitor;
     env=monitorConfig.env;
     monitorEnable=monitorConfig.enable;
-    var axiomApiTokenName=monitorConfig.axiomApiToken.replace("$","");
+    let axiomApiTokenName=monitorConfig.axiomApiToken.replace("$","");
     axiomApiToken=process.env[axiomApiTokenName];
     axiomIngestApiUrl=monitorConfig.axiomIngestApiUrl;
     platform=monitorConfig.platform;
@@ -38,7 +38,7 @@ export default function monitor(app) {
 
 async function ingest_client_info(context) {
     if(!monitorEnable)return;
-    var c=context;
+    let c=context;
     await ingestEvent({
         "event_type": "client_info", 
         "worker_id": process.pid,
@@ -55,7 +55,7 @@ async function ingest_client_info(context) {
 
 async function ingest_conversations(context) {
     if(!monitorEnable)return;
-    var c=context;
+    let c=context;
     await ingestEvent({
         "event_type": "conversations", 
         "worker_id": process.pid,
@@ -72,7 +72,7 @@ async function ingest_conversations(context) {
 
 async function ingest_installed(body) {
     if(!monitorEnable)return;
-    var c=body;
+    let c=body;
     await ingestEvent({
         "event_type": "installed", 
         "worker_id": process.pid,
@@ -89,7 +89,7 @@ async function ingest_installed(body) {
 
 async function ingest_uninstalled(body) {
     if(!monitorEnable)return;
-    var c=body;
+    let c=body;
     await ingestEvent({
         "event_type": "uninstalled", 
         "body": body,
