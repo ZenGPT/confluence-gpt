@@ -10,10 +10,11 @@ export default function monitor(app) {
     const monitorConfig=config[app.get("env")].monitor;
     env=monitorConfig.env;
     monitorEnable=monitorConfig.enable;
-    axiomApiToken=monitorConfig.axiomApiToken;
+    var axiomApiTokenName=monitorConfig.axiomApiToken.replace("$","");
+    axiomApiToken=process.env[axiomApiTokenName];
     axiomIngestApiUrl=monitorConfig.axiomIngestApiUrl;
     platform=monitorConfig.platform;
-
+    
     app.post('/installed', async (req, res, next) => {
         await ingest_installed(req.body);
         await next();
