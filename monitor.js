@@ -15,31 +15,31 @@ export default function monitor(app) {
     axiomIngestApiUrl=monitorConfig.axiomIngestApiUrl;
     platform=monitorConfig.platform;
     
-    app.post('/installed', async (req, res, next) => {
-        await ingest_installed(req.body);
-        await next();
+    app.post('/installed', (req, res, next) => {
+        ingest_installed(req.body);
+        next();
     });
 
-    app.post('/uninstalled', async (req, res, next) => {
-        await ingest_uninstalled(req.body);
-        await next();
+    app.post('/uninstalled', (req, res, next) => {
+        ingest_uninstalled(req.body);
+        next();
     });
 
-    app.get('/client/info', async (req, res, next) => {
-        await ingest_client_info(req.context);
-        await next();
+    app.get('/client/info', (req, res, next) => {
+        ingest_client_info(req.context);
+        next();
     });
 
-    app.post('/conversations', async (req, res, next) => {
-        await ingest_conversations(req.context);
-        await next();
+    app.post('/conversations', (req, res, next) => {
+        ingest_conversations(req.context);
+        next();
     });
 }
 
-async function ingest_client_info(context) {
+function ingest_client_info(context) {
     if(!monitorEnable)return;
     let c=context;
-    await ingestEvent({
+    ingestEvent({
         "event_type": "client_info", 
         "worker_id": process.pid,
         "environment":env,
@@ -53,10 +53,10 @@ async function ingest_client_info(context) {
        });
 }
 
-async function ingest_conversations(context) {
+function ingest_conversations(context) {
     if(!monitorEnable)return;
     let c=context;
-    await ingestEvent({
+    ingestEvent({
         "event_type": "conversations", 
         "worker_id": process.pid,
         "environment":env,
@@ -70,10 +70,10 @@ async function ingest_conversations(context) {
        });
 }
 
-async function ingest_installed(body) {
+function ingest_installed(body) {
     if(!monitorEnable)return;
     let c=body;
-    await ingestEvent({
+    ingestEvent({
         "event_type": "installed", 
         "worker_id": process.pid,
         "environment":env,
@@ -87,10 +87,10 @@ async function ingest_installed(body) {
        });
 }
 
-async function ingest_uninstalled(body) {
+function ingest_uninstalled(body) {
     if(!monitorEnable)return;
     let c=body;
-    await ingestEvent({
+    ingestEvent({
         "event_type": "uninstalled", 
         "body": body,
         "worker_id": process.pid,
@@ -105,9 +105,9 @@ async function ingest_uninstalled(body) {
        });
 }
 
-async function ingestEvent(event){
+function ingestEvent(event){
     try {
-        await fetch(axiomIngestApiUrl, {
+        fetch(axiomIngestApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-ndjson', 'Authorization': 'Bearer '+axiomApiToken },
             body: JSON.stringify(event)
