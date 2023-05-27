@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 // TODO: remote the hard-code host
 const ASK_API_URL = 'http://localhost:5001/v1/ask';
@@ -27,7 +27,7 @@ export default function routes(app, addon) {
     );
   });
 
-  app.get('/client/info', addon.checkValidToken(), async (req, res) => {
+  app.get('/client/info', addon.checkValidToken(), async (req, res, next) => {
     const product_id = req.context.addonKey;
     const client_id = req.context.clientKey;
 
@@ -42,13 +42,14 @@ export default function routes(app, addon) {
       }
     );
     response.body.pipe(res);
+    await next();
   });
 
   app.post(
     '/conversations',
     // Require a valid token to access this resource
     addon.checkValidToken(),
-    async (req, res) => {
+    async (req, res, next) => {
       const { messages } = req.body;
 
       if (!messages) {
@@ -78,6 +79,7 @@ export default function routes(app, addon) {
       });
 
       response.body.pipe(res);
+      await next();
     }
   );
 
