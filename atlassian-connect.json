@@ -20,6 +20,45 @@
     "signed-install": true
   },
   "modules": {
+    "customContent": [
+      {
+        "uiSupport": {
+          "contentViewComponent": {
+            "moduleKey": "gpt-custom-content-view-module-key"
+          },
+          "listViewComponent": {
+            "moduleKey": "gpt-custom-content-list-view-module-key"
+          },
+          "icons": {
+            "item": {
+              "width": 16,
+              "height": 16,
+              "url": "image/zenuml_logo.png"
+            }
+          }
+        },
+        "apiSupport": {
+          "bodyType": "raw",
+          "supportedContainerTypes": [
+            "space",
+            "page",
+            "blogpost",
+            "comment"
+          ],
+          "supportedChildTypes": [
+            "attachment",
+            "comment"
+          ],
+          "indexing": {
+            "enabled": true
+          }
+        },
+        "name": {
+          "value": "Ai Aide"
+        },
+        "key": "gpt-custom-content-key"
+      }
+    ],
     "dialogs": [
       {
         "url": "/hello-world?contentId={content.id}",
@@ -55,6 +94,24 @@
         "key": "byline-item"
       }
     ],
-    "generalPages": []
+    "generalPages": [
+      {
+        "key": "gpt-custom-content-list-view-module-key",
+        "location": "none",
+        "url": "/hello-world",
+        "name": {
+          "value": "ZenUML Dashboard"
+        }
+      },
+      {
+        "key": "gpt-custom-content-view-module-key",
+        "location": "none",
+        "url": "/hello-world?version=__VERSION__&spaceKey={space.key}&addonKey=__ADDON_KEY__&postInstallPageKey=__POST_INSTALL_KEY__",
+        "name": {
+          "value": "ZenUML Dashboard"
+        }
+      }
+
+    ]
   }
 }
