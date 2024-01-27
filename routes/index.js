@@ -1,9 +1,14 @@
 import fetch from 'node-fetch';
 
-// TODO: remote the hard-code host
 const ASK_API_URL = 'http://localhost:5001/v1/ask';
 const ASK_API_AUTH_TOKEN = 'Bearer localhost';
 const CLIENT_INFO_API_URL = 'http://localhost:5001/v1/client/info';
+const OPENAI_BASEURL='https://gateway.ai.cloudflare.com/v1/8d5fc7ce04adc5096f52485cce7d7b3d/diagramly-ai/openai';
+const SYSTEM_PROMPT = `You're an experienced software architect and familiar with UML.`;
+const USER_PROMPT = `ZenUML Translator specializes in analyzing error stack traces for method call relationships and translating them into ZenUML DSL without explicit participant declarations. It identifies which class methods are calling others and structures this information into ZenUML DSL. For instance, given a stack trace snippet ‘#0 /app/app/Modules/WeiXin/WeiXinService.php(32): SocialiteProviders\Manager\OAuth2\AbstractProvider->user() #1 /app/app/Modules/WeiXin/WeiXinService.php(28): App\Modules\WeiXin\WeiXinService->loginCallbackToRegisterUser()’, it understands that the ‘loginCallbackToRegisterUser’ method of WeiXinService calls the ‘user’ method on OAuth2AbstractProvider. The resulting DSL would be structured as:
+WeiXinService.loginCallbackToRegisterUser() {
+ OAuth2AbstractProvider.user()
+}. This approach streamlines the translation process, making it more efficient and accurate. The translator maintains a friendly and professional demeanor, ensuring DSL outputs are clear and precisely represent the calling hierarchy. For unclear or incomplete stack traces, it seeks clarification.`;
 
 export default function routes(app, addon) {
   // Redirect root path to /atlassian-connect.json,
@@ -45,11 +50,7 @@ export default function routes(app, addon) {
     await next();
   });
 
-  app.post(
-    '/conversations',
-    // Require a valid token to access this resource
-    addon.checkValidToken(),
-    async (req, res, next) => {
+  app.post('/conversations', addon.checkValidToken(), async (req, res, next) => {
       const { messages } = req.body;
 
       if (!messages) {
@@ -80,6 +81,47 @@ export default function routes(app, addon) {
 
       response.body.pipe(res);
       await next();
+    }
+  );
+
+  app.post('/image-to-dsl', async (req, res, next) => {
+      const { imageUrl } = req.body;
+
+      if (!imageUrl) {
+        res.status(422).end();
+        return;
+      }
+
+      const payload = {
+        model: 'gpt-4-vision-preview',
+        messages: [
+          {
+            role: 'system',
+            content: SYSTEM_PROMPT,
+          },
+          {
+            role: 'user',
+            content: [ {type: 'text', text: USER_PROMPT}, {type: 'image_url', image_url: imageUrl} ],
+          },
+        ],
+        max_tokens: 300,
+      };
+
+      console.log('OpenAI request:', JSON.stringify(payload));
+
+      const response = await fetch(`${OPENAI_BASEURL}/chat/completions`, {
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": 'Bearer ' + process.env.OPENAI_API_KEY ,
+        },
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+
+      const json = await response.json();
+      console.log("OpenAI response: ", JSON.stringify(json))
+
+      return res.json(json).end();
     }
   );
 
