@@ -5,7 +5,7 @@ const ASK_API_AUTH_TOKEN = 'Bearer localhost';
 const CLIENT_INFO_API_URL = 'http://localhost:5001/v1/client/info';
 const OPENAI_BASEURL='https://gateway.ai.cloudflare.com/v1/8d5fc7ce04adc5096f52485cce7d7b3d/diagramly-ai/openai';
 const SYSTEM_PROMPT = `You're an experienced software architect and familiar with UML.`;
-const USER_PROMPT = `ZenUML Translator specializes in analyzing error stack traces for method call relationships and translating them into ZenUML DSL without explicit participant declarations. It identifies which class methods are calling others and structures this information into ZenUML DSL. For instance, given a stack trace snippet ‘#0 /app/app/Modules/WeiXin/WeiXinService.php(32): SocialiteProviders\Manager\OAuth2\AbstractProvider->user() #1 /app/app/Modules/WeiXin/WeiXinService.php(28): App\Modules\WeiXin\WeiXinService->loginCallbackToRegisterUser()’, it understands that the ‘loginCallbackToRegisterUser’ method of WeiXinService calls the ‘user’ method on OAuth2AbstractProvider. The resulting DSL would be structured as:
+const USER_PROMPT = `ZenUML Translator specializes in analyzing error stack traces for method call relationships and translating them into ZenUML DSL without explicit participant declarations. It identifies which class methods are calling others and structures this information into ZenUML DSL. For instance, given a stack trace snippet ‘#0 /app/app/Modules/WeiXin/WeiXinService.php(32): SocialiteProviders\\Manager\\OAuth2\\AbstractProvider->user() #1 /app/app/Modules/WeiXin/WeiXinService.php(28): App\\Modules\\WeiXin\\WeiXinService->loginCallbackToRegisterUser()’, it understands that the ‘loginCallbackToRegisterUser’ method of WeiXinService calls the ‘user’ method on OAuth2AbstractProvider. The resulting DSL would be structured as:
 WeiXinService.loginCallbackToRegisterUser() {
  OAuth2AbstractProvider.user()
 }. This approach streamlines the translation process, making it more efficient and accurate. The translator maintains a friendly and professional demeanor, ensuring DSL outputs are clear and precisely represent the calling hierarchy. For unclear or incomplete stack traces, it seeks clarification.`;
@@ -22,7 +22,7 @@ export default function routes(app, addon) {
   app.get('/hello-world', (req, res) => {
     // Rendering a template is easy; the render method takes two params: the name of the component or template file, and its props.
     // Handlebars and jsx are both supported, but please note that jsx changes require `npm run watch-jsx` in order to be picked up by the server.
-    res.render(
+    return res.render(
       'hello-world.jsx', // change this to 'hello-world.jsx' to use the Atlaskit & React version
       {
         title: 'Atlassian Connect',
@@ -32,7 +32,7 @@ export default function routes(app, addon) {
     );
   });
 
-  app.get('/client/info', addon.checkValidToken(), async (req, res, next) => {
+  app.get('/client/info', addon.checkValidToken(), async (req, res) => {
     const product_id = req.context.addonKey;
     const client_id = req.context.clientKey;
 
@@ -46,11 +46,10 @@ export default function routes(app, addon) {
         },
       }
     );
-    response.body.pipe(res);
-    await next();
+    return response.body.pipe(res);
   });
 
-  app.post('/conversations', addon.checkValidToken(), async (req, res, next) => {
+  app.post('/conversations', addon.checkValidToken(), async (req, res) => {
       const { messages } = req.body;
 
       if (!messages) {
@@ -79,12 +78,11 @@ export default function routes(app, addon) {
         body: JSON.stringify(data),
       });
 
-      response.body.pipe(res);
-      await next();
+      return response.body.pipe(res);
     }
   );
 
-  app.post('/image-to-dsl', async (req, res, next) => {
+  app.post('/image-to-dsl', async (req, res) => {
       const { imageUrl } = req.body;
 
       if (!imageUrl) {
