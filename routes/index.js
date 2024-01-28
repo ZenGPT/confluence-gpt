@@ -123,7 +123,7 @@ export default function routes(app, addon) {
       const json = await response.json();
       console.log("OpenAI response: ", JSON.stringify(json))
 
-      return res.json(json).end();
+      return res.json(json.choices[0].message.content).end();
     }
   );
 
