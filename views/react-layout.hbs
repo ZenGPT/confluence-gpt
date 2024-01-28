@@ -14,7 +14,7 @@
         }
     </style>
 </head>
-<body>
+<body style="height: 100vh;">
   <section id="content" role="main" class="ac-content">{{{body}}}</section>
   <script src="{{reactSource}}"></script>
   <script src="{{reactDomSource}}"></script>
@@ -26,6 +26,8 @@
     {{else}}
       ReactDOM.hydrate(React.createElement(window.__root_component.default, props), document.getElementById('content'));
     {{/if}}
+
+    AP && AP.sizeToParent();
   </script>
 </body>
 </html>

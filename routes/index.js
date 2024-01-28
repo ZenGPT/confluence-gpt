@@ -32,6 +32,10 @@ export default function routes(app, addon) {
     );
   });
 
+  app.get('/image-to-dsl', (req, res) => {
+    return res.render( 'image-to-dsl.jsx', { title: 'Diagramming with AI', browserOnly: true, } );
+  });
+
   app.get('/client/info', addon.checkValidToken(), async (req, res) => {
     const product_id = req.context.addonKey;
     const client_id = req.context.clientKey;
