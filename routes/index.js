@@ -4,11 +4,8 @@ const ASK_API_URL = 'http://localhost:5001/v1/ask';
 const ASK_API_AUTH_TOKEN = 'Bearer localhost';
 const CLIENT_INFO_API_URL = 'http://localhost:5001/v1/client/info';
 const OPENAI_BASEURL='https://gateway.ai.cloudflare.com/v1/8d5fc7ce04adc5096f52485cce7d7b3d/diagramly-ai/openai';
-const SYSTEM_PROMPT = `You're an experienced software architect and familiar with UML.`;
-const USER_PROMPT = `ZenUML Translator specializes in analyzing error stack traces for method call relationships and translating them into ZenUML DSL without explicit participant declarations. It identifies which class methods are calling others and structures this information into ZenUML DSL. For instance, given a stack trace snippet ‘#0 /app/app/Modules/WeiXin/WeiXinService.php(32): SocialiteProviders\\Manager\\OAuth2\\AbstractProvider->user() #1 /app/app/Modules/WeiXin/WeiXinService.php(28): App\\Modules\\WeiXin\\WeiXinService->loginCallbackToRegisterUser()’, it understands that the ‘loginCallbackToRegisterUser’ method of WeiXinService calls the ‘user’ method on OAuth2AbstractProvider. The resulting DSL would be structured as:
-WeiXinService.loginCallbackToRegisterUser() {
- OAuth2AbstractProvider.user()
-}. This approach streamlines the translation process, making it more efficient and accurate. The translator maintains a friendly and professional demeanor, ensuring DSL outputs are clear and precisely represent the calling hierarchy. For unclear or incomplete stack traces, it seeks clarification.`;
+const SYSTEM_PROMPT = `You're a Mermaid diagram expert.`;
+const USER_PROMPT = `Generate Mermaid DSL for the given image. Output in json format.`;
 
 export default function routes(app, addon) {
   // Redirect root path to /atlassian-connect.json,

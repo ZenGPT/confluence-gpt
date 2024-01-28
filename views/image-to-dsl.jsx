@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import DebugComponent from './components/DebugComponent';
-import { processStream } from './StreamProcessor/StreamProcessor.mjs';
 import Conversations from './components/Conversations';
 import MessageSender from './components/MessageSender';
 import { v4 as uuidv4 } from 'uuid';
@@ -74,13 +73,24 @@ const FormDefaultExample = () => {
         });
 
         // TODO: abstract to a lib function
-        const json = await response.json();
+        const answer = await response.json();
+        let dsl = answer;
+
+        try {
+          const matchResult = answer.match(/```json([\s\S]*?)```/);
+          const jsonCodeBlock = matchResult && matchResult[1];
+          const data = JSON.parse(jsonCodeBlock);
+          dsl = data.code;
+        } catch(e) {
+          console.error(`Unparsable GPT answer:`, answer);
+        }
+
         setSessions((prev) => {
           const updatedSessions = prev.map((chat) => {
             if (chat.id === chatId) {
               return {
                 ...chat,
-                message: JSON.stringify(json),
+                message: dsl,
                 loading: false,
               };
             }
