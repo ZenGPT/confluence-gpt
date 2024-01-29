@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import DebugComponent from './components/DebugComponent';
 import Conversations from './components/Conversations';
+import Mermaid from './components/Mermaid';
 import MessageSender from './components/MessageSender';
 import { v4 as uuidv4 } from 'uuid';
 import Button from '@atlaskit/button';
@@ -43,6 +44,7 @@ const StyledButton = styled(Button)`
 
 const FormDefaultExample = () => {
   const [sessions, setSessions] = React.useState([]);
+  const [dsl, setDsl] = React.useState('');
 
   const handleSubmit = React.useCallback(
     async (input) => {
@@ -74,13 +76,12 @@ const FormDefaultExample = () => {
 
         // TODO: abstract to a lib function
         const answer = await response.json();
-        let dsl = answer;
 
         try {
           const matchResult = answer.match(/```json([\s\S]*?)```/);
           const jsonCodeBlock = matchResult && matchResult[1];
           const data = JSON.parse(jsonCodeBlock);
-          dsl = data.code;
+          setDsl(data.code);
         } catch(e) {
           console.error(`Unparsable GPT answer:`, answer);
         }
@@ -90,7 +91,7 @@ const FormDefaultExample = () => {
             if (chat.id === chatId) {
               return {
                 ...chat,
-                message: dsl,
+                message: answer,
                 loading: false,
               };
             }
@@ -128,6 +129,7 @@ const FormDefaultExample = () => {
       <DebugComponent />
       <Wrapper>
         <Conversations sessions={sessions} />
+        <Mermaid dsl={dsl} />
         <MessageSender onSubmit={handleSubmit} />
         <Tooltip content="Close the dialog">
           {(tooltipProps) => (
