@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: package app
-        run: zip -qq -r /tmp/${{ needs.init_build_version.outputs.artifactName }} *  -x .cache/ .github/**\* .vscode/**\* .git/ node_modules/**\*
+        run: zip -qq -r /tmp/${{ needs.init_build_version.outputs.artifactName }} *  -x .cache/ .github/**\* .vscode/**\* .git/ 
         
       - name: create a prerelease
         id: createPrerelease
