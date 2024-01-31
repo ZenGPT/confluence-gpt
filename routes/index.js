@@ -5,7 +5,7 @@ const ASK_API_AUTH_TOKEN = 'Bearer localhost';
 const CLIENT_INFO_API_URL = 'http://localhost:5001/v1/client/info';
 const OPENAI_BASEURL='https://gateway.ai.cloudflare.com/v1/8d5fc7ce04adc5096f52485cce7d7b3d/diagramly-ai/openai';
 const SYSTEM_PROMPT = `You're a Mermaid diagram expert.`;
-const USER_PROMPT = `Generate Mermaid DSL for the given sequence diagram image. Output in json format.`;
+const USER_PROMPT = `Generate Mermaid DSL for the given sequence diagram image. Output the DSL in code block.`;
 
 export default function routes(app, addon) {
   // Redirect root path to /atlassian-connect.json,

@@ -67,10 +67,10 @@ const Dashboard = () => {
         const answer = await response.json();
 
         try {
-          const matchResult = answer.match(/```json([\s\S]*?)```/);
-          const jsonCodeBlock = matchResult && matchResult[1];
-          const data = JSON.parse(jsonCodeBlock);
-          setDsl(data.code);
+          const matchResult = answer.match(/```(json|mermaid)([\s\S]*?)```/);
+          const content = matchResult && matchResult[2];
+          console.debug('Extracted content:', content);
+          setDsl(content);
         } catch(e) {
           console.error(`Unparsable GPT answer:`, answer);
         }
@@ -88,7 +88,6 @@ const Dashboard = () => {
           });
           return updatedSessions;
         });
-        //   refresh qutta
       } catch (e) {
         setSessions((prev) => {
           const updatedSessions = prev.map((chat) => {
@@ -119,7 +118,7 @@ const Dashboard = () => {
       <Wrapper>
         <Conversations sessions={sessions} />
         <Mermaid dsl={dsl} />
-        <MessageSender onSubmit={handleSubmit} />
+        <MessageSender onSubmit={handleSubmit} placeholder={'Enter an image URL here'} />
       </Wrapper>
     </Page>
   );

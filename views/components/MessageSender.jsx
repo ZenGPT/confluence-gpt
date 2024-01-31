@@ -67,7 +67,7 @@ const ToolBtnBox = styled.span`
   }
 `;
 
-const MessageSender = ({ onSubmit }) => {
+const MessageSender = ({ onSubmit, placeholder }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [currentPrompt, setCurrentPrompt] = React.useState('');
   const [tokenUsageRatio, setTokenUsageRatio] = React.useState('');
@@ -131,7 +131,7 @@ const MessageSender = ({ onSubmit }) => {
                     ref={inputRef}
                     resize="smart"
                     onKeyDown={handleInputKeyDown}
-                    placeholder="e.g. Write a Job Description for Senior DevOps Engineer"
+                    placeholder={placeholder || "e.g. Write a Job Description for Senior DevOps Engineer"}
                     {...fieldProps}
                   />
                 )}
