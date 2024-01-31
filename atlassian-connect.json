@@ -98,7 +98,7 @@
       {
         "key": "gpt-custom-content-list-view-module-key",
         "location": "none",
-        "url": "/hello-world",
+        "url": "/dashboard",
         "name": {
           "value": "ZenUML Dashboard"
         }

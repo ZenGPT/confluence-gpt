@@ -29,8 +29,8 @@ export default function routes(app, addon) {
     );
   });
 
-  app.get('/image-to-dsl', (req, res) => {
-    return res.render( 'image-to-dsl.jsx', { title: 'Diagramming with AI', browserOnly: true, } );
+  app.get('/dashboard', (req, res) => {
+    return res.render( 'dashboard.jsx', { title: 'AI Aide', browserOnly: true, } );
   });
 
   app.get('/client/info', addon.checkValidToken(), async (req, res) => {

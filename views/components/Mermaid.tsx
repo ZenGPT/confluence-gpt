@@ -7,7 +7,6 @@ const Mermaid = ({ dsl = '' }) => {
   mermaid.mermaidAPI.initialize({ startOnLoad: true });
 
   useEffect(() => {
-    console.log('useEffect in Mermaid')
     if(dsl && typeof dsl === 'string') {
       mermaid.mermaidAPI.render('any-id', dsl).then(({ svg }) => {
         setSvg(svg)
