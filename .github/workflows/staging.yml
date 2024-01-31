@@ -9,6 +9,60 @@ on:
     branches: ['main', 'staging/**']
 
 jobs:
+  init_build_version:
+    name: init build version
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Generate Git Info File
+        uses: ./.github/actions/git-info
+      - name: Export Properties
+        id: properties
+        shell: bash
+        run: |
+          VERSION="$(echo $(date +'v%Y.%m.%d')_${{ github.run_number }}_$(git rev-parse --short=8 HEAD))"
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "BUILDTIME=$(echo $(date -u))" >>  "$GITHUB_OUTPUT"
+          echo "artifactName=gpt_ace.$VERSION.tar" >> "$GITHUB_OUTPUT"
+    outputs:
+      VERSION: ${{ steps.properties.outputs.VERSION }}
+      BUILDTIME: ${{ steps.properties.outputs.BUILDTIME }}
+      artifactName: ${{ steps.properties.outputs.artifactName }}
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    needs:
+      - init_build_version
+      - test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: package app
+        run: zip -qq -r /tmp/${{ needs.init_build_version.outputs.artifactName }} *  -x .cache/ .github/**\* .vscode/**\* .git/ node_modules/**\*
+        
+      - name: create a prerelease
+        id: createPrerelease
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ needs.init_build_version.outputs.VERSION }}
+          name: ${{ needs.init_build_version.outputs.VERSION }}
+          body: "${{ needs.init_build_version.outputs.VERSION }},branch:${{ github.head_ref || github.ref_name }}, build time: ${{ needs.init_build_version.outputs.BUILDTIME }}"
+          draft: true
+          prerelease: false
+          files: |
+            /tmp/${{ needs.init_build_version.outputs.artifactName }}
+
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -25,84 +79,86 @@ jobs:
       - name: Test
         run: npm run lint && npm run test
 
-  staging-deploy:
-    name: Deploy to staging
-    needs: test
-    if: ${{ github.event_name != 'pull_request' }}
-    runs-on: ubuntu-latest
-    environment: staging
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: npm
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build
-      - name: Generate Git Info File
-        uses: ./.github/actions/git-info
-      - name: Deploy to server
-        uses: easingthemes/ssh-deploy@v4.1.8
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.HOST_IP }}
-          REMOTE_USER: ${{ secrets.HOST_USER }}
-          TARGET: /home/${{ secrets.HOST_USER }}/ace-server/
-          EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/'
-          SCRIPT_AFTER: |
-            cd /home/${{ secrets.HOST_USER }}/ace-server/
-            npm install --production
-            sudo pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
+  # staging-deploy:
+  #   name: Deploy to staging
+  #   needs: 
+  #     - test
+  #     - build
+  #   if: ${{ github.event_name != 'pull_request' }}
+  #   runs-on: ubuntu-latest
+  #   environment: staging
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '16'
+  #         cache: npm
+  #     - name: Install dependencies
+  #       run: npm install
+  #     - name: Build
+  #       run: npm run build
+  #     - name: Generate Git Info File
+  #       uses: ./.github/actions/git-info
+  #     - name: Deploy to server
+  #       uses: easingthemes/ssh-deploy@v4.1.8
+  #       with:
+  #         SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+  #         REMOTE_HOST: ${{ secrets.HOST_IP }}
+  #         REMOTE_USER: ${{ secrets.HOST_USER }}
+  #         TARGET: /home/${{ secrets.HOST_USER }}/ace-server/
+  #         EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/'
+  #         SCRIPT_AFTER: |
+  #           cd /home/${{ secrets.HOST_USER }}/ace-server/
+  #           npm install --production
+  #           sudo pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
 
-  staging-install:
-    name: Install staging to Confluence
-    needs: staging-deploy
-    environment: staging
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Install
-        run: |
-          pip3 install pluploader
-          pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://ace-staging.gptdock.com/atlassian-connect.json
+  # staging-install:
+  #   name: Install staging to Confluence
+  #   needs: staging-deploy
+  #   environment: staging
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Setup Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: '3.10'
+  #     - name: Install
+  #       run: |
+  #         pip3 install pluploader
+  #         pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://ace-staging.gptdock.com/atlassian-connect.json
 
-  draft-release:
-    name: Create Draft release
-    needs: staging-install
-    if: ${{ github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: npm
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build
-      - name: Set properties
-        id: properties
-        run: echo "version=$(date +'%Y.%m.%d%H%M')" >> $GITHUB_OUTPUT
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.properties.outputs.version }}
-          body: 'New release'
-          draft: true
+  # draft-release:
+  #   name: Create Draft release
+  #   needs: staging-install
+  #   if: ${{ github.ref == 'refs/heads/main' }}
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: write
+  #     pull-requests: write
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '16'
+  #         cache: npm
+  #     - name: Install dependencies
+  #       run: npm install
+  #     - name: Build
+  #       run: npm run build
+  #     - name: Set properties
+  #       id: properties
+  #       run: echo "version=$(date +'%Y.%m.%d%H%M')" >> $GITHUB_OUTPUT
+  #     - name: Create release
+  #       uses: softprops/action-gh-release@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         tag_name: v${{ steps.properties.outputs.version }}
+  #         body: 'New release'
+  #         draft: true
