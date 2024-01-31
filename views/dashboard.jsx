@@ -5,9 +5,6 @@ import Conversations from './components/Conversations';
 import Mermaid from './components/Mermaid';
 import MessageSender from './components/MessageSender';
 import { v4 as uuidv4 } from 'uuid';
-import Button from '@atlaskit/button';
-import EditorCloseIcon from '@atlaskit/icon/glyph/editor/close';
-import Tooltip from '@atlaskit/tooltip';
 import { observeDomChanges } from '../utils';
 
 const Page = styled.div`
@@ -34,15 +31,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const StyledButton = styled(Button)`
-  && {
-    position: fixed;
-  }
-  top: 16px;
-  right: 16px;
-`;
-
-const FormDefaultExample = () => {
+const Dashboard = () => {
   const [sessions, setSessions] = React.useState([]);
   const [dsl, setDsl] = React.useState('');
 
@@ -131,22 +120,9 @@ const FormDefaultExample = () => {
         <Conversations sessions={sessions} />
         <Mermaid dsl={dsl} />
         <MessageSender onSubmit={handleSubmit} />
-        <Tooltip content="Close the dialog">
-          {(tooltipProps) => (
-            <StyledButton
-              {...tooltipProps}
-              type="button"
-              appearance="primary"
-              onClick={() => {
-                AP.dialog.close();
-              }}
-              iconBefore={<EditorCloseIcon />}
-            />
-          )}
-        </Tooltip>
       </Wrapper>
     </Page>
   );
 };
 
-export default FormDefaultExample;
+export default Dashboard;
