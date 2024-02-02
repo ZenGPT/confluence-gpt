@@ -47,6 +47,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm install
+      - name: Build
+        run: npm run build
       - name: package app
         run: zip -qq -r /tmp/${{ needs.init_build_version.outputs.artifactName }} *  -x .cache/ .github/**\* .vscode/**\* .git/ 
         
