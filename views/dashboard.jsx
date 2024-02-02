@@ -107,6 +107,8 @@ const Dashboard = () => {
     [sessions]
   );
 
+  const handleDslChange = (e) => setDsl(e.target.value);
+
   useEffect(() => {
     // there is a margin on document.body, perhaps added by Confluence since I didn't found related logic in our code, remove it because it causes a unwanted scrollbar
     observeDomChanges(document.body, () => (document.body.style.margin = '0'));
@@ -117,6 +119,7 @@ const Dashboard = () => {
       <DebugComponent />
       <Wrapper>
         <Conversations sessions={sessions} />
+        {dsl && <textarea value={dsl} onChange={handleDslChange} rows="5"></textarea>}
         <Mermaid dsl={dsl} />
         <MessageSender onSubmit={handleSubmit} placeholder={'Enter an image URL here'} />
       </Wrapper>
