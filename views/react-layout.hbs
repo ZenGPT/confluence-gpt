@@ -18,16 +18,19 @@
   <section id="content" role="main" class="ac-content">{{{body}}}</section>
   <script src="{{reactSource}}"></script>
   <script src="{{reactDomSource}}"></script>
-  <script id="__root_component_script" src="{{rootComponentSource}}" data-props="{{props}}"></script>
-  <script>
+  <script id="__root_component_script" type="module" src="{{rootComponentSource}}" data-props="{{props}}"></script>
+  <script type="module">
+    import * as root from "{{rootComponentSource}}";
+    console.log('root', root);
+
     var props = JSON.parse(document.getElementById('__root_component_script').getAttribute('data-props'));
     {{#if browserOnly}}
-      ReactDOM.render(React.createElement(window.__root_component.default, props), document.getElementById('content'));
+      {{!-- ReactDOM.render(React.createElement(window.__root_component.default, props), document.getElementById('content')); --}}
     {{else}}
-      ReactDOM.hydrate(React.createElement(window.__root_component.default, props), document.getElementById('content'));
+      {{!-- ReactDOM.hydrate(React.createElement(window.__root_component.default, props), document.getElementById('content')); --}}
     {{/if}}
 
-    AP && AP.sizeToParent();
+    {{!-- AP && AP.sizeToParent(); --}}
   </script>
 </body>
 </html>
