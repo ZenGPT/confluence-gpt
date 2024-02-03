@@ -116,4 +116,4 @@ jobs:
       - name: Install
         run: |
           pip3 install pluploader
-          pluploader --base-url https://gpt-dock-stag.atlassian.net --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://conf-gpt-stag.zenuml.com/atlassian-connect.json
+          pluploader --base-url https://gpt-dock-stag.atlassian.net --user ${{ secrets.ZENUML_STAGE_GPT_ACE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_GPT_ACE_UPM_PASSWORD }} install --cloud --plugin-uri https://conf-gpt-stag.zenuml.com/atlassian-connect.json
