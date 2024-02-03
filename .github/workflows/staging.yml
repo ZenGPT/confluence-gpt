@@ -31,12 +31,29 @@ jobs:
       BUILDTIME: ${{ steps.properties.outputs.BUILDTIME }}
       artifactName: ${{ steps.properties.outputs.artifactName }}
 
-  build:
-    name: build
+  test:
+    name: Test
     runs-on: ubuntu-latest
-    needs:
-      - init_build_version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Test
+        run: npm run lint && npm run test
+
+  staging-deploy:
+    name: Deploy to staging
+    needs: 
       - test
+    if: ${{ github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    environment: staging
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -64,103 +81,34 @@ jobs:
           prerelease: false
           files: |
             /tmp/${{ needs.init_build_version.outputs.artifactName }}
+      - name: Generate Git Info File
+        uses: ./.github/actions/git-info
+      - name: Deploy to server
+        uses: easingthemes/ssh-deploy@v4.1.8
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_IP }}
+          REMOTE_USER: ${{ secrets.HOST_USER }}
+          TARGET: /home/${{ secrets.HOST_USER }}/gpt_ace/
+          EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/'
+          SCRIPT_AFTER: |
+            cd /home/${{ secrets.HOST_USER }}/gpt_ace/
+            npm install --production
+            pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
 
-  test:
-    name: Test
+  staging-install:
+    name: Install staging to Confluence
+    needs: staging-deploy
+    environment: staging
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          node-version: '16'
-          cache: npm
-      - name: Install dependencies
-        run: npm install
-      - name: Test
-        run: npm run lint && npm run test
-
-  # staging-deploy:
-  #   name: Deploy to staging
-  #   needs: 
-  #     - test
-  #     - build
-  #   if: ${{ github.event_name != 'pull_request' }}
-  #   runs-on: ubuntu-latest
-  #   environment: staging
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Setup Node
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '16'
-  #         cache: npm
-  #     - name: Install dependencies
-  #       run: npm install
-  #     - name: Build
-  #       run: npm run build
-  #     - name: Generate Git Info File
-  #       uses: ./.github/actions/git-info
-  #     - name: Deploy to server
-  #       uses: easingthemes/ssh-deploy@v4.1.8
-  #       with:
-  #         SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-  #         REMOTE_HOST: ${{ secrets.HOST_IP }}
-  #         REMOTE_USER: ${{ secrets.HOST_USER }}
-  #         TARGET: /home/${{ secrets.HOST_USER }}/ace-server/
-  #         EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/'
-  #         SCRIPT_AFTER: |
-  #           cd /home/${{ secrets.HOST_USER }}/ace-server/
-  #           npm install --production
-  #           sudo pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
-
-  # staging-install:
-  #   name: Install staging to Confluence
-  #   needs: staging-deploy
-  #   environment: staging
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Setup Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.10'
-  #     - name: Install
-  #       run: |
-  #         pip3 install pluploader
-  #         pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://ace-staging.gptdock.com/atlassian-connect.json
-
-  # draft-release:
-  #   name: Create Draft release
-  #   needs: staging-install
-  #   if: ${{ github.ref == 'refs/heads/main' }}
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: write
-  #     pull-requests: write
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Setup Node
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '16'
-  #         cache: npm
-  #     - name: Install dependencies
-  #       run: npm install
-  #     - name: Build
-  #       run: npm run build
-  #     - name: Set properties
-  #       id: properties
-  #       run: echo "version=$(date +'%Y.%m.%d%H%M')" >> $GITHUB_OUTPUT
-  #     - name: Create release
-  #       uses: softprops/action-gh-release@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         tag_name: v${{ steps.properties.outputs.version }}
-  #         body: 'New release'
-  #         draft: true
+          python-version: '3.10'
+      - name: Install
+        run: |
+          pip3 install pluploader
+          pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://zenuml-stg.atlassian.net/atlassian-connect.json
