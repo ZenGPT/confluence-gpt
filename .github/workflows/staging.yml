@@ -98,6 +98,7 @@ jobs:
             export DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }}
             export LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com
             export PORT=3000
+            export NODE_ENV=production
             pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
 
   staging-install:
@@ -115,4 +116,4 @@ jobs:
       - name: Install
         run: |
           pip3 install pluploader
-          pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://conf-gpt-stag.zenuml.com/atlassian-connect.json
+          pluploader --base-url https://gpt-dock-stag.atlassian.net --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://conf-gpt-stag.zenuml.com/atlassian-connect.json
