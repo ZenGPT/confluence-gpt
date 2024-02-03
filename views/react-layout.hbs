@@ -8,18 +8,21 @@
   <link rel="stylesheet" href="//unpkg.com/@atlaskit/css-reset/dist/bundle.css" />
   {{{styleTags}}}
   <script src="//connect-cdn.atl-paas.net/all.js" type="text/javascript"></script>
-    <style>
-        body {
-            background: var(--ds-surface, #fafbfc);
-        }
-    </style>
+  <style>
+      body {
+          background: var(--ds-surface, #fafbfc);
+      }
+  </style>
 </head>
 <body style="height: 100vh;">
   <section id="content" role="main" class="ac-content">{{{body}}}</section>
   <script src="{{reactSource}}"></script>
   <script src="{{reactDomSource}}"></script>
   <script id="__root_component_script" src="{{rootComponentSource}}" data-props="{{props}}"></script>
-  <script>
+  <script type="module">
+
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
     var props = JSON.parse(document.getElementById('__root_component_script').getAttribute('data-props'));
     {{#if browserOnly}}
       ReactDOM.render(React.createElement(window.__root_component.default, props), document.getElementById('content'));

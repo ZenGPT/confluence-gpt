@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
-import mermaid from 'mermaid';
 
 const Mermaid = ({ dsl = '' }) => {
   const [svg, setSvg] = React.useState([]);
 
-  mermaid.mermaidAPI.initialize({ startOnLoad: true });
+  //@ts-ignore
+  window.mermaid.mermaidAPI.initialize({ startOnLoad: true });
 
   useEffect(() => {
     if(dsl && typeof dsl === 'string') {
-      mermaid.mermaidAPI.render('any-id', dsl).then(({ svg }) => {
+      //@ts-ignore
+      window.mermaid.mermaidAPI.render('any-id', dsl).then(({ svg }) => {
         setSvg(svg)
       });
     }
