@@ -83,6 +83,7 @@ jobs:
             /tmp/${{ needs.init_build_version.outputs.artifactName }}
       - name: Generate Git Info File
         uses: ./.github/actions/git-info
+        # rsync command has to be existed on the remote server.
       - name: Deploy to server
         uses: easingthemes/ssh-deploy@v4.1.8
         with:
@@ -94,6 +95,9 @@ jobs:
           SCRIPT_AFTER: |
             cd /home/${{ secrets.HOST_USER }}/gpt_ace/
             npm install --production
+            DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }}
+            LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com
+            PORT=3000
             pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
 
   staging-install:
@@ -111,4 +115,4 @@ jobs:
       - name: Install
         run: |
           pip3 install pluploader
-          pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://zenuml-stg.atlassian.net/atlassian-connect.json
+          pluploader --base-url https://zenuml-stg.atlassian.net/wiki --user ${{ secrets.ZENUML_STAGE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_UPM_PASSWORD }} install --cloud --plugin-uri https://conf-gpt-stag.zenuml.com/atlassian-connect.json
