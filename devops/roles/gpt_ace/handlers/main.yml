@@ -1,0 +1,19 @@
+---
+# - name: Restart gpt_ace
+#   become: True
+#   systemd:
+#     name: "gpt_ace"
+#     state: restarted
+#     daemon_reload: True
+#   when: gpt_ace_started is True
+
+- name: Restart gpt_ace
+  ansible.builtin.command: 'pm2 reload all'
+  become_user: "{{ app_user }}"
+  environment:
+    NODE_ENV: production
+  args:
+    chdir: "{{ app_home }}"
+  ignore_errors: True
+
+

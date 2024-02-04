@@ -1,0 +1,8 @@
+- hosts: gpt_ace_db
+  gather_facts: yes
+  become: true
+  vars_files: 
+    - common_vars/global.yaml
+  roles:
+    - ansible-role-pip
+    - ansible-role-postgresql

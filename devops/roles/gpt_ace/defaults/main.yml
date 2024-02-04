@@ -1,0 +1,34 @@
+---
+gpt_ace_inner_port: 3001
+gpt_ace_started: true
+
+app_home_logs: "{{app_home}}/logs"
+app_zip: ""
+app_zip_path: "{{ app_home }}/gpt_ace.zip"
+app_zip_src: "gpt_ace.v2024.02.03_167_bdbe2776.zip"
+gpt_ace_tls_private_key_file: "zenuml.com.key"
+gpt_ace_tls_certificate_file: "zenuml.com.crt"
+
+
+app_config:
+  development:
+    port: 3000
+    errorTemplate: true
+    store:
+      adapter: sequelize
+      dialect: sqlite3
+      logging: false
+      type: memory
+  production:
+    port: "3000"
+    errorTemplate: true
+    localBaseUrl: "http://127.0.0.1"
+    store:
+      type: postgres
+      url: "{{ gpt_ace_db_connection_url }}"
+    whitelist:
+    - "*.jira-dev.com"
+    - "*.atlassian.net"
+    - "*.atlassian.com"
+    - "*.jira.com"
+  product: confluence

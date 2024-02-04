@@ -1,0 +1,149 @@
+---
+- name: install unzip 
+  ansible.builtin.apt:
+    name: unzip
+
+- name: mkdir folders
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{app_user}}"
+    group: "{{app_group}}"
+    mode: u=rwx,g=rx,o=rx
+  loop:
+    - "{{ app_root_home | default('/apps')}}"
+    - "{{ app_home }}"
+    - "{{ app_home_logs }}"
+
+- name: download app.zip
+  ansible.builtin.uri:
+    url: "{{ app_zip_url }}"
+    dest: "{{ app_zip_path }}"
+  when: app_zip_url is defined and gpt_ace_started
+  register:  __app_zip
+
+- name: copy app_zip_src to dest
+  ansible.builtin.copy:
+    src: "{{ app_zip_src }}"
+    dest: "{{ app_zip_path }}"
+  when: app_zip_src is defined and gpt_ace_started
+  register:  __app_zip
+
+- name: template nginx tls certificate
+  ansible.builtin.copy:
+    src: "{{ gpt_ace_tls_certificate_file }}"
+    dest: "{{ gpt_ace_tls_certificate_path }}"
+    owner: "{{app_user}}"
+    group: "{{app_group}}"
+    mode: u=rw,g=r,o=r  
+  when: gpt_ace_tls_certificate_file is defined
+
+- name: template nginx tls private key
+  ansible.builtin.copy:
+    src: "{{ gpt_ace_tls_private_key_file }}"
+    dest: "{{ gpt_ace_tls_private_key_path }}"
+    owner: "{{app_user}}"
+    group: "{{app_group}}"
+    mode: u=rw,g=r,o=r
+  when: gpt_ace_tls_private_key_file is defined
+
+# - name: copy gpt_ace zip 
+#   ansible.builtin.copy:
+#     src: "{{ app_zip_path }}"
+#     dest: "{{ app_home }}"
+#     owner: "{{ app_user }}"
+#     group: "{{ app_group }}"
+#     mode: u=rwx,g=rwx,o=rx
+#   register:  __app_zip
+#   when: app_zip_url is not defined
+
+- name: extract app zip 
+  ansible.builtin.unarchive:
+    src: "{{ app_zip_path }}"
+    dest: "{{ app_home }}"
+    owner: "{{ app_user }}"
+    remote_src: yes
+    group: "{{ app_group }}"
+    mode: u=rwx,g=rwx,o=rx
+  when: gpt_ace_started
+  notify:
+    - Restart gpt_ace
+
+- name: delete  zip file
+  ansible.builtin.file:
+    path: "{{ app_zip_path }}"
+    state: absent
+
+- name: template credentials.json
+  ansible.builtin.copy:
+    content: "{{ credentials_config | from_yaml | to_json }}"
+    dest: "{{app_home}}/credentials.json"
+    owner: "{{app_user}}"
+    group: "{{app_group}}"
+    mode: u=rw,g=r,o=r
+  when: gpt_ace_started
+  notify:
+    - Restart gpt_ace
+
+- name: template atlassian-connect.json
+  ansible.builtin.copy:
+    content: "{{ atlassian_connect_config | from_yaml | to_json }}"
+    dest: "{{app_home}}/atlassian-connect.json"
+    owner: "{{app_user}}"
+    group: "{{app_group}}"
+    mode: u=rw,g=r,o=r
+  when: gpt_ace_started
+
+- name: template config.json
+  ansible.builtin.copy:
+    content: "{{ app_config | from_yaml | to_json }}"
+    dest: "{{app_home}}/config.json"
+    owner: "{{app_user}}"
+    group: "{{app_group}}"
+    mode: u=rw,g=r,o=r
+  when: gpt_ace_started
+  notify:
+    - Restart gpt_ace
+
+# - name: template gpt_ace.service
+#   ansible.builtin.template:
+#     src: gpt_ace.service.j2
+#     dest: "/etc/systemd/system/gpt_ace.service"
+#     owner: "{{app_user}}"
+#     group: "{{app_group}}"
+#     mode: u=rw,g=r,o=r
+#   when: gpt_ace_started
+#   notify:
+#     - Restart gpt_ace
+#   register: output
+
+- name: install pm2
+  community.general.npm:
+    name: pm2
+    version: 5.2.2
+    global: true
+
+- name: start app.js
+  ansible.builtin.command: 'pm2 start app.js  --node-args="-r esm"'
+  become_user: "{{ app_user }}"
+  args:
+    chdir: "{{ app_home }}"
+  environment:
+    NODE_ENV: production
+  register: output
+  when: gpt_ace_started
+  ignore_errors: true
+
+
+- debug:
+    var: output
+
+
+# - name: Ensure gpt_ace service is started and enabled
+#   become: True
+#   systemd:
+#     daemon_reload: True
+#     name: "gpt_ace"
+#     state: stopped
+#     enabled: True
+#   when: gpt_ace_started

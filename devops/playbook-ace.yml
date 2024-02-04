@@ -1,0 +1,9 @@
+- hosts: gpt_ace
+  gather_facts: yes
+  become: true
+  vars_files: 
+    - common_vars/global.yaml
+  roles:
+    - ansible-role-nodejs
+    - gpt_ace
+    - ansible-role-nginx

@@ -1,0 +1,21 @@
+{{ ansible_managed | comment }}
+
+
+[Unit]
+Description=gpt_ace
+After=network-online.target
+
+[Service]
+Restart=always
+RestartSec=5
+TimeoutSec=5
+User={{ app_user }}
+Group={{ app_group }}
+Type=simple
+Environment=PORT={{ gpt_ace_port }}
+WorkingDirectory={{ app_home }}
+ExecStart=node -r esm app.js
+
+
+[Install]
+WantedBy=multi-user.target

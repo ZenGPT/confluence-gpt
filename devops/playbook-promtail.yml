@@ -1,0 +1,7 @@
+- hosts: promtail
+  gather_facts: yes
+  become: true
+  vars_files: 
+    - common_vars/global.yaml
+  roles:
+    - ansible-role-promtail

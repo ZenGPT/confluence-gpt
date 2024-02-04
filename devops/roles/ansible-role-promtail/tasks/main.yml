@@ -1,0 +1,22 @@
+---
+- import_tasks: preflight.yml
+  tags:
+    - promtail_install
+    - promtail
+
+- import_tasks: install.yml
+  become: True
+  tags:
+    - promtail_install
+    - promtail
+
+- name: Ensure promtail service is started and enabled
+  become: True
+  systemd:
+    daemon_reload: True
+    name: "{{ promtail_systemd_service }}"
+    state: started
+    enabled: True
+  tags:
+    - promtail_run
+    - promtail
