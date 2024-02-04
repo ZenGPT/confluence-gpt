@@ -92,7 +92,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_IP }}
           REMOTE_USER: ${{ secrets.HOST_USER }}
           TARGET: /home/${{ secrets.HOST_USER }}/gpt_ace/
-          EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/, /devops/, /config.json, /atlassian-connect.json, /credentials.json'
+          EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/, /devops/, config.json, atlassian-connect.json, credentials.json'
           SCRIPT_AFTER: |
             cd /home/${{ secrets.HOST_USER }}/gpt_ace/
             npm install --production
