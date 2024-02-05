@@ -100,6 +100,7 @@ jobs:
             export LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com
             export PORT=3000
             export NODE_ENV=production
+            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
 
   staging-install:
