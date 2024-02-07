@@ -1,7 +1,7 @@
 // TODO: error catch
 export const queryTokenUsage = async () => {
   const token = await AP.context.getToken();
-  const response = await fetch(`/client/info?jwt=${token}`, {
+  const response = await fetch(`/v2/client/info?jwt=${token}`, {
     method: 'GET',
   });
 

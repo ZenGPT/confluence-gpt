@@ -13,3 +13,4 @@ coverage
 **/.local.stag.json
 devops/env_vars/**/*
 devops/common_vars/*.yaml
+.env

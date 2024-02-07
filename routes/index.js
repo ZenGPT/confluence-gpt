@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import db from './db';
 
 const ASK_API_URL = 'http://localhost:5001/v1/ask';
 const ASK_API_AUTH_TOKEN = 'Bearer localhost';
@@ -50,6 +51,33 @@ export default function routes(app, addon) {
     return response.body.pipe(res);
   });
 
+  app.get('/v2/client/info', addon.checkValidToken(), async (req, res) => {
+    const product_id = req.context.addonKey;
+    const client_id = req.context.clientKey;
+
+    if (!client_id || !product_id) {
+        return res.status(400).json({ error: 'client_id and product_id must be provided' });
+    }
+
+    try {
+        const client = await db.getOrInitClient(client_id, product_id);
+        if (!client) {
+            return res.status(404).json({ error: 'client not found' });
+        }
+
+        const quotaUsed = client.max_quota - client.token_quota;
+
+        res.json({
+            client_id: client.client_id,
+            quota_used: quotaUsed,
+            max_quota: client.max_quota
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   app.post('/conversations', addon.checkValidToken(), async (req, res) => {
       const { messages } = req.body;
 
@@ -83,13 +111,32 @@ export default function routes(app, addon) {
     }
   );
 
-  app.post('/image-to-dsl', async (req, res) => {
+  app.post('/image-to-dsl', addon.checkValidToken(), async (req, res) => {
       const { imageUrl } = req.body;
+      const userId = req.context.userAccountId;
+      const clientId = req.context.clientKey;
+      const productId = req.context.addonKey;
+
+      console.log('Request to /image-to-dsl', imageUrl, userId, clientId, productId);
 
       if (!imageUrl) {
         res.status(422).end();
         return;
       }
+
+      const client = await db.getOrInitClient(clientId, productId);
+      if (!client) {
+        return res.status(404).json({ error: 'Client not found' });
+      }
+      if (client.token_quota <= 0) {
+        return res.status(402).json({ error: 'Not enough tokens' });
+      }
+
+      // TODO: calculate the image URL token size and deduct from the user's quota.
+      // const tokensNeeded = await calculateTokensUsed(imageUrl);
+      // if (tokensNeeded > client.token_quota) {
+      //   return res.status(402).json({ error: 'Not enough tokens' });
+      // }
 
       const payload = {
         model: 'gpt-4-vision-preview',
@@ -120,7 +167,16 @@ export default function routes(app, addon) {
       const json = await response.json();
       console.log("OpenAI response: ", JSON.stringify(json))
 
-      return res.json(json.choices[0].message.content).end();
+      // TODO: calculate the tokens used from the response and deduct from the user's quota.
+      const tokenUsage = 100;
+      await db.deductClientToken(clientId, productId, tokenUsage);
+      await db.increaseUserTokenUsed(userId, clientId, productId, tokenUsage);
+
+      if (json.choices && json.choices.length > 0) {
+        return res.json(json.choices[0].message.content).end();
+      } else {
+        return res.json('Something is wrong...').end();
+      }
     }
   );
 

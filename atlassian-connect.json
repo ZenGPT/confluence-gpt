@@ -6,7 +6,7 @@
     "name": "P&D Vision",
     "url": "https://www.zenuml.com"
   },
-  "baseUrl": "{{localBaseUrl}}",
+  "baseUrl": "https://ba94-47-128-214-197.ngrok-free.app",
   "authentication": {
     "type": "jwt"
   },
@@ -14,7 +14,7 @@
     "installed": "/installed",
     "uninstalled": "/uninstalled"
   },
-  "enableLicensing": true,
+  "enableLicensing": false,
   "scopes": ["READ", "WRITE"],
   "apiMigrations": {
     "signed-install": true
