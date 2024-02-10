@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import db from './db';
+import { Client } from '../service/db'
 
 const ASK_API_URL = 'http://localhost:5001/v1/ask';
 const ASK_API_AUTH_TOKEN = 'Bearer localhost';
@@ -7,6 +8,9 @@ const CLIENT_INFO_API_URL = 'http://localhost:5001/v1/client/info';
 const OPENAI_BASEURL='https://gateway.ai.cloudflare.com/v1/8d5fc7ce04adc5096f52485cce7d7b3d/diagramly-ai/openai';
 const SYSTEM_PROMPT = `You're a Mermaid diagram expert.`;
 const USER_PROMPT = `Generate Mermaid DSL for the given sequence diagram image. Output the DSL in code block.`;
+
+const DEFAULT_TOKEN_QUOTA = 500000;
+
 
 export default function routes(app, addon) {
   // Redirect root path to /atlassian-connect.json,
@@ -60,14 +64,18 @@ export default function routes(app, addon) {
     }
 
     try {
-        const client = await db.getOrInitClient(client_id, product_id);
+        // const client = await db.getOrInitClient(client_id, product_id);
+        const [client, created] = await Client.findOrCreate({
+          where: {client_id, product_id},
+          defaults: {max_quota: DEFAULT_TOKEN_QUOTA, token_quota: DEFAULT_TOKEN_QUOTA, version: 1}
+        });
         if (!client) {
             return res.status(404).json({ error: 'client not found' });
         }
 
         const quotaUsed = client.max_quota - client.token_quota;
 
-        res.json({
+        res.status(created ? 201 : 200).json({
             client_id: client.client_id,
             quota_used: quotaUsed,
             max_quota: client.max_quota
