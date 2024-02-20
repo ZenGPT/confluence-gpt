@@ -150,7 +150,9 @@ export default function routes(app, addon) {
             content: [ {type: 'text', text: USER_PROMPT}, {type: 'image_url', image_url: imageUrl} ],
           },
         ],
-        max_tokens: 300,
+        // TODO 
+        // max_tokens is too large: 30000. This model supports at most 4096 completion tokens, whereas you provided 30000.
+        max_tokens: 4096,
       };
 
       console.log('OpenAI request:', JSON.stringify(payload));
@@ -165,10 +167,16 @@ export default function routes(app, addon) {
       });
 
       const json = await response.json();
-      console.log("OpenAI response: ", JSON.stringify(json))
 
-      // TODO: calculate the tokens used from the response and deduct from the user's quota.
-      const tokenUsage = 100;
+      console.log(`OpenAI response for ${userId},${clientId},${productId},result:${JSON.stringify(json)}`);
+
+      if(json.error || !json.usage){
+        return res.json('Something is wrong: ').end();
+      }
+
+
+      // openai api doc: https://platform.openai.com/docs/api-reference/chat/create
+      const tokenUsage = json.usage.total_tokens;
       await db.deductClientToken(clientId, productId, tokenUsage);
       await db.increaseUserTokenUsed(userId, clientId, productId, tokenUsage);
 
