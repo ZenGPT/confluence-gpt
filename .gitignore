@@ -14,3 +14,4 @@ coverage
 devops/env_vars/**/*
 devops/common_vars/*.yaml
 .env
+*.sqlite

@@ -62,3 +62,17 @@ With `ngrok` based [local environment setup](https://bitbucket.org/atlassian/atl
 * Getting set up with Atlassian Connect Express (ACE)
 : https://developer.atlassian.com/cloud/confluence/getting-set-up-with-ace/
 * atlassian-connect-express source code: https://bitbucket.org/atlassian/atlassian-connect-express/src/master/
+
+## DB ORM
+
+* Sequelize: https://sequelize.org/docs/v6/getting-started/
+* Tables:
+  * gpt_dock_client_data
+    * client_id
+    * product_id
+    * max_quota
+    * token_quota
+  * gpt_dock_user_data
+    * user_id
+    * org_id
+    * token_used
