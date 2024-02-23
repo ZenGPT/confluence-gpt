@@ -27,9 +27,20 @@ Develop:
 -   node v16.\*
 -   Set up Ngrok: use [VSCode extendsion](https://ngrok.com/blog-post/integrating-vscode-and-ngrok) or ngrok command to setup your own API key
 -   Crends **Credentials.json** based on **Credentials.json.sample**. [api-token Reference](https://id.atlassian.com/manage-profile/security/api-tokens)
+- Start pg db: `make pg`. It'll init db automantically.
+- Set local environment:
+  ```
+  export DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5438/gpt_ace
+  export LOCAL_BASE_URL=https://{your custom domain}
+  export PORT=3000
+  export NODE_ENV=production
+  export OPENAI_API_KEY=....
+  ```
+- copy .env.sample to .env
 -   > npm install
 -   > npm run build
 -   > npm run start
+- install your own app into your Confluence instance at the first time of setting up the local env.
 
 
 ## Set up local development environment using Cloudflare Tunnel
