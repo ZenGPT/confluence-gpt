@@ -67,7 +67,7 @@ const Dashboard = () => {
         const answer = await response.json();
 
         try {
-          const matchResult = answer.match(/```(json|mermaid)([\s\S]*?)```/);
+          const matchResult = answer.match(/```(json|mermaid)?([\s\S]*?)```/);
           const content = matchResult && matchResult[2];
           console.debug('Extracted content:', content);
           setDsl(content);
