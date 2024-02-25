@@ -95,6 +95,7 @@ jobs:
           EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/, /devops/, config.json, atlassian-connect.json, credentials.json'
           SCRIPT_AFTER: |
             cd /home/${{ secrets.HOST_USER }}/gpt_ace/
+            . ~/.profile
             npm install --production
             export DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }}
             export LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com
