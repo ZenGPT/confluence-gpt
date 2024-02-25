@@ -31,8 +31,31 @@ const Wrapper = styled.div`
   }
 `;
 
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/material.css';
+import 'codemirror/mode/javascript/javascript.js';
+
+import { UnControlled as CodeMirror } from 'react-codemirror2'
+
+
+const codeMirrorOptions = {
+  mode: 'javascript',
+  tabSize: 4,
+  theme: 'monokai',
+  lineNumbers: true,
+  line: true,
+  // keyMap: "sublime",
+  extraKeys: { "Ctrl": "autocomplete" },
+  foldGutter: true,
+  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+  styleSelectedText: true,
+  highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
+  placeholder: 'Write you code here',
+  autoCloseBrackets: true,
+};
+
 const Dashboard = () => {
-  const [sessions, setSessions] = React.useState([]);
+const [sessions, setSessions] = React.useState([]);
   const [dsl, setDsl] = React.useState('');
 
   const handleSubmit = React.useCallback(
@@ -66,14 +89,13 @@ const Dashboard = () => {
         // TODO: abstract to a lib function
         const answer = await response.json();
 
-        try {
-          const matchResult = answer.match(/```(json|mermaid)?([\s\S]*?)```/);
-          const content = matchResult && matchResult[2];
-          console.debug('Extracted content:', content);
-          setDsl(content);
-        } catch(e) {
+        const matchResult = answer.match(/```(json|mermaid)?([\s\S]*?)```/);
+        if(!matchResult) {
           console.error(`Unparsable GPT answer:`, answer);
         }
+        const content = matchResult && matchResult[2];
+        console.debug('Extracted content:', content);
+        setDsl(content);
 
         setSessions((prev) => {
           const updatedSessions = prev.map((chat) => {
@@ -107,7 +129,7 @@ const Dashboard = () => {
     [sessions]
   );
 
-  const handleDslChange = (e) => setDsl(e.target.value);
+  const handleDslChange = (editor, data, value) => setDsl(value);
 
   useEffect(() => {
     // there is a margin on document.body, perhaps added by Confluence since I didn't found related logic in our code, remove it because it causes a unwanted scrollbar
@@ -119,7 +141,8 @@ const Dashboard = () => {
       <DebugComponent />
       <Wrapper>
         <Conversations sessions={sessions} />
-        {dsl && <textarea value={dsl} onChange={handleDslChange} rows="5"></textarea>}
+
+        {dsl && <CodeMirror value={dsl} options={codeMirrorOptions} onChange={handleDslChange} />}
         <Mermaid dsl={dsl} />
         <MessageSender onSubmit={handleSubmit} placeholder={'Enter an image URL here'} />
       </Wrapper>

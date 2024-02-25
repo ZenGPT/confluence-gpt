@@ -12,10 +12,9 @@ export function addServerSideRendering(app, handlebarsEngine) {
   const ssrEngine = function (viewFile, options, callback) {
     // Allow specifying the template by the name of the source file or the transpiled file
     const viewFilePath = viewFile.replace(/\.jsx$/, '.js');
-    const relativeViewFilePath = path.join(
-      '/',
-      path.relative(viewsDir, viewFilePath)
-    );
+    const styleFilePath = viewFile.replace(/\.jsx$/, '.css');
+    const relativeViewFilePath = path.join( '/', path.relative(viewsDir, viewFilePath) );
+    const relativeStyleFilePath = path.join( '/', path.relative(viewsDir, styleFilePath) );
     // The `build` script produces a nodejs-friendly and a browser-friendly version of the view.
     const nodeViewPath = path.join(viewsDir, 'node', relativeViewFilePath);
     const props = { ...options };
@@ -61,6 +60,7 @@ export function addServerSideRendering(app, handlebarsEngine) {
           devEnv ? 'development' : 'production.min'
         }.js`,
         rootComponentSource: relativeViewFilePath,
+        rootComponentStyleSource: relativeStyleFilePath,
         // Supply props for rendering / hydration
         props: JSON.stringify(props),
       };

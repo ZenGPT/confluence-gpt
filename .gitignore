@@ -7,6 +7,8 @@ credentials.json
 .cache
 views/*.js
 views/*.js.map
+views/*.css
+views/*.css.map
 views/node
 coverage
 .parcel-cache
