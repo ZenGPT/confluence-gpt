@@ -99,12 +99,7 @@ jobs:
             export PATH=/usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin:$PATH
             cd /home/${{ secrets.HOST_USER }}/gpt_ace/
             npm install --production
-            export DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }}
-            export LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com
-            export PORT=3000
-            export NODE_ENV=production
-            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
+            DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }} LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com PORT=3000 NODE_ENV=production OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} pm2 reload app --update-env
 
   staging-install:
     name: Install staging to Confluence
