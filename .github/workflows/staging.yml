@@ -94,6 +94,9 @@ jobs:
           TARGET: /home/${{ secrets.HOST_USER }}/gpt_ace/
           EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/, /devops/, config.json, atlassian-connect.json, credentials.json'
           SCRIPT_AFTER: |
+            VERSION=v16.20.2
+            DISTRO=linux-x64
+            export PATH=/usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin:$PATH
             cd /home/${{ secrets.HOST_USER }}/gpt_ace/
             npm install --production
             export DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }}
