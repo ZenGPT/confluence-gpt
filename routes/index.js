@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { findOrCreateClient, clientRunOutOfToken, deductClientToken } from '../service/client';
+import * as DiagramSvc from '../service/diagram';
 
 const ASK_API_URL = 'http://localhost:5001/v1/ask';
 const ASK_API_AUTH_TOKEN = 'Bearer localhost';
@@ -17,17 +18,8 @@ export default function routes(app, addon) {
 
   // This is an example route used by "generalPages" module (see atlassian-connect.json).
   // Verify that the incoming request is authenticated with Atlassian Connect.
-  app.get('/hello-world', (req, res) => {
-    // Rendering a template is easy; the render method takes two params: the name of the component or template file, and its props.
-    // Handlebars and jsx are both supported, but please note that jsx changes require `npm run watch-jsx` in order to be picked up by the server.
-    return res.render(
-      'hello-world.jsx', // change this to 'hello-world.jsx' to use the Atlaskit & React version
-      {
-        title: 'Atlassian Connect',
-        //, issueId: req.query['issueId']
-        browserOnly: true, // you can set this to disable server-side rendering for react views
-      }
-    );
+  app.get('/show-dashboard', (req, res) => {
+    return res.render( 'dashboard.jsx', { title: 'AI Aide', browserOnly: true, } );
   });
 
   app.get('/dashboard', (req, res) => {
@@ -183,6 +175,23 @@ export default function routes(app, addon) {
     }
   );
 
+  app.post('/save-diagram', addon.checkValidToken(), async (req, res) => {
+    const userId = req.context.userAccountId;
+    const clientId = req.context.clientKey;
+    const productId = req.context.addonKey;
+    const { dslCode,contentId,creatorId } = req.body;
+    console.log("request to save diagram", dslCode, userId, clientId, productId);
+
+    if (!dslCode) {
+      res.status(400).end();
+      return;
+    }
+
+    const result = DiagramSvc.findOrCreateDiagram(clientId, productId, dslCode, contentId, creatorId)
+    res.status(200).send('');
+
+  });
+
   // Add additional route handlers here...
   app.get('/ai-aide', addon.authenticate(), function (req, res) {
     //  Get the ACE HTTP Client which interfaces with our Confluence instance.
@@ -212,4 +221,22 @@ export default function routes(app, addon) {
       }
     );
   });
+
+  {
+    var fs = require('fs');
+    var path = require('path');
+    var files = fs.readdirSync("routes");
+    for(var index in files) {
+        var file = files[index];
+        if (file === "index.js") continue;
+        // skip non-javascript files
+        if (path.extname(file) != ".js") continue;
+
+        var routes = require("./" + path.basename(file));
+
+        if (typeof routes === "function") {
+            routes(app, addon);
+        }
+    }
+  }
 }

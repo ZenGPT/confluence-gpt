@@ -71,9 +71,43 @@ export const User = sequelize.define('gpt_dock_user_data', {
   underscored: true
 });
 
+export const Diagram = sequelize.define('gpt_dock_diagram_data', {
+  content_id: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  dsl_code: {
+    type: Sequelize.STRING,
+    allowNull: true
+  },
+  creator_id: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  _updated_at: {
+    type: Sequelize.DATE,
+    allowNull: false,
+    defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+  },
+  org_id: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    primaryKey: true
+  },
+  version: {
+    type: Sequelize.BIGINT,
+    allowNull: false,
+    defaultValue: 1
+  }
+}, {
+  timestamps: false,
+  underscored: true
+});
+
 async function init() {
   await Client.sync();
   await User.sync();
+  await Diagram.sync();
 }
 
 init();

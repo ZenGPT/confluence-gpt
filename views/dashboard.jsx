@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import DebugComponent from './components/DebugComponent';
+import SaveButton from './components/SaveButton';
 import Conversations from './components/Conversations';
 import Mermaid from './components/Mermaid';
 import MessageSender from './components/MessageSender';
@@ -55,7 +56,7 @@ const codeMirrorOptions = {
 };
 
 const Dashboard = () => {
-const [sessions, setSessions] = React.useState([]);
+  const [sessions, setSessions] = React.useState([]);
   const [dsl, setDsl] = React.useState('');
 
   const handleSubmit = React.useCallback(
@@ -140,6 +141,7 @@ const [sessions, setSessions] = React.useState([]);
     <Page>
       <DebugComponent />
       <Wrapper>
+        <SaveButton dsl={dsl} contentId="xxadddf" creatorId="creator_idxxx" />
         <Conversations sessions={sessions} />
 
         {dsl && <CodeMirror value={dsl} options={codeMirrorOptions} onChange={handleDslChange} />}
