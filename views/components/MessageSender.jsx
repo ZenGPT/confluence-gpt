@@ -1,6 +1,7 @@
 import Form, { Field, HelperMessage } from '@atlaskit/form';
 import React from 'react';
 import Popup from '@atlaskit/popup';
+import FileUploadButton from './FileUploadButton';
 import PreDefinedPrompts from './PreDefinedPrompts';
 import LightbulbFilledIcon from '@atlaskit/icon/glyph/lightbulb-filled';
 import LoadingButton from '@atlaskit/button/loading-button';
@@ -67,8 +68,17 @@ const ToolBtnBox = styled.span`
   }
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  align-items: center;
+  & > *:not(:last-child) {
+    margin-right: 10px;
+  }
+`;
+
 const MessageSender = ({ onSubmit, placeholder }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState('');
   const [currentPrompt, setCurrentPrompt] = React.useState('');
   const [tokenUsageRatio, setTokenUsageRatio] = React.useState('');
 
@@ -95,10 +105,14 @@ const MessageSender = ({ onSubmit, placeholder }) => {
     }
   };
 
+  const handleUpload = (url) => {
+    setInputValue(prev => `${prev}${url}`);
+  };
+
   const handleSubmit = async (data, formApi) => {
     if (!data.query) return;
-    inputRef.current.value = '';
     setCurrentPrompt('');
+    setInputValue('');
     resizeTextArea();
     await onSubmit(data.query || currentPrompt);
     formApi.reset();
@@ -119,38 +133,47 @@ const MessageSender = ({ onSubmit, placeholder }) => {
     })();
   }, []);
 
+  React.useEffect(() => {
+    setInputValue(currentPrompt);
+  }, [currentPrompt]);
+
   return (
     <ChatSendBox>
       <FormBox>
         <Form onSubmit={handleSubmit}>
           {({ formProps, submitting }) => (
             <form {...formProps} ref={formRef}>
-              <Field name="query" defaultValue={currentPrompt}>
+              <Field name="query" defaultValue={inputValue}>
                 {({ fieldProps }) => (
                   <StyledTextArea
                     ref={inputRef}
                     resize="smart"
                     onKeyDown={handleInputKeyDown}
                     placeholder={placeholder || "e.g. Write a Job Description for Senior DevOps Engineer"}
+                    value={inputValue}
+                    onChange={e => setInputValue(e.target.value)}
                     {...fieldProps}
                   />
                 )}
               </Field>
               <ButtonBox>
-                <Popup
-                  isOpen={isOpen}
-                  onClose={() => setIsOpen(false)}
-                  content={() => <PreDefinedPrompts onSelect={handleSelect} />}
-                  placement="bottom-start"
-                  trigger={(triggerProps) => (
-                    <ToolBtnBox
-                      {...triggerProps}
-                      onClick={() => setIsOpen(!isOpen)}
-                    >
-                      <LightbulbFilledIcon label="Predefined prompts" />
-                    </ToolBtnBox>
-                  )}
-                />
+                <ButtonGroup>
+                  <FileUploadButton onUpload={handleUpload} />
+                  <Popup
+                    isOpen={isOpen}
+                    onClose={() => setIsOpen(false)}
+                    content={() => <PreDefinedPrompts onSelect={handleSelect} />}
+                    placement="bottom-start"
+                    trigger={(triggerProps) => (
+                      <ToolBtnBox
+                        {...triggerProps}
+                        onClick={() => setIsOpen(!isOpen)}
+                      >
+                        <LightbulbFilledIcon label="Predefined prompts" />
+                      </ToolBtnBox>
+                    )}
+                  />
+                </ButtonGroup>
                 <LoadingButton
                   type="submit"
                   appearance="primary"
