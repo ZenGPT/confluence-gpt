@@ -20,6 +20,112 @@
     "signed-install": true
   },
   "modules": {
+    "dynamicContentMacros": [
+      {
+        "key": "diagramlyai-macro",
+        "name": {
+          "value": "Diagramly AI"
+        },
+        "renderModes": {
+          "default": {
+            "url": "/viewer?contentId={content.id}&spaceKey={space.key}&pageId={page.id}&pageVersion={page.version}&macroId={macro.id}"
+          }
+        },
+        "url": "/viewer?contentId={content.id}&spaceKey={space.key}&pageId={page.id}&pageVersion={page.version}&macroId={macro.id}",
+        "description": {
+          "value": "Diagramly AI"
+        },
+        "outputType": "block",
+        "bodyType": "none",
+        "editor": {
+          "url": "/dashboard",
+          "editTitle": {
+            "value": "Diagramly AI"
+          },
+          "insertTitle": {
+            "value": "Diagramly AI"
+          },
+          "width": "100%",
+          "height": "100%",
+          "cacheable": true
+        },
+        "icon": {
+          "width": 16,
+          "height": 16,
+          "url": "/confluence-plugin/image/zenuml_logo.png"
+        },
+        "documentation": {
+          "url": "https://zenuml.atlassian.net/wiki/spaces/Doc/overview"
+        },
+        "categories": ["visuals"],
+        "featured": true,
+        "parameters": [
+          {
+            "identifier": "diagramName",
+            "name": {
+              "value": "Diagram name (do not change)",
+              "i18n": "diagramName"
+            },
+            "type": "string",
+            "required": true,
+            "multiple": false,
+            "defaultValue": "None"
+          }
+        ]
+      },
+      {
+        "key": "diagramlyai-embed-macro",
+        "name": {
+          "value": "Embed Diagramly AI"
+        },
+        "renderModes": {
+          "default": {
+            "url": "/attachment?version=2023.01&spaceKey={space.key}&pageId={page.id}&pageVersion={page.version}&macroId={macro.id}&uuid={uuid}&addonKey=my-api"
+          }
+        },
+        "url": "/confluence-plugin/embed-viewer.html?version=2023.01&spaceKey={space.key}&pageId={page.id}&pageVersion={page.version}&macroId={macro.id}&uuid={uuid}&outputType={output.type}&addonKey=my-api",
+        "description": {
+          "value": "Embed Diagramly AI"
+        },
+        "outputType": "block",
+        "bodyType": "none",
+        "editor": {
+          "url": "/confluence-plugin/embed-editor.html?version=2023.01&addonKey=my-api",
+          "editTitle": {
+            "value": "Embed Diagramly AI"
+          },
+          "insertTitle": {
+            "value": "Embed Diagramly AI"
+          },
+          "width": "100%",
+          "height": "100%",
+          "cacheable": true
+        },
+        "icon": {
+          "width": 16,
+          "height": 16,
+          "url": "/confluence-plugin/image/zenuml_logo.png"
+        },
+        "documentation": {
+          "url": "https://zenuml.atlassian.net/wiki/spaces/Doc/overview"
+        },
+        "categories": ["visuals"],
+        "featured": true,
+        "parameters": [
+          {
+            "identifier": "diagramName",
+            "name": {
+              "value": "Diagram name (do not change)",
+              "i18n": "diagramName"
+            },
+            "type": "string",
+            "required": true,
+            "multiple": false,
+            "defaultValue": "None"
+          }
+        ]
+      }
+    ],
     "customContent": [
       {
         "uiSupport": {

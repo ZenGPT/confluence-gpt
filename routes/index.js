@@ -18,11 +18,33 @@ export default function routes(app, addon) {
 
   // This is an example route used by "generalPages" module (see atlassian-connect.json).
   // Verify that the incoming request is authenticated with Atlassian Connect.
-  app.get('/show-dashboard', (req, res) => {
-    return res.render( 'dashboard.jsx', { title: 'AI Aide', browserOnly: true, } );
+  app.get('/viewer',addon.checkValidToken(), (req, res) => {
+
+    var httpClient = addon.httpClient(req);
+    var contentId  = req.query['contentId'];
+    
+    httpClient.get({
+        url: '/rest/api/content/' + contentId + '/property',
+        json: true
+    }, function (err, response) {
+        if (err) { 
+            res.send("Error: " + response.statusCode + ": " + err);
+        }
+        else {
+          console.log('-------------' + response.body);
+            var customerData = response.body.results.filter(function(result) {return result.key == "customer-data"})
+            res.render('viewer.jsx', {
+                values: customerData[0].value,
+                contentId: contentId
+            });
+        }
+    })
+
+
+    
   });
 
-  app.get('/dashboard', (req, res) => {
+  app.get('/dashboard', addon.checkValidToken(), (req, res) => {
     return res.render( 'dashboard.jsx', { title: 'AI Aide', browserOnly: true, } );
   });
 

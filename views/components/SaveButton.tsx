@@ -3,16 +3,18 @@ import Button from '@atlaskit/button';
 import * as clientApi from '../../libs/api';
 const SaveButton = (props) => {
 
-  const saveAndBack =  (aDsl,contentId, creatorId) => {
+  const saveAndBack =  (aDsl) => {
     // http request
-    const result = clientApi.saveDiagram(aDsl,contentId, creatorId)
-    console.log(result);
+    console.log(aDsl);
+    // db save 
+    props.browserWindow.AP.confluence.saveMacro({foo: 'bar'}, aDsl);
+    props.browserWindow.AP.confluence.closeMacroEditor();
     
   };
 
 
   return (
-    <Button onClick={() => saveAndBack(props.dsl, props.contentId, props.creatorId)}>Save and go back</Button>
+    <Button onClick={() => saveAndBack(props.dsl)}>Save and go back</Button>
   );
 };
 

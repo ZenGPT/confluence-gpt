@@ -141,7 +141,7 @@ const Dashboard = () => {
     <Page>
       <DebugComponent />
       <Wrapper>
-        <SaveButton dsl={dsl} contentId="xxadddf" creatorId="creator_idxxx" />
+        <SaveButton dsl={dsl} browserWindow={window}/>
         <Conversations sessions={sessions} />
 
         {dsl && <CodeMirror value={dsl} options={codeMirrorOptions} onChange={handleDslChange} />}
