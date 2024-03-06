@@ -46,8 +46,7 @@
             "value": "Diagramly AI"
           },
           "width": "100%",
-          "height": "100%",
-          "cacheable": true
+          "height": "100%"
         },
         "icon": {
           "width": 16,
