@@ -106,12 +106,77 @@
       {
         "key": "gpt-custom-content-view-module-key",
         "location": "none",
-        "url": "/hello-world?version=__VERSION__&spaceKey={space.key}&addonKey=__ADDON_KEY__&postInstallPageKey=__POST_INSTALL_KEY__",
+        "url": "/hello-world?version=__VERSION__&spaceKey={space.key}&addonKey=gptdock-confluence&postInstallPageKey=__POST_INSTALL_KEY__",
         "name": {
           "value": "ZenUML Dashboard"
         }
+      },
+      {
+        "key": "zenuml-content-sequence-viewer-dialog",
+        "location": "none",
+        "url": "/confluence-plugin/viewer-dialog.html?version=__VERSION__&addonKey=gptdock-confluence",
+        "name": {
+          "value": "ZenUML Sequence Viewer Dialog"
+        }
+      },
+      {
+        "key": "zenuml-content-sequence-editor-dialog",
+        "location": "none",
+        "url": "/confluence-plugin/editor-dialog.html?version=__VERSION__&spaceKey={space.key}&content.id={content.id}&content.version={content.version}&addonKey=gptdock-confluence",
+        "name": {
+          "value": "ZenUML Sequence Editor"
+        }
       }
-
+    ],
+    "dynamicContentMacros": [
+      {
+        "key": "gpt-diagram-macro",
+        "name": {
+          "value": "AI Aide Diagram"
+        },
+        "renderModes": {
+          "default": {
+            "url": "/attachment?version=__VERSION__&spaceKey={space.key}&pageId={page.id}&pageVersion={page.version}&macroId={macro.id}&uuid={uuid}&addonKey=gptdock-confluence"
+          }
+        },
+        "url": "/confluence-plugin/viewer.html?version=__VERSION__&spaceKey={space.key}&pageId={page.id}&pageVersion={page.version}&macroId={macro.id}&uuid={uuid}&outputType={output.type}&addonKey=gptdock-confluence",
+        "description": {
+          "value": "Create a AI Aide Diagram"
+        },
+        "outputType": "block",
+        "bodyType": "plain-text",
+        "editor": {
+          "url": "/confluence-plugin/editor.html?version=__VERSION__&update=20240309&addonKey=gptdock-confluence",
+          "width": "100%",
+          "height": "100%",
+          "cacheable": true
+        },
+        "icon": {
+          "width": 16,
+          "height": 16,
+          "url": "image/app-logo.png"
+        },
+        "documentation": {
+          "url": "https://zenuml.atlassian.net/wiki/spaces/Doc/overview"
+        },
+        "categories": [
+          "visuals"
+        ],
+        "featured": true,
+        "parameters": [
+          {
+            "identifier": "diagramName",
+            "name": {
+              "value": "Diagram name (do not change)",
+              "i18n": "diagramName"
+            },
+            "type": "string",
+            "required": true,
+            "multiple": false,
+            "defaultValue": "None"
+          }
+        ]
+      }
     ]
   }
 }
