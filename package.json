@@ -17,7 +17,8 @@
     "watch-jsx-node": "parcel watch --log-level 1 --target node --out-dir views/node views/*.jsx",
     "watch-jsx": "concurrently 'npm:watch-jsx-browser' 'npm:watch-jsx-node'",
     "watch": "concurrently -i 'npm:watch-server' 'npm:watch-jsx-browser' 'npm:watch-jsx-node'",
-    "lint": "eslint app.js routes"
+    "lint": "eslint app.js routes",
+    "build-confluence-plugin": "cd modules/confluence-plugin && yarn install && yarn build:full"
   },
   "dependencies": {
     "@atlaskit/button": "^15.1.0",
