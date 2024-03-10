@@ -59,23 +59,40 @@ const Viewer = () => {
   const [sessions, setSessions] = React.useState([]);
   const [dsl, setDsl] = React.useState('');
 
-
   useEffect(() => {
+		  const fetchData = async () => {
 
-    const fetchData = async () => {
-      AP.confluence.getMacroBody(function(data){
-        console.log("xxxxxxx" + data) ;
-        setDsl(data);
-      });
-    };
-    fetchData();
+		      AP.confluence.getMacroBody(function(body){
+            console.log('body:'+ body);
+          });
 
-  }, []);
+		      AP.confluence.getMacroData(function(data){
+		          if(data){
+		            const customContentId = data.contentId;
+		            AP.request({
+                   url: `/rest/api/content/${customContentId}`,
+                   data: {
+                     "expand": "body.raw"
+                   },
+	                  success: function (response) {
+	                    setDsl(JSON.parse(JSON.parse(response).body.raw.value).dsl);
+	                    setTimeout(AP.resize, 1500)
+	                  }
+                });
+		          }else{
+		            console.log("data is not exists");
+		          }
+          });
+
+		  };
+		  fetchData();
+  },[]);
+
 
   return (
     <Page>
       <Wrapper>
-        <Mermaid dsl={dsl} />
+        <Mermaid dsl={dsl}  />
       </Wrapper>
     </Page>
   );

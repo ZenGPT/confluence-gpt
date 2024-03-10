@@ -38,7 +38,7 @@
         "outputType": "block",
         "bodyType": "none",
         "editor": {
-          "url": "/dashboard",
+          "url": "/dashboard?spaceKey={space.key}",
           "editTitle": {
             "value": "Diagramly AI"
           },
@@ -205,7 +205,7 @@
         "location": "none",
         "url": "/dashboard",
         "name": {
-          "value": "ZenUML Dashboard"
+          "value": "Ai Aide Dashboard"
         }
       },
       {
@@ -213,7 +213,7 @@
         "location": "none",
         "url": "/hello-world?version=__VERSION__&spaceKey={space.key}&addonKey=__ADDON_KEY__&postInstallPageKey=__POST_INSTALL_KEY__",
         "name": {
-          "value": "ZenUML Dashboard"
+          "value": "Ai Aide Dashboard"
         }
       }
 

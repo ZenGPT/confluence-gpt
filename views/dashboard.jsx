@@ -55,9 +55,20 @@ const codeMirrorOptions = {
   autoCloseBrackets: true,
 };
 
+function getUrlParam (param) {
+  let regExp = new RegExp(`${param}=([^&]*)`);
+  let matches = regExp.exec(window.location.search);
+  if (matches && matches.length > 0) {
+    const codedParam = regExp && matches[1];
+    return decodeURIComponent(codedParam);
+  }
+  return ''
+}
+
 const Dashboard = () => {
   const [sessions, setSessions] = React.useState([]);
   const [dsl, setDsl] = React.useState('');
+  const spaceKey = getUrlParam('spaceKey');
 
   const handleSubmit = React.useCallback(
     async (input) => {
@@ -141,7 +152,7 @@ const Dashboard = () => {
     <Page>
       <DebugComponent />
       <Wrapper>
-        <SaveButton dsl={dsl} browserWindow={window}/>
+        <SaveButton dsl={dsl} browserWindow={window} spaceKey={spaceKey}/>
         <Conversations sessions={sessions} />
 
         {dsl && <CodeMirror value={dsl} options={codeMirrorOptions} onChange={handleDslChange} />}
