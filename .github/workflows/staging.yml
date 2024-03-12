@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Test
-        run: npm run lint && npm run test
+        run: npm run lint && npm run test && npm run build
 
   staging-deploy:
     name: Deploy to staging
