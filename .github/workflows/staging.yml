@@ -40,12 +40,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20.11.1'
           cache: npm
       - name: Install dependencies
         run: npm install
       - name: Test
-        run: npm run lint && npm run test
+        run: npm run lint && npm run test && npm run build
 
   staging-deploy:
     name: Deploy to staging
@@ -61,7 +61,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20.11.1'
           cache: npm
       - name: Install dependencies
         run: npm install
