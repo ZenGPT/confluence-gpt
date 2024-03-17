@@ -127,12 +127,12 @@ const ListView = () => {
 
   const turnNextPage = (e) => {
       e.preventDefault();
-			loadPageData(paginationObj.start + 1, paginationObj.limit);
+			loadPageData(paginationObj.start + paginationObj.limit, paginationObj.limit);
   };
 
   const turnPrevPage = (e) => {
       e.preventDefault();
-			loadPageData(paginationObj.start - 1, paginationObj.limit);
+			loadPageData(paginationObj.start - paginationObj.limit, paginationObj.limit);
   };
 
   return (
