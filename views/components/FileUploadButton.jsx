@@ -52,7 +52,7 @@ const FileUploadButton = ({ onUpload }) => {
       {isLoading ? (
         <Spinner size="medium" />
       ) : (
-        <IconButton icon={ImageIcon} onClick={handleClick} label="Upload Image" />
+        <IconButton icon={ImageIcon} onClick={handleClick} label="Upload Image" type="button"/>
       )}
       <input
         type="file"
