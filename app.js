@@ -84,8 +84,8 @@ app.use(compression());
 app.use(addon.middleware());
 
 // Mount the static files directory
-const staticDir = path.join(__dirname, 'public');
-app.use(express.static(staticDir));
+app.use('/confluence-plugin', express.static(path.join(__dirname, 'modules/confluence-plugin/dist')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Atlassian security policy requirements
 // http://go.atlassian.com/security-requirements-for-cloud-apps

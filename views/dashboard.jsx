@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import DebugComponent from './components/DebugComponent';
-import Conversations from './components/Conversations';
-import Mermaid from './components/Mermaid';
+import Workspace from './components/Workspace';
 import MessageSender from './components/MessageSender';
 import { v4 as uuidv4 } from 'uuid';
 import { observeDomChanges } from '../utils';
@@ -14,7 +13,7 @@ const Page = styled.div`
   justify-content: start;
   height: 100vh;
   margin: 0 auto;
-  overflow: hidden;
+  overflow: auto;
 `;
 
 const Wrapper = styled.div`
@@ -25,34 +24,11 @@ const Wrapper = styled.div`
   flex-direction: column;
   flex-grow: 1;
   justify-content: space-between;
-  overflow: hidden;
+  overflow: auto;
   h2 {
     line-height: 1;
   }
 `;
-
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/material.css';
-import 'codemirror/mode/javascript/javascript.js';
-
-import { UnControlled as CodeMirror } from 'react-codemirror2'
-
-
-const codeMirrorOptions = {
-  mode: 'javascript',
-  tabSize: 4,
-  theme: 'monokai',
-  lineNumbers: true,
-  line: true,
-  // keyMap: "sublime",
-  extraKeys: { "Ctrl": "autocomplete" },
-  foldGutter: true,
-  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-  styleSelectedText: true,
-  highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
-  placeholder: 'Write you code here',
-  autoCloseBrackets: true,
-};
 
 const Dashboard = () => {
 const [sessions, setSessions] = React.useState([]);
@@ -129,7 +105,20 @@ const [sessions, setSessions] = React.useState([]);
     [sessions]
   );
 
-  const handleDslChange = (editor, data, value) => setDsl(value);
+  const exampleDSL = `
+  sequenceDiagram
+      title: Here is a title
+  
+      participant A
+      participant B
+      participant C
+      participant D
+  
+      A->>B: Normal line
+      B-->>C: Dashed line
+      C->>D: Open arrow
+      D-->>A: Dashed open arrow
+  `;
 
   useEffect(() => {
     // there is a margin on document.body, perhaps added by Confluence since I didn't found related logic in our code, remove it because it causes a unwanted scrollbar
@@ -140,10 +129,7 @@ const [sessions, setSessions] = React.useState([]);
     <Page>
       <DebugComponent />
       <Wrapper>
-        <Conversations sessions={sessions} />
-
-        {dsl && <CodeMirror value={dsl} options={codeMirrorOptions} onChange={handleDslChange} />}
-        <Mermaid dsl={dsl} />
+        <Workspace dsl={dsl || exampleDSL} sessions={sessions} />
         <MessageSender onSubmit={handleSubmit} placeholder={'Enter an image URL here'} />
       </Wrapper>
     </Page>
