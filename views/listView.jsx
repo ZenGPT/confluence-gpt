@@ -1,8 +1,7 @@
 import React, { useEffect,useState } from 'react';
 import styled from 'styled-components';
 import DebugComponent from './components/DebugComponent';
-import Workspace from './components/Workspace';
-import MessageSender from './components/MessageSender';
+import Button from '@atlaskit/button';
 import { v4 as uuidv4 } from 'uuid';
 import { observeDomChanges } from '../utils';
 
@@ -30,6 +29,8 @@ const Wrapper = styled.div`
   }
 `;
 
+const customContentKey = 'ac:gptdock-confluence:gpt-custom-content-key';
+
 const ListView = () => {
 
 	const [confDiagramResp, setConfDiagramResp] = useState([]);
@@ -49,7 +50,7 @@ const ListView = () => {
         url: "/rest/api/content/",
         type: "GET",
         data: {
-          "type": 'ac:gptdock-confluence:gpt-custom-content-key',
+          "type": customContentKey,
           "spaceKey": context.confluence.space.key,
           "expand": "version"
         },
@@ -73,14 +74,13 @@ const ListView = () => {
 
 
 	async function loadPageData(start, limit) {
-			console.log("xxx");
 		  const localAp = AP;
 			const context = await localAp.context.getContext();
 			localAp.request({
         url: "/rest/api/content/",
         type: "GET",
         data: {
-          "type": 'ac:gptdock-confluence:gpt-custom-content-key',
+          "type": customContentKey,
           "spaceKey": context.confluence.space.key,
           "expand": "version",
           "start": start,
@@ -117,9 +117,9 @@ const ListView = () => {
       .sort((doc1, doc2) => Number(doc2.id) - Number(doc1.id))
       .map((doc) => {
         return (
-          <li key={doc.id}>
-            <div>{doc.title}</div>
-          </li>
+          <tr key={doc.id}>
+            <td>{doc.title}</td>
+          </tr>
         )
       }))
   }, [confDiagramResp]);
@@ -139,17 +139,18 @@ const ListView = () => {
     <Page>
       <DebugComponent />
       <Wrapper>
-				<ul>
-					<h1>abc</h1>
-					{diagramItemList}
-				</ul>
+        <h1>Diagramly Collection</h1>
+				<table>
+          <tbody>
+            {diagramItemList}
+          </tbody>
+        </table>
 				<div>
-
 					{ paginationObj.hasPrev &&
-						<a  onClick={turnPrevPage}>Previous Page</a>
+						<Button onClick={turnPrevPage}>Prev</Button> 
 					}
 					{ paginationObj.hasNext &&
-						<a onClick={turnNextPage}>Next Page</a>
+						<Button onClick={turnNextPage}>Next</Button> 
 					}
 
 				</div>
