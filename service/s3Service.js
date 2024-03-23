@@ -23,18 +23,15 @@ export const uploadToS3 = async ({ name, type, buffer }) => {
         Bucket: CF_R2_BUCKET_NAME,
         Key: uniqueName,
         Body: buffer,
-        ACL: 'public-read',
         ContentType: type,
       };
   
       // Upload the file to S3
       await s3.putObject(params).promise();
   
-      // Build the public URL of the uploaded file
-      const path = `${uniqueName}`;
-      console.log(`File uploaded successfully: ${path}`);
+      console.log(`File uploaded successfully: ${uniqueName}`);
       
-      return path;
+      return uniqueName;
     } catch (error) {
       console.error('Error uploading file to S3:', error);
       throw error; // Rethrow the error after logging it
