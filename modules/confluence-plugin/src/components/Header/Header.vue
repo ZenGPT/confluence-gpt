@@ -231,6 +231,8 @@ export default {
     }
   },
   mounted() {
+    this.setActiveTab('mermaid');
+    
     if (this.diagramType === "mermaid") {
       this.mermaidTitle = this.title;
 

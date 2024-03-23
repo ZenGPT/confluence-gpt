@@ -6,44 +6,11 @@
     >
       <div v-if="!hasFeedback">
         <p class="font-bold text-lg">
-          Rate your experience with ZenUML
+          Generate Diagram
         </p>
         <div class="mt-8 flex justify-between text-sm">
-          <div
-            v-for="(value, index) in score"
-            :key="value"
-            @click="handleSetValue(index + 1)"
-            class="bg-[#F1F1F1] w-12 h-12 rounded-lg border-2 p-1.5 text-3xl flex items-center justify-center group hover:bg-[#e0e0e0] duration-200 cursor-pointer"
-            :class="csatVal === index + 1 ? 'border-[#444BFF]' : 'border-transparent'"
-          >
-            {{ value }}
-          </div>
-        </div>
-        <div class="mt-2.5 text-sm text-[#939393] flex justify-between">
-          <span>Very bad</span>
-          <span>Very good</span>
-        </div>
-        <div class="flex text-xs mt-10 justify-center">
-          <a
-            v-if="!csatVal"
-            target="_blank"
-            @click="handlePopTooFrequentlyClick"
-            data-event-label="csat_too_frequent"
-            class="text-[#939393] hover:text-[#282828] hover:underline"
-            href="https://zenuml.atlassian.net/servicedesk/customer/portals"
-          >
-            Pop too frequently?</a
-          >
-          <div v-else class="flex w-full text-sm gap-8 items-center cursor-pointer">
-            <span class="font-bold text-[#939393]" @click="handleSkipClick">Skip</span>
-            <a
-              target="_blank"
-              @click="handleTellUsMoreClick"
-              data-event-label="csat_tell_us_more"
-              class="px-7 text-base flex justify-center h-[52px] items-center flex-1 py-3 bg-[#282828] rounded-lg text-white"
-              href="https://github.com/orgs/ZenUml/discussions"
-            >Tell us more</a>
-          </div>
+          <textarea id="inputArea" cols="50" rows="5" placeholder="Enter an image URL here"></textarea>
+          <button @click="handleGenerateClick">Generate</button>
         </div>
       </div>
       <div>
@@ -76,6 +43,7 @@
 import {onMounted, onUnmounted, ref} from "vue";
 import useCSATState from "@/hooks/useCSATState";
 import {trackEvent} from "@/utils/window";
+import EventBus from '@/EventBus'
 
 const score = ['\u{1F620}', '\u{1F612}', '\u{1F610}', '\u{1F60A}', '\u{1F60D}'];
 const hasFeedback = ref(false);
@@ -86,13 +54,8 @@ const {checkStateOfCSAT, updateStateOfCSAT} = useCSATState();
 
 let timer: number;
 
-onMounted(async () => {
-  const isPopped = await checkStateOfCSAT();
-  if (!isPopped) {
-    timer = setTimeout(() => {
-      open.value = true;
-    }, 1000 * 60)
-  }
+onMounted( () => {
+  open.value = true;
 });
 
 onUnmounted(() => {
@@ -126,6 +89,32 @@ const handleCloseClick = () => {
     updateStateOfCSAT();
   }, 500);
 }
+
+const handleGenerateClick = async () => {
+  //@ts-ignore
+  const input = document.getElementById('inputArea').value;
+  if(!input) return;
+
+  //@ts-ignore
+  const token = await AP.context.getToken();
+  const response = await fetch(`/image-to-dsl?jwt=${token}`, {
+    method: 'POST',
+    body: JSON.stringify({imageUrl: input}),
+    headers: { 'Content-type': 'application/json; charset=UTF-8', },
+  });
+
+  // TODO: abstract to a lib function
+  const answer = await response.json();
+
+  const matchResult = answer.match(/```(json|mermaid)?([\s\S]*?)```/);
+  if(!matchResult) {
+    console.error(`Unparsable GPT answer:`, answer);
+  }
+  const content = matchResult && matchResult[2];
+  console.debug('Extracted content:', content);
+
+  EventBus.$emit('updateCode', content)
+};
 
 const handleSetValue = (value: number) => {
   csatVal.value = value;

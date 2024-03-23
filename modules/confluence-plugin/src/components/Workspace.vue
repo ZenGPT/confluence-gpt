@@ -9,7 +9,7 @@
         <DiagramPortal />
       </div>
     </div>
-    <CSAT />
+    <GPT />
   </div>
 </template>
 
@@ -18,7 +18,7 @@
   import Split from 'split.js'
   import Header from "@/components/Header/Header.vue";
   import DiagramPortal from "@/components/DiagramPortal.vue";
-  import CSAT from '@/components/CSAT/index.vue'
+  import GPT from '@/components/GPT/index.vue'
   export default {
     name: 'Workspace',
     props: {
@@ -33,7 +33,7 @@
       DiagramPortal,
       Header,
       Editor,
-      CSAT
+      GPT
     }
   }
 </script>

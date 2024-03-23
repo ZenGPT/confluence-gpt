@@ -132,7 +132,7 @@
       {
         "key": "gpt-diagram-macro",
         "name": {
-          "value": "AI Aide Diagram"
+          "value": "Diagramly"
         },
         "renderModes": {
           "default": {
