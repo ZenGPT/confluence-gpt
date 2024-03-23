@@ -98,9 +98,9 @@
       {
         "key": "gpt-custom-content-list-view-module-key",
         "location": "none",
-        "url": "/dashboard",
+        "url": "/listView",
         "name": {
-          "value": "ZenUML Dashboard"
+          "value": "Diagramly Dashboard"
         }
       },
       {
