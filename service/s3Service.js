@@ -1,7 +1,6 @@
 var AWS = require('aws-sdk');
 var uuidv4 = require('uuid').v4;
 
-const IMAGE_SERVICE_BASE_URL='https://media.diagramly.ai';
 const CF_R2_BUCKET_NAME='media-diagramly-ai';
 
 var s3 = new AWS.S3({
@@ -32,10 +31,10 @@ export const uploadToS3 = async ({ name, type, buffer }) => {
       await s3.putObject(params).promise();
   
       // Build the public URL of the uploaded file
-      const imageUrl = `${IMAGE_SERVICE_BASE_URL}/${uniqueName}`;
-      console.log(`File uploaded successfully: ${imageUrl}`);
+      const path = `${uniqueName}`;
+      console.log(`File uploaded successfully: ${path}`);
       
-      return imageUrl;
+      return path;
     } catch (error) {
       console.error('Error uploading file to S3:', error);
       throw error; // Rethrow the error after logging it

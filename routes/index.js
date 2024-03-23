@@ -116,6 +116,7 @@ export default function routes(app, addon) {
     }
   );
 
+  // TODO: can receive the image URL with the input prompt
   app.post('/image-to-dsl', addon.checkValidToken(), async (req, res) => {
       const { imageUrl } = req.body;
       const userId = req.context.userAccountId;

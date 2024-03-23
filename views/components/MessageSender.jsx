@@ -1,7 +1,7 @@
 import Form, { Field, HelperMessage } from '@atlaskit/form';
 import React from 'react';
 import Popup from '@atlaskit/popup';
-import FileUploadButton from './FileUploadButton';
+import ImageUploadAndPreview from './ImageUploadAndPreview';
 import PreDefinedPrompts from './PreDefinedPrompts';
 import LightbulbFilledIcon from '@atlaskit/icon/glyph/lightbulb-filled';
 import LoadingButton from '@atlaskit/button/loading-button';
@@ -78,9 +78,20 @@ const ButtonGroup = styled.div`
 
 const MessageSender = ({ onSubmit, placeholder }) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState('');
   const [currentPrompt, setCurrentPrompt] = React.useState('');
   const [tokenUsageRatio, setTokenUsageRatio] = React.useState('');
+  const [imageFile, setImageFile] = React.useState(null);
+  const [showPreview, setShowPreview] = React.useState(true);
+
+  const handleImageSelected = (file) => {
+    setImageFile(file);
+    setShowPreview(true);
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setShowPreview(false);
+  };
 
   const inputRef = React.useRef();
   const formRef = React.useRef();
@@ -105,16 +116,21 @@ const MessageSender = ({ onSubmit, placeholder }) => {
     }
   };
 
-  const handleUpload = (url) => {
-    setInputValue(prev => `${prev}${url}`);
-  };
-
   const handleSubmit = async (data, formApi) => {
-    if (!data.query) return;
+    if (!data.query && !imageFile) return;
+
     setCurrentPrompt('');
-    setInputValue('');
+    setImageFile(null);
+    setShowPreview(false);
     resizeTextArea();
-    await onSubmit(data.query || currentPrompt);
+    if (imageFile) {
+      await onSubmit({
+        input: data.query || currentPrompt,
+        imageFile,
+      });
+    } else {
+      await onSubmit({ query: data.query || currentPrompt });
+    }
     formApi.reset();
     await getTokenUsageRatio();
   };
@@ -133,32 +149,30 @@ const MessageSender = ({ onSubmit, placeholder }) => {
     })();
   }, []);
 
-  React.useEffect(() => {
-    setInputValue(currentPrompt);
-  }, [currentPrompt]);
-
   return (
     <ChatSendBox>
       <FormBox>
         <Form onSubmit={handleSubmit}>
           {({ formProps, submitting }) => (
             <form {...formProps} ref={formRef}>
-              <Field name="query" defaultValue={inputValue}>
+              <Field name="query" defaultValue={currentPrompt}>
                 {({ fieldProps }) => (
                   <StyledTextArea
                     ref={inputRef}
                     resize="smart"
                     onKeyDown={handleInputKeyDown}
                     placeholder={placeholder || "e.g. Write a Job Description for Senior DevOps Engineer"}
-                    value={inputValue}
-                    onChange={e => setInputValue(e.target.value)}
                     {...fieldProps}
                   />
                 )}
               </Field>
               <ButtonBox>
                 <ButtonGroup>
-                  <FileUploadButton onUpload={handleUpload} />
+                <ImageUploadAndPreview
+                  onImageSelected={handleImageSelected}
+                  onRemove={handleRemoveImage}
+                  showPreview={showPreview}
+                />
                   <Popup
                     isOpen={isOpen}
                     onClose={() => setIsOpen(false)}
