@@ -92,7 +92,12 @@ export default {
       }, {
         line: codeRange.stop.line-1, ch: codeRange.stop.col
       }, {css: 'background: gray'})
-    })
+    });
+    EventBus.$on('updateCode', (code) => {
+      console.log('--Editor - updateCode:', code)
+      this.onEditorCodeChange(code);
+      cmEditor.setValue(code)
+    });
     cmEditor.setValue(this.code)
     cmEditor.on('change', _.debounce((instance) => {
       this.onEditorCodeChange(instance.getValue())
