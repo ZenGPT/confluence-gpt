@@ -34,8 +34,36 @@ const Dashboard = () => {
 const [sessions, setSessions] = React.useState([]);
   const [dsl, setDsl] = React.useState('');
 
+  const uploadImageToS3 = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const token = await AP.context.getToken();
+    const response = await fetch(`/upload-image?jwt=${token}`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload image');
+    }
+
+    return response.json();
+  };
+
+  const convert2Base64 = async (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   const handleSubmit = React.useCallback(
-    async (input) => {
+    async ({input, imageFile}) => {
       const chat = {
         type: 'user',
         message: input,
@@ -55,7 +83,22 @@ const [sessions, setSessions] = React.useState([]);
       // TODO: move this part to /libs/api
       // try fetch data from server, if error, set error message, if success, set success message
       try {
+        // upload image to S3
+        if (imageFile) {
+          try {
+            // eslint-disable-next-line no-unused-vars
+            const { imageUrl } = await uploadImageToS3(imageFile);
+
+            input = await convert2Base64(imageFile); // if the input is an image, convert it to base64
+
+            // TODO: record the uploaded image path with the chatId in the database
+          } catch (error) {
+            console.error('Image upload failed:', error);
+          }
+        }
+
         const token = await AP.context.getToken();
+
         const response = await fetch(`/image-to-dsl?jwt=${token}`, {
           method: 'POST',
           body: JSON.stringify({imageUrl: input}),

@@ -73,7 +73,7 @@ app.use(
 );
 
 // Include request parsers
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 

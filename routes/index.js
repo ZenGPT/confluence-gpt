@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { findOrCreateClient, clientRunOutOfToken, deductClientToken } from '../service/client';
+import { uploadToS3 } from '../service/s3Service';
 
 const ASK_API_URL = 'http://localhost:5001/v1/ask';
 const ASK_API_AUTH_TOKEN = 'Bearer localhost';
@@ -7,6 +8,10 @@ const CLIENT_INFO_API_URL = 'http://localhost:5001/v1/client/info';
 const OPENAI_BASEURL='https://gateway.ai.cloudflare.com/v1/8d5fc7ce04adc5096f52485cce7d7b3d/diagramly-ai/openai';
 const SYSTEM_PROMPT = `You're a Mermaid diagram expert.`;
 const USER_PROMPT = `Generate Mermaid DSL for the given sequence diagram image. Output the DSL in code block.`;
+
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 export default function routes(app, addon) {
   // Redirect root path to /atlassian-connect.json,
@@ -116,6 +121,7 @@ export default function routes(app, addon) {
     }
   );
 
+  // TODO: can receive the image URL with the input prompt
   app.post('/image-to-dsl', addon.checkValidToken(), async (req, res) => {
       const { imageUrl } = req.body;
       const userId = req.context.userAccountId;
@@ -187,6 +193,26 @@ export default function routes(app, addon) {
       }
     }
   );
+
+  // Upload image to S3
+  app.post('/upload-image', addon.checkValidToken(), upload.single('image'), async (req, res) => {
+    if (!req.file) {
+      return res.status(422).json({ error: 'A file is required' });
+    }
+
+    try {
+      const imageUrl = await uploadToS3({
+        name: req.file.originalname,
+        type: req.file.mimetype,
+        buffer: req.file.buffer,
+      });
+
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error('Upload error:', error);
+      res.status(500).json({ error: 'Error uploading file' });
+    }
+  });
 
   // Add additional route handlers here...
   app.get('/ai-aide', addon.authenticate(), function (req, res) {
