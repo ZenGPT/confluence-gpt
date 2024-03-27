@@ -39,6 +39,11 @@ export default function routes(app, addon) {
     return res.render( 'dashboard.jsx', { title: 'AI Aide', browserOnly: true, } );
   });
 
+
+  app.get('/listView', (req, res) => {
+    return res.render( 'listView.jsx', { title: 'Diagramly Dashboard', browserOnly: true, } );
+  });
+
   app.get('/client/info', addon.checkValidToken(), async (req, res) => {
     const product_id = req.context.addonKey;
     const client_id = req.context.clientKey;
