@@ -50,7 +50,7 @@ export default {
     initEditor: function (options){
       cmEditor = codemirror.fromTextArea(this.$refs.htmlEditor, options);
     },
-    onEditorCodeChange: function (newCode) {
+    updateCode: function (newCode) {
       const isMermaid = this.diagramType === 'mermaid';
 
       if (isMermaid) {
@@ -59,6 +59,10 @@ export default {
         // TODO: rename the action updateCode2
         this.$store.dispatch('updateCode2', newCode);
       }
+    },
+    onEditorCodeChange: function (newCode) {
+      this.updateCode(newCode);
+      EventBus.$emit('EditorCodeChange', {code: newCode, diagramType: this.diagramType});
     },
   },
   computed: {
@@ -93,9 +97,8 @@ export default {
         line: codeRange.stop.line-1, ch: codeRange.stop.col
       }, {css: 'background: gray'})
     });
-    EventBus.$on('updateCode', (code) => {
-      console.log('--Editor - updateCode:', code)
-      this.onEditorCodeChange(code);
+    EventBus.$on('ExternalCodeChange', (code) => {
+      this.updateCode(code);
       cmEditor.setValue(code)
     });
     cmEditor.setValue(this.code)

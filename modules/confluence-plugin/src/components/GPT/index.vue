@@ -1,36 +1,27 @@
 <template>
   <transition name="fade">
-    <div
-      v-if="open"
-      class="fixed w-[470px] h-fit bottom-4 right-4 z-50 bg-white text-[#282828] py-10 px-12 rounded-xl drop-shadow-[0_20px_26px_rgba(176,176,176,0.35)]"
-    >
-      <div v-if="!hasFeedback">
-        <p class="font-bold text-lg">
-          Generate Diagram
-        </p>
-        <div class="mt-8 flex justify-between text-sm">
-          <textarea id="inputArea" cols="50" rows="5" placeholder="Enter an image URL here"></textarea>
-          <button @click="handleGenerateClick">Generate</button>
+    <div v-if="open" class="fixed w-[470px] h-fit bottom-4 right-4 z-50 bg-white text-[#282828] py-10 px-12 rounded-xl drop-shadow-[0_20px_26px_rgba(176,176,176,0.35)]" >
+      <div>
+        <p class="font-bold text-lg"> Generate Diagram </p>
+        <div class="mt-2 flex justify-between text-sm">
+          <textarea id="inputArea" class="mr-2" cols="80" rows="3" placeholder="Enter an image URL here"></textarea>
+          <button class="h-[52px] px-8 py-3 bg-[#282828] rounded-[6px] text-white" @click="handleGenerateClick">Generate</button>
         </div>
       </div>
       <div>
         <transition name="fade-no-transform">
-          <div
-            class="bg-inherit rounded-lg flex flex-col py-[18px] -mx-[10px]"
-            v-if="hasFeedback && csatVal"
-          >
+          <div class="bg-inherit rounded-lg flex flex-col py-[18px] -mx-[10px]" v-if="versions.length > 1">
             <div class="flex gap-2">
-              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                <rect width="36" height="36" rx="18" fill="#1BA97F"/>
-                <path d="M12.7119 18L16.4619 21.75L23.9619 14.25" stroke="white" stroke-width="1.125"
-                      stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <span class="text-center text-4xl font-bold">Thank You</span>
+              <span class="text-center text-lg font-bold">Generated Versions</span>
             </div>
-            <p class="mt-4">Your review was successfully submitted.</p>
+            <p class="mt-4">
+              <select id="generatedVersions" v-model="currentVersion" @change="handleOptionChange">
+                <option v-for="(option, index) in versions" :key="index" :value="option">{{ option.label }}</option>
+              </select>
+              <p v-if="currentVersion.input">User input: {{ currentVersion.input }}</p>
+            </p>
             <div class="flex justify-end mt-8">
-              <button class="h-[52px] px-8 py-3 bg-[#282828] rounded-[6px] text-white" @click="handleCloseClick">Close
-              </button>
+              <button class="h-[52px] px-8 py-3 bg-[#282828] rounded-[6px] text-white" @click="handleCloseClick">Close </button>
             </div>
           </div>
         </transition>
@@ -41,52 +32,34 @@
 
 <script setup lang="ts">
 import {onMounted, onUnmounted, ref} from "vue";
-import useCSATState from "@/hooks/useCSATState";
-import {trackEvent} from "@/utils/window";
-import EventBus from '@/EventBus'
+import EventBus from '@/EventBus';
+import store from "@/model/store2";
 
-const score = ['\u{1F620}', '\u{1F612}', '\u{1F610}', '\u{1F60A}', '\u{1F60D}'];
-const hasFeedback = ref(false);
+const versions = ref([]);
+const currentVersion = ref({});
 const open = ref(false);
-const csatVal = ref<null | number>(null);
-
-const {checkStateOfCSAT, updateStateOfCSAT} = useCSATState();
 
 let timer: number;
 
 onMounted( () => {
   open.value = true;
+  currentVersion.value = {label: 'Original', code: store.state.diagram.mermaidCode};
+  //@ts-ignore
+  versions.value.push(currentVersion.value);
+
+  EventBus.$on('EditorCodeChange', ({code}) => {
+    //@ts-ignore
+    currentVersion.value.code = code;
+  });
 });
 
 onUnmounted(() => {
   clearTimeout(timer)
 });
 
-const handleSkipClick = () => {
-  hasFeedback.value = true;
-}
-
-const handlePopTooFrequentlyClick = () => {
-  trackEvent("csat", "csat_too_frequent", "operation");
-  open.value = false;
-  hasFeedback.value = false;
-  updateStateOfCSAT();
-}
-
-const handleTellUsMoreClick = () => {
-  trackEvent("csat", "csat_tell_us_more", "operation");
-  hasFeedback.value = true;
-}
-
 const handleCloseClick = () => {
-  trackEvent("csat", "click", "operation", {
-    csat_value: csatVal.value,
-  });
-
   setTimeout(() => {
     open.value = false;
-    hasFeedback.value = false;
-    updateStateOfCSAT();
   }, 500);
 }
 
@@ -95,29 +68,52 @@ const handleGenerateClick = async () => {
   const input = document.getElementById('inputArea').value;
   if(!input) return;
 
+  let content;
+
   //@ts-ignore
-  const token = await AP.context.getToken();
-  const response = await fetch(`/image-to-dsl?jwt=${token}`, {
-    method: 'POST',
-    body: JSON.stringify({imageUrl: input}),
-    headers: { 'Content-type': 'application/json; charset=UTF-8', },
-  });
+  if(AP?.context) {
+    //@ts-ignore
+    const token = await AP.context.getToken();
+    const response = await fetch(`/image-to-dsl?jwt=${token}`, {
+      method: 'POST',
+      body: JSON.stringify({imageUrl: input}),
+      headers: { 'Content-type': 'application/json; charset=UTF-8', },
+    });
 
-  // TODO: abstract to a lib function
-  const answer = await response.json();
+    // TODO: abstract to a lib function
+    const answer = await response.json();
 
-  const matchResult = answer.match(/```(json|mermaid)?([\s\S]*?)```/);
-  if(!matchResult) {
-    console.error(`Unparsable GPT answer:`, answer);
+    const matchResult = answer.match(/```(json|mermaid)?([\s\S]*?)```/);
+    if(!matchResult) {
+      console.error(`Unparsable GPT answer:`, answer);
+    }
+    content = matchResult && matchResult[2];
+    console.debug('Extracted content:', content);
+  } else {
+    //local dev
+    content = `sequenceDiagram
+    title Here is a generation for input ${input}
+    participant A
+    participant B
+    participant C
+    participant D
+    A->>B: Normal line
+    B-->>C: Dashed line
+    C->>D: Open arrow
+    D-->>A: Dashed open arrow
+    `;
   }
-  const content = matchResult && matchResult[2];
-  console.debug('Extracted content:', content);
 
-  EventBus.$emit('updateCode', content)
+  EventBus.$emit('ExternalCodeChange', content);
+  //@ts-ignore
+  currentVersion.value = {label: new Date().toISOString(), input, code: content};
+  //@ts-ignore
+  versions.value.push(currentVersion.value);
 };
 
-const handleSetValue = (value: number) => {
-  csatVal.value = value;
+const handleOptionChange = () => {
+  //@ts-ignore
+  EventBus.$emit('ExternalCodeChange', currentVersion.value.code);
 };
 
 </script>
