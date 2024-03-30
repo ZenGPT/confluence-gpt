@@ -35,12 +35,11 @@ export default function routes(app, addon) {
     );
   });
 
-  app.get('/dashboard', (req, res) => {
+  app.get('/dashboard', addon.authenticate(), (req, res) => {
     return res.render( 'dashboard.jsx', { title: 'AI Aide', browserOnly: true, } );
   });
 
-
-  app.get('/listView', (req, res) => {
+  app.get('/listView', addon.authenticate(), (req, res) => {
     return res.render( 'listView.jsx', { title: 'Diagramly Dashboard', browserOnly: true, } );
   });
 
