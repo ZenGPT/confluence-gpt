@@ -5,6 +5,11 @@
         <p class="font-bold text-lg"> Generate Diagram </p>
         <div class="mt-2 flex justify-between text-sm">
           <textarea id="inputArea" class="mr-2" cols="80" rows="3" placeholder="Enter an image URL here"></textarea>
+          <ImageUploadAndPreview
+            :onImageSelected="handleImageSelected"
+            :onRemove="handleRemoveImage"
+            :showPreview="true"
+          />
           <button class="h-[52px] px-8 py-3 bg-[#282828] rounded-[6px] text-white" @click="handleGenerateClick">Generate</button>
         </div>
       </div>
@@ -32,12 +37,14 @@
 
 <script setup lang="ts">
 import {onMounted, onUnmounted, ref} from "vue";
+import ImageUploadAndPreview from '@/components/ImageUploadAndPreview.vue'
 import EventBus from '@/EventBus';
 import store from "@/model/store2";
 
 const versions = ref([]);
 const currentVersion = ref({});
 const open = ref(false);
+const imageFile = ref(null);
 
 let timer: number;
 
@@ -63,10 +70,29 @@ const handleCloseClick = () => {
   }, 500);
 }
 
+const handleImageSelected = (file) => {
+  imageFile.value = file;
+}
+
+const handleRemoveImage = () => {
+  imageFile.value = null;
+}
+
+const convert2Base64 = async (file) => {
+  return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+}
+
 const handleGenerateClick = async () => {
   //@ts-ignore
-  const input = document.getElementById('inputArea').value;
-  if(!input) return;
+  let input = document.getElementById('inputArea').value;
+  if(!input && !imageFile.value) return;
 
   let content;
 
@@ -74,6 +100,24 @@ const handleGenerateClick = async () => {
   if(AP?.context) {
     //@ts-ignore
     const token = await AP.context.getToken();
+
+    if (imageFile.value) {
+      const formData = new FormData();
+      formData.append('image', imageFile.value);
+      const response = await fetch(`/upload-image?jwt=${token}`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      input = await convert2Base64(imageFile.value); // replace input with base64 if image is uploaded
+
+      console.debug('Uploaded image:', input);
+    }
+
     const response = await fetch(`/image-to-dsl?jwt=${token}`, {
       method: 'POST',
       body: JSON.stringify({imageUrl: input}),
