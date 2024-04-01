@@ -1,38 +1,29 @@
 <template>
-  <transition name="fade">
-    <div v-if="open" class="fixed w-[470px] h-fit bottom-4 right-4 z-50 bg-white text-[#282828] py-10 px-12 rounded-xl drop-shadow-[0_20px_26px_rgba(176,176,176,0.35)]" >
-      <div>
-        <p class="font-bold text-lg"> Generate Diagram </p>
-        <div class="mt-2 flex justify-between text-sm">
-          <textarea id="inputArea" class="mr-2" cols="80" rows="3" placeholder="Enter an image URL here"></textarea>
-          <ImageUploadAndPreview
-            :onImageSelected="handleImageSelected"
-            :onRemove="handleRemoveImage"
-            :showPreview="true"
-          />
-          <button class="h-[52px] px-8 py-3 bg-[#282828] rounded-[6px] text-white" @click="handleGenerateClick">Generate</button>
-        </div>
+  <div class="generation-container">
+    <div class="generation-form">
+      <p class="font-bold text-lg">Generate Diagram</p>
+      <textarea id="inputArea" class="styled-textarea" placeholder="Enter an image URL here"></textarea>
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <ImageUploadAndPreview
+          :onImageSelected="handleImageSelected"
+          :onRemove="handleRemoveImage"
+          :showPreview="true"
+        />
+        <button class="px-3 py-2 bg-[#0052CC] rounded-[4px] text-white" @click="handleGenerateClick">Generate</button>
       </div>
-      <div>
-        <transition name="fade-no-transform">
-          <div class="bg-inherit rounded-lg flex flex-col py-[18px] -mx-[10px]" v-if="versions.length > 1">
-            <div class="flex gap-2">
-              <span class="text-center text-lg font-bold">Generated Versions</span>
-            </div>
-            <p class="mt-4">
-              <select id="generatedVersions" v-model="currentVersion" @change="handleOptionChange">
-                <option v-for="(option, index) in versions" :key="index" :value="option">{{ option.label }}</option>
-              </select>
-              <p v-if="currentVersion.input">User input: {{ currentVersion.input }}</p>
-            </p>
-            <div class="flex justify-end mt-8">
-              <button class="h-[52px] px-8 py-3 bg-[#282828] rounded-[6px] text-white" @click="handleCloseClick">Close </button>
-            </div>
+      <div class="bg-inherit rounded-lg flex flex-col py-[18px] -mx-[10px]" v-if="versions.length > 1">
+          <div class="flex gap-2">
+            <span class="text-center text-lg font-bold">Generated Versions</span>
           </div>
-        </transition>
-      </div>
+          <p class="mt-4">
+            <select id="generatedVersions" v-model="currentVersion" @change="handleOptionChange">
+              <option v-for="(option, index) in versions" :key="index" :value="option">{{ option.label }}</option>
+            </select>
+            <p v-if="currentVersion.input">User input: {{ currentVersion.input }}</p>
+          </p>
+        </div>
     </div>
-  </transition>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -163,24 +154,28 @@ const handleOptionChange = () => {
 </script>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active {
-  transition: all .3s ease;
+.generation-container {
+  position: sticky;
+  bottom: 32px;
+  width: 768px;
+  margin: 0 auto;
+  padding-top: 16px;
 }
 
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-  transform: translateY(30px);
+.generation-form {
+  background: #fff;
+  border-radius: 3px;
+  padding: 8px 16px 16px 16px;
+  box-shadow: var(
+    --ds-shadow-overlay,
+    0 4px 8px -2px rgba(9, 30, 66, 0.25),
+    0 0 1px rgba(9, 30, 66, 0.31)
+  );
 }
 
-.fade-leave-active {
-  transform: translateY(30px);
-}
-
-.fade-no-transform-enter-active, .fade-no-transform-leave-active {
-  transition: opacity .3s ease;
-}
-
-.fade-no-transform-enter, .fade-no-transform-leave-to {
-  opacity: 0;
+.styled-textarea {
+  margin-top: 8px;
+  border: none;
+  width: 100%;
 }
 </style>
