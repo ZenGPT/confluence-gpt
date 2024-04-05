@@ -1,14 +1,28 @@
 <template>
   <div class="content h-screen flex flex-col">
+
     <Header class="flex-shrink-0"/>
-    <div class="workspace flex-grow split">
-      <div id="workspace-left" class="editor overflow-auto">
-        <editor/>
+    <div class="left">
+
+    </div>
+    <div class="right">
+      <button class="flex items-center bg-blue-700 px-2 py-1 text-white text-sm font-semibold rounded disabled:bg-gray-300" @click.stop="modeSwitch">{{modeSwitchBtnTxt}}</button>
+      <div class="workspace flex-grow split" v-if="swithToEditMode">
+          <div id="workspace-left" class="editor overflow-auto">
+            <editor/>
+          </div>
+          <div id="workspace-right" class="diagram overflow-auto">
+            <DiagramPortal />
+          </div>
       </div>
-      <div id="workspace-right" class="diagram overflow-auto">
-        <DiagramPortal />
+
+      <div class="workspace flex-grow" v-if="swithToEditMode == false">
+          <div id="workspace-right" class="diagram overflow-auto">
+            <DiagramPortal />
+          </div>
       </div>
     </div>
+
     <GPT />
   </div>
 </template>
@@ -22,11 +36,28 @@
   export default {
     name: 'Workspace',
     props: {
-      msg: String
+      msg: String,
+      modeSwitchBtnTxt: {
+        type: String,
+        default: "Edit"
+      },
+      swithToEditMode: {
+        type: Boolean,
+        default: false
+      }
     },
     mounted () {
       if (window.split) {
         Split(['#workspace-left', '#workspace-right'])
+      }
+    },
+    setup(props){
+      const modeSwitch = () => {
+        props.swithToEditMode = !props.swithToEditMode;
+        props.modeSwitchBtnTxt = props.swithToEditMode?"Edit":"View";
+      }
+      return {
+        modeSwitch
       }
     },
     components: {
