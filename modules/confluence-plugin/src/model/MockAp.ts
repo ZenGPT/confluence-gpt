@@ -56,8 +56,11 @@ export default class MockAp implements IAp {
         return {body: JSON.stringify(customContentListSeq)};
       }
 
-
       return {body: JSON.stringify({id: 1234, body: {raw: {value: JSON.stringify('content')}}})};
+    }
+
+    if(req.url.startsWith('/rest/atlassian-connect/1/addons')) {
+      return {body: JSON.stringify({license: {active: true}})};
     }
 
     const handler = this.requestHandlers.find(h => h.match(req));

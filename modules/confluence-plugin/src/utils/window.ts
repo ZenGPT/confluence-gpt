@@ -75,7 +75,7 @@ export function trackEvent(
       console.log("Error in calling gtag", e);
     }
 
-    r2Track(action, eventDetails);
+    // r2Track(action, eventDetails);
   } catch (e) {
     console.error(
       "Error in trackingEvent. Please report to our helpdesk: https://zenuml.atlassian.net/servicedesk/customer/portals",
