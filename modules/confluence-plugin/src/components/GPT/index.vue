@@ -2,7 +2,8 @@
   <div class="generation-container">
     <div class="generation-form">
       <p class="font-bold text-lg">Generate Diagram</p>
-      <textarea class="styled-textarea" placeholder="Enter an image URL here or upload an image" v-model="inputText"></textarea>
+      <textarea class="styled-textarea" placeholder="Enter an image URL here or upload an image" 
+        v-model="inputText" @change="handleRemoveImage"></textarea>
       <div style="display: flex; align-items: center; justify-content: space-between;">
         <ImageUploadAndPreview
           :onImageSelected="handleImageSelected"
