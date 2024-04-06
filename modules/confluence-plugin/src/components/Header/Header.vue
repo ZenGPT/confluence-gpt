@@ -4,7 +4,7 @@
   >
     <div class="flex shrink-1 min-w-0">
       <div class="group ml-2 p-0.5 rounded flex bg-gray-100 hover:bg-gray-200">
-        <button
+        <!-- <button
           type="button"
           ref="btn-sequence"
           class="flex focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 rounded focus:outline-none focus-visible:ring-offset-gray-100"
@@ -34,7 +34,7 @@
               >Sequence</span
             >
           </span>
-        </button>
+        </button> -->
         <button
           type="button"
           ref="btn-mermaid"

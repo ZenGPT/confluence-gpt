@@ -1,35 +1,53 @@
 <template>
-  <div class="generation-container">
-    <div class="generation-form">
-      <p class="font-bold text-lg">Generate Diagram</p>
-      <textarea class="styled-textarea" placeholder="Enter an image URL here or upload an image" v-model="inputText"></textarea>
-      <div style="display: flex; align-items: center; justify-content: space-between;">
-        <ImageUploadAndPreview
-          :onImageSelected="handleImageSelected"
-          :onRemove="handleRemoveImage"
-          :showPreview="!isImageFileGenerated()"
-        />
-        <button class="px-3 py-2 bg-[#0052CC] rounded-[4px] text-white" 
-          @click="handleGenerateClick" :disabled="busy">
-          <span>
-            <span style="display: inline-block; margin-bottom: -5px;" class="mr-1"><svg width="24" height="24" viewBox="0 0 24 24" role="presentation"><path fill="currentColor" fill-rule="evenodd" d="M9.276 4.382L7.357 9.247l-4.863 1.917a.78.78 0 000 1.45l4.863 1.918 1.919 4.863a.78.78 0 001.45 0h-.001l1.918-4.863 4.864-1.919a.781.781 0 000-1.45l-4.864-1.916-1.918-4.865a.776.776 0 00-.44-.438.778.778 0 00-1.01.438zm8.297-2.03l-.743 1.886-1.884.743a.56.56 0 000 1.038l1.884.743.743 1.886a.558.558 0 001.038 0l.745-1.886 1.883-.743a.557.557 0 000-1.038l-1.883-.743-.745-1.885a.552.552 0 00-.314-.314.562.562 0 00-.724.314zm-.704 13.003l-.744 1.883-1.883.744a.553.553 0 00-.316.314.56.56 0 00.316.724l1.883.743.744 1.884c.057.144.17.258.314.315a.56.56 0 00.724-.315l.744-1.884 1.883-.743a.557.557 0 000-1.038l-1.883-.744-.744-1.883a.551.551 0 00-.315-.316.56.56 0 00-.723.316z"></path></svg></span>
-            <span v-if="!busy">Generate</span>
-            <span v-if="busy">Generating...</span>
-          </span>
-        </button>
-      </div>
-      <div class="bg-inherit rounded-lg flex flex-col py-[18px] -mx-[10px]" v-if="versions.length > 1">
-          <div class="flex gap-2">
-            <span class="text-center text-lg font-bold">Generated Versions</span>
-          </div>
-          <p class="mt-4">
-            <select id="generatedVersions" v-model="currentVersion" @change="handleOptionChange">
-              <option v-for="(option, index) in versions" :key="index" :value="option">{{ option.label }}</option>
-            </select>
-            <p v-if="currentVersion.isInputUrl"><img :src=currentVersion.input class="image-preview" /></p>
-            <p v-if="!currentVersion.isInputUrl && currentVersion.input">User Input: {{ currentVersion.input }}</p>
-          </p>
+  <div>
+    <div class="generation-container" v-if="open">
+      <div class="generation-form">
+        <div style="display: flex; justify-content: space-between;">
+          <p class="font-bold text-lg">Generate Diagram</p>
+          <button type="button" class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+            @click="handleCloseClick">
+            <span class="sr-only">Close menu</span>
+            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
+      
+        <textarea class="styled-textarea" placeholder="Enter an image URL here or upload an image" v-model="inputText"></textarea>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <ImageUploadAndPreview
+            :onImageSelected="handleImageSelected"
+            :onRemove="handleRemoveImage"
+            :showPreview="!isImageFileGenerated()"
+          />
+          <button class="px-3 py-2 bg-[#0052CC] rounded-[4px] text-white" 
+            @click="handleGenerateClick" :disabled="busy">
+            <span>
+              <span style="display: inline-block; margin-bottom: -5px;" class="mr-1"><svg width="24" height="24" viewBox="0 0 24 24" role="presentation"><path fill="currentColor" fill-rule="evenodd" d="M9.276 4.382L7.357 9.247l-4.863 1.917a.78.78 0 000 1.45l4.863 1.918 1.919 4.863a.78.78 0 001.45 0h-.001l1.918-4.863 4.864-1.919a.781.781 0 000-1.45l-4.864-1.916-1.918-4.865a.776.776 0 00-.44-.438.778.778 0 00-1.01.438zm8.297-2.03l-.743 1.886-1.884.743a.56.56 0 000 1.038l1.884.743.743 1.886a.558.558 0 001.038 0l.745-1.886 1.883-.743a.557.557 0 000-1.038l-1.883-.743-.745-1.885a.552.552 0 00-.314-.314.562.562 0 00-.724.314zm-.704 13.003l-.744 1.883-1.883.744a.553.553 0 00-.316.314.56.56 0 00.316.724l1.883.743.744 1.884c.057.144.17.258.314.315a.56.56 0 00.724-.315l.744-1.884 1.883-.743a.557.557 0 000-1.038l-1.883-.744-.744-1.883a.551.551 0 00-.315-.316.56.56 0 00-.723.316z"></path></svg></span>
+              <span v-if="!busy">Generate</span>
+              <span v-if="busy">Generating...</span>
+            </span>
+          </button>
+        </div>
+        <div class="bg-inherit rounded-lg flex flex-col py-[18px] -mx-[10px]" v-if="versions.length > 1">
+            <div class="flex gap-2">
+              <span class="text-center text-lg font-bold">Generated Versions</span>
+            </div>
+            <p class="mt-4">
+              <select id="generatedVersions" v-model="currentVersion" @change="handleOptionChange">
+                <option v-for="(option, index) in versions" :key="index" :value="option">{{ option.label }}</option>
+              </select>
+              <p v-if="currentVersion.isInputUrl"><img :src=currentVersion.input class="image-preview" /></p>
+              <p v-if="!currentVersion.isInputUrl && currentVersion.input">User Input: {{ currentVersion.input }}</p>
+            </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="fixed h-fit bottom-4 right-4 z-50 bg-white text-[#282828] py-5 px-4 rounded-xl drop-shadow-[0_20px_26px_rgba(176,176,176,0.35)]" v-if="!open">
+      <button @click="handleOpenClick">
+        <svg width="24" height="24" viewBox="0 0 24 24" role="presentation"><path fill="currentColor" fill-rule="evenodd" d="M9.276 4.382L7.357 9.247l-4.863 1.917a.78.78 0 000 1.45l4.863 1.918 1.919 4.863a.78.78 0 001.45 0h-.001l1.918-4.863 4.864-1.919a.781.781 0 000-1.45l-4.864-1.916-1.918-4.865a.776.776 0 00-.44-.438.778.778 0 00-1.01.438zm8.297-2.03l-.743 1.886-1.884.743a.56.56 0 000 1.038l1.884.743.743 1.886a.558.558 0 001.038 0l.745-1.886 1.883-.743a.557.557 0 000-1.038l-1.883-.743-.745-1.885a.552.552 0 00-.314-.314.562.562 0 00-.724.314zm-.704 13.003l-.744 1.883-1.883.744a.553.553 0 00-.316.314.56.56 0 00.316.724l1.883.743.744 1.884c.057.144.17.258.314.315a.56.56 0 00.724-.315l.744-1.884 1.883-.743a.557.557 0 000-1.038l-1.883-.744-.744-1.883a.551.551 0 00-.315-.316.56.56 0 00-.723.316z"></path></svg>
+      </button>
     </div>
   </div>
 </template>
@@ -42,7 +60,7 @@ import store from "@/model/store2";
 
 const versions = ref([]);
 const currentVersion = ref({});
-const open = ref(false);
+const open = ref(true);
 const imageFile = ref(null);
 const inputText = ref('');
 const busy = ref(false);
@@ -65,10 +83,12 @@ onUnmounted(() => {
   clearTimeout(timer)
 });
 
-const handleCloseClick = () => {
-  setTimeout(() => {
-    open.value = false;
-  }, 500);
+function handleCloseClick() {
+  open.value = false;
+}
+
+function handleOpenClick() {
+  open.value = true;
 }
 
 const handleImageSelected = (file) => {
