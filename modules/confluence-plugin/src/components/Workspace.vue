@@ -46,18 +46,22 @@
         default: false
       }
     },
-    mounted () {
-      if (window.split) {
-        Split(['#workspace-left', '#workspace-right'])
-      }
-    },
     setup(props){
       const modeSwitch = () => {
         props.swithToEditMode = !props.swithToEditMode;
-        props.modeSwitchBtnTxt = props.swithToEditMode?"Edit":"View";
+        props.modeSwitchBtnTxt = props.swithToEditMode ? "View" : "Edit";
       }
       return {
         modeSwitch
+      }
+    },
+    watch:{
+      swithToEditMode(newValue, oldValue) {
+        if (window.split && newValue) {
+          setTimeout(() => {
+            Split(['#workspace-left', '#workspace-right']);
+          }, 500)
+        }
       }
     },
     components: {
