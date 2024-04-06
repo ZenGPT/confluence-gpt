@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="handleClick">Upload Image</button>
+    <button class="px-3 py-2 bg-gray-100 rounded-[4px]" @click="handleClick">Upload Image</button>
     <input
       ref="fileInput"
       type="file"
