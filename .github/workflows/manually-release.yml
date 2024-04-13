@@ -1,0 +1,92 @@
+name: Deploy postgresql to staging
+
+on: 
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'commit to deploy'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+env:
+  APP_ENV: "stag"
+
+
+jobs:
+
+  init_build_version:
+    name: init build version
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Generate Git Info File
+        uses: ./.github/actions/git-info
+      - name: Export Properties
+        id: properties
+        shell: bash
+        run: |
+          VERSION="$(echo $(date +'v%Y.%m.%d')_${{ github.run_number }}_$(git rev-parse --short=8 HEAD))"
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "BUILDTIME=$(echo $(date -u))" >>  "$GITHUB_OUTPUT"
+          echo "artifactName=gpt_ace.$VERSION.zip" >> "$GITHUB_OUTPUT"
+    outputs:
+      VERSION: ${{ steps.properties.outputs.VERSION }}
+      BUILDTIME: ${{ steps.properties.outputs.BUILDTIME }}
+      artifactName: ${{ steps.properties.outputs.artifactName }}
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with: 
+          ref: "${{ inputs.commit }}"
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Test
+        run: npm run lint && npm run test && npm run build
+
+  release:
+    name: ${{ inputs.commit }} to production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Generate Git Info File
+        uses: ./.github/actions/git-info
+      - name: Deploy to server
+        uses: easingthemes/ssh-deploy@v4.1.8
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_IP }}
+          REMOTE_USER: ${{ secrets.HOST_USER }}
+          TARGET: /home/${{ secrets.HOST_USER }}/ace-server/
+          EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/'
+          SCRIPT_AFTER: |
+            cd /home/${{ secrets.HOST_USER }}/ace-server/
+            npm install --production
+            sudo pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
+
+
