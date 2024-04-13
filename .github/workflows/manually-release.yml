@@ -1,4 +1,4 @@
-name: Deploy postgresql to staging
+name: Manually Release
 
 on: 
   workflow_dispatch:
