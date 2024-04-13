@@ -4,7 +4,7 @@ on:
   push:
     tags-ignore:
       - '**' # do not run on tags
-    branches: ['main', 'staging/**', 'release-*']
+    branches: ['main', 'staging/**']
   pull_request:
     branches: ['main', 'staging/**']
 
