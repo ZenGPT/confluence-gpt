@@ -130,12 +130,16 @@ const handleGenerateClick = async () => {
 
   const content = await retryableImageToDsl2(input);
 
-  EventBus.$emit('ExternalCodeChange', content);
+  if(!content) {
+    inputValidationError.value = 'Failed to generate.';
+  } else {
+    EventBus.$emit('ExternalCodeChange', content);
 
-  //@ts-ignore
-  currentVersion.value = {label: new Date().toISOString(), input, imageFile: imageFile.value, code: content};
-  //@ts-ignore
-  versions.value.push(currentVersion.value);
+    //@ts-ignore
+    currentVersion.value = {label: new Date().toISOString(), input, imageFile: imageFile.value, code: content};
+    //@ts-ignore
+    versions.value.push(currentVersion.value);
+  }
 
   busy.value = false;
 };

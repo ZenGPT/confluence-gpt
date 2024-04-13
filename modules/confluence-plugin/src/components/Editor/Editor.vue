@@ -98,6 +98,11 @@ export default {
       }, {css: 'background: gray'})
     });
     EventBus.$on('ExternalCodeChange', (code) => {
+      if(code == this.code) {
+        console.log('No code change, skipped.');
+        return;
+      }
+      
       this.updateCode(code);
       cmEditor.setValue(code)
     });
