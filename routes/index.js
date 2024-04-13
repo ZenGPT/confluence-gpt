@@ -141,13 +141,8 @@ export default function routes(app, addon) {
 
       const payload = {
         model: 'gpt-4-vision-preview',
-        messages: [
-          {
-            role: 'system',
-            content: SYSTEM_PROMPT,
-          },
-          {
-            role: 'user',
+        messages: [ { role: 'system', content: SYSTEM_PROMPT, },
+          { role: 'user',
             content: [ {type: 'text', text: USER_PROMPT}, {type: 'image_url', image_url: imageUrl} ],
           },
         ],
@@ -182,6 +177,62 @@ export default function routes(app, addon) {
         return res.json(json.choices[0].message.content).end();
       } else {
         return res.json('Something is wrong...').end();
+      }
+    }
+  );
+
+  app.post('/image-to-dsl2', addon.checkValidToken(), async (req, res) => {
+      const { messages } = req.body;
+      const userId = req.context.userAccountId;
+      const clientId = req.context.clientKey;
+      const productId = req.context.addonKey;
+
+      console.log('Request to /image-to-dsl2', messages, userId, clientId, productId);
+
+      if (!messages) {
+        res.status(422).end();
+        return;
+      }
+
+      if (await clientRunOutOfToken(clientId, productId)) {
+        return res.status(402).json({ error: 'Not enough tokens' });
+      }
+
+      const newMessages = [{role: 'system', content: SYSTEM_PROMPT}].concat(messages);
+
+      const payload = {
+        model: 'gpt-4-vision-preview',
+        messages: newMessages,
+        max_tokens: 4096,
+      };
+
+      console.log('OpenAI request:', JSON.stringify(payload));
+
+      const response = await fetch(`${OPENAI_BASEURL}/chat/completions`, {
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": 'Bearer ' + process.env.OPENAI_API_KEY ,
+        },
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+
+      const json = await response.json();
+
+      console.log(`OpenAI response for ${userId},${clientId},${productId},result:${JSON.stringify(json)}`);
+
+      if(json.error || !json.usage) {
+        return res.json({error: 'Response error'}).end();
+      }
+
+      const tokenUsage = json.usage.total_tokens;
+      await deductClientToken(userId, clientId, productId, tokenUsage);
+
+      if (json.choices && json.choices.length > 0) {
+        const response = {answer: json.choices[0].message.content, messages};
+        return res.json(response).end();
+      } else {
+        return res.json({error: 'Missing choices'}).end();
       }
     }
   );
