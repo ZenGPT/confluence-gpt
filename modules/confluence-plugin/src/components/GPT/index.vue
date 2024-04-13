@@ -66,7 +66,7 @@ import ImageUploadAndPreview from '@/components/ImageUploadAndPreview.vue'
 import EventBus from '@/EventBus';
 import store from "@/model/store2";
 import { convert2Base64, scrollToElement, isUrl } from "@/utils/web-utils";
-import { imageToDSL } from "@/services/gpt-service";
+import { retryableImageToDsl } from "@/services/gpt-service";
 import { uploadImage } from "@/services/upload-service";
 
 const versions = ref([]);
@@ -128,7 +128,7 @@ const handleGenerateClick = async () => {
     input = await convert2Base64(imageFile.value);
   }
 
-  const content = await imageToDSL(input);
+  const content = await retryableImageToDsl(input);
 
   EventBus.$emit('ExternalCodeChange', content);
 

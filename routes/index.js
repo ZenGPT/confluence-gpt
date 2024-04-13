@@ -139,12 +139,6 @@ export default function routes(app, addon) {
         return res.status(402).json({ error: 'Not enough tokens' });
       }
 
-      // TODO: calculate the image URL token size and deduct from the user's quota.
-      // const tokensNeeded = await calculateTokensUsed(imageUrl);
-      // if (tokensNeeded > client.token_quota) {
-      //   return res.status(402).json({ error: 'Not enough tokens' });
-      // }
-
       const payload = {
         model: 'gpt-4-vision-preview',
         messages: [
@@ -157,8 +151,6 @@ export default function routes(app, addon) {
             content: [ {type: 'text', text: USER_PROMPT}, {type: 'image_url', image_url: imageUrl} ],
           },
         ],
-        // TODO 
-        // max_tokens is too large: 30000. This model supports at most 4096 completion tokens, whereas you provided 30000.
         max_tokens: 4096,
       };
 

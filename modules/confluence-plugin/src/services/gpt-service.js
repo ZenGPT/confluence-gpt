@@ -1,4 +1,16 @@
-export async function imageToDSL(imageUrl) {
+import mermaid from 'mermaid';
+
+const MAX_RETRIES = 3;
+
+export async function retryableImageToDsl(imageUrl) {
+  let dsl;
+  const count = 1;
+  do {
+    dsl = await imageToDsl(imageUrl);
+  } while(count++ < MAX_RETRIES && !(await validateMermaidDsl(dsl)));
+}
+
+async function imageToDsl(imageUrl) {
   if (AP?.context) {
     const token = await AP.context.getToken();
 
@@ -33,3 +45,13 @@ export async function imageToDSL(imageUrl) {
     D-->>A: Dashed open arrow
     `;
 };
+
+async function validateMermaidDsl(dsl) {
+  try {
+    await mermaid.mermaidAPI.render('any-id', dsl);
+    return true;
+  } catch(e) {
+    console.debug('Error rendering mermaid DSL:', e);
+    return false;
+  }
+}
