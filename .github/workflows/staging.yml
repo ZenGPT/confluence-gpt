@@ -94,7 +94,7 @@ jobs:
           TARGET: /home/${{ secrets.HOST_USER }}/gpt_ace/
           EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/, /devops/, config.json, atlassian-connect.json, credentials.json'
           SCRIPT_AFTER: |
-            VERSION=v16.20.2
+            VERSION=v20.11.1
             DISTRO=linux-x64
             export PATH=/usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin:$PATH
             cd /home/${{ secrets.HOST_USER }}/gpt_ace/
