@@ -34,8 +34,6 @@ jobs:
           echo "dockerImageTag=confluence-gpt:$VERSION"  >> "$GITHUB_OUTPUT"
           echo "devopsName=devops-$VERSION.zip" >> "$GITHUB_OUTPUT"
           echo "repo_name=${GITHUB_REPOSITORY}" >> "$GITHUB_OUTPUT"
-      
-
       - name: create a prerelease
         id: createPrerelease
         uses: softprops/action-gh-release@v1
@@ -49,9 +47,9 @@ jobs:
     outputs:
       VERSION: ${{ steps.properties.outputs.VERSION }}
       BUILDTIME: ${{ steps.properties.outputs.BUILDTIME }}
-      artifactName: ${{ steps.properties.outputs.backendArtifactName }}
+      artifactName: ${{ steps.properties.outputs.artifactName }}
       devopsName: ${{ steps.properties.outputs.devopsName }}
-      dockerImageTag: ${{ steps.properties.outputs.backendDockerImageTag }}
+      dockerImageTag: ${{ steps.properties.outputs.dockerImageTag }}
       repo_name: ${{ steps.properties.outputs.repo_name }}
 
   build_devops:
