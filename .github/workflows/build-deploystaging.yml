@@ -65,15 +65,6 @@ jobs:
         uses: ./.github/actions/git-info
       - name: package devops
         run: ls -al . && cd devops && ls -al . && zip -qq -r ${{ needs.init_build_version.outputs.devopsName }} *
-
-      - name: Upload devops artifact
-        uses: actions/upload-artifact@v4
-        id: devops_artifacts
-        with:
-          name: devops_artifacts
-          retention-days: 1
-          path: |
-            devops/${{ needs.init_build_version.outputs.devopsName }}
   
       - name: upload devops artifacts to the prerelease
         id: upload_devops_prerelease
@@ -85,7 +76,7 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            /tmp/${{ needs.init_build_version.outputs.devopsName }}
+            /devops/${{ needs.init_build_version.outputs.devopsName }}
 
   build_docker_image:
     name: build Docker Image
