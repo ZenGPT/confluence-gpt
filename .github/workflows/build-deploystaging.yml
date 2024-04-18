@@ -76,7 +76,7 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            /devops/${{ needs.init_build_version.outputs.devopsName }}
+            ${{ github.workspace }}/devops/${{ needs.init_build_version.outputs.devopsName }}
 
   build_docker_image:
     name: build Docker Image
