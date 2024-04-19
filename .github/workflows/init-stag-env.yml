@@ -43,13 +43,12 @@ jobs:
         run: |
           echo "${{ secrets.STAG_SSH_PRIVATE_KEY }}" > ${{ github.workspace }}/.ssh_private_key.pem
           chmod 0400 ${{ github.workspace }}/.ssh_private_key.pem
-          
       - name: deploy diagramly saas production
         uses: dawidd6/action-ansible-playbook@v2
-        working-directory: devops
         with:
           playbook: playbook-docker.yml
           key: ${{ secrets.STAG_SSH_PRIVATE_KEY }}
+          directory: ./devops
           options: |
             --extra-vars "GPT_ACE_HOST=${{secrets.STAG_ACE_HOST}} ansible_ssh_user=${{secrets.STAG_ACE_HOST_USERNAME}} ansible_ssh_private_key_file=${{ github.workspace }}/.ssh_private_key.pem" --extra-vars=@_github_vars.json --extra-vars=@_github_secrets.json
 
