@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Build Docker Image And Deploy to Staging
 run-name: ${{ github.run_number }} Build Docker Image ${{github.ref_name}} by @${{ github.actor }}
 
 on:
