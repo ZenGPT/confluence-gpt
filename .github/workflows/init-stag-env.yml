@@ -45,6 +45,7 @@ jobs:
           chmod 0400 ${{ github.workspace }}/.ssh_private_key.pem
       - name: deploy diagramly saas production
         uses: dawidd6/action-ansible-playbook@v2
+        working-directory: devops
         with:
           playbook: playbook-docker.yml
           key: ${{ secrets.STAG_SSH_PRIVATE_KEY }}
