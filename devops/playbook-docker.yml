@@ -1,4 +1,4 @@
-- hosts: gpt_ace
+- hosts: {{GPT_ACE_HOST}}
   gather_facts: yes
   become: true
   vars_files: 

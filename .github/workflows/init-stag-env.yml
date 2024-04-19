@@ -50,5 +50,6 @@ jobs:
           key: ${{ secrets.STAG_SSH_PRIVATE_KEY }}
           options: |
             --inventory env_vars/${{env.APP_ENV}}/hosts.yaml
-            --extra-vars "app_backend_zip_path=${{ github.workspace }}/${{ env.backendArtifactName }} app_frontend_zip_path=${{ github.workspace }}/${{ env.fontendArtifactName }}  app_version=${{ github.event.release.tag_name }} ansible_ssh_private_key_file=${{ github.workspace }}/.ssh_private_key.pem diagramly_tls_certificate_file=${{ github.workspace }}/diagramly.ai.pem diagramly_tls_private_key_file=${{ github.workspace }}/diagramly.ai.key" --extra-vars=@_github_vars.json --extra-vars=@_github_secrets.json
+            --extra-vars "GPT_ACE_HOST=${{secrets.STAG_ACE_HOST}} ansible_ssh_user=${{secrets.STAG_ACE_HOST_USERNAME}} ansible_ssh_private_key_file=${{ github.workspace }}/.ssh_private_key.pem" --extra-vars=@_github_vars.json --extra-vars=@_github_secrets.json
+
 
