@@ -1,0 +1,54 @@
+name: Initialize Stag Env
+
+on: 
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'commit to deploy'
+        required: true
+        type: string
+
+
+jobs:
+  install_docker:
+    name: Install Docker
+    runs-on: ubuntu-latest
+    if: contains(fromJson('["zacker330", "MrCoder"]'), github.actor)
+    steps:
+      - name: Export Properties
+        id: properties
+        shell: bash
+        run: |
+          VERSION=${{ github.event.release.tag_name }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with: 
+          ref: "${{ inputs.commit }}"
+          
+      # Put all the secrets and the repo vars into the json files, ansible can read them
+      - name: write secrets into json
+        run: |
+          ls -al .
+          echo "${{ toJSON(secrets) }}" > _github_secrets.json
+          ls -al .
+
+      - name: write github repo vars into json
+        run: |
+          ls -al .
+          echo "${{ toJSON(vars) }}" > _github_vars.json
+          ls -al .
+
+      - name: write ssh private key
+        run: |
+          echo "${{ secrets.STAG_SSH_PRIVATE_KEY }}" > ${{ github.workspace }}/.ssh_private_key.pem
+          chmod 0400 ${{ github.workspace }}/.ssh_private_key.pem
+      - name: deploy diagramly saas production
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: playbook-docker.yml
+          key: ${{ secrets.STAG_SSH_PRIVATE_KEY }}
+          options: |
+            --inventory env_vars/${{env.APP_ENV}}/hosts.yaml
+            --extra-vars "app_backend_zip_path=${{ github.workspace }}/${{ env.backendArtifactName }} app_frontend_zip_path=${{ github.workspace }}/${{ env.fontendArtifactName }}  app_version=${{ github.event.release.tag_name }} ansible_ssh_private_key_file=${{ github.workspace }}/.ssh_private_key.pem diagramly_tls_certificate_file=${{ github.workspace }}/diagramly.ai.pem diagramly_tls_private_key_file=${{ github.workspace }}/diagramly.ai.key" --extra-vars=@_github_vars.json --extra-vars=@_github_secrets.json
+
