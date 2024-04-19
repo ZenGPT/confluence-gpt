@@ -1,0 +1,7 @@
+- hosts: {{GPT_ACE_HOST}}
+  gather_facts: yes
+  become: true
+  vars_files: 
+    - common_vars/global.yaml
+  roles:
+    - ansible-role-docker

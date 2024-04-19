@@ -1,0 +1,112 @@
+name: Build Docker Image And Deploy to Staging
+run-name: ${{ github.run_number }} Build Docker Image ${{github.ref_name}} by @${{ github.actor }}
+
+on:
+  push:
+    tags-ignore:
+      - '**' # do not run on tags
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+permissions:
+  contents: write
+
+
+jobs:
+  init_build_version:
+    name: init build version
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Generate Git Info File
+        uses: ./.github/actions/git-info
+      - name: Export Properties
+        id: properties
+        shell: bash
+        run: |
+          VERSION="$(echo $(date +'v%Y.%m.%d')_${{ github.run_number }}_$(git rev-parse --short=8 HEAD))"
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "BUILDTIME=$(echo $(date -u))" >>  "$GITHUB_OUTPUT"
+          echo "artifactName=confluence-gpt-$VERSION.tar" >> "$GITHUB_OUTPUT"
+          echo "dockerImageTag=confluence-gpt:$VERSION"  >> "$GITHUB_OUTPUT"
+          echo "devopsName=devops-$VERSION.zip" >> "$GITHUB_OUTPUT"
+          echo "repo_name=${GITHUB_REPOSITORY}" >> "$GITHUB_OUTPUT"
+      - name: create a prerelease
+        id: createPrerelease
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.properties.outputs.dockerImageTag }}
+          name: ${{ steps.properties.outputs.artifactName }}
+          body: "${{ steps.properties.outputs.VERSION }},branch:${{ github.head_ref || github.ref_name }}, build time: ${{ steps.properties.outputs.BUILDTIME }}"
+          draft: true
+          prerelease: false
+    outputs:
+      VERSION: ${{ steps.properties.outputs.VERSION }}
+      BUILDTIME: ${{ steps.properties.outputs.BUILDTIME }}
+      artifactName: ${{ steps.properties.outputs.artifactName }}
+      devopsName: ${{ steps.properties.outputs.devopsName }}
+      dockerImageTag: ${{ steps.properties.outputs.dockerImageTag }}
+      repo_name: ${{ steps.properties.outputs.repo_name }}
+
+  build_devops:
+    name: package devops
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - init_build_version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Generate Git Info File
+        uses: ./.github/actions/git-info
+      - name: package devops
+        run: ls -al . && cd devops && ls -al . && zip -qq -r ${{ needs.init_build_version.outputs.devopsName }} *
+  
+      - name: upload devops artifacts to the prerelease
+        id: upload_devops_prerelease
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ needs.init_build_version.outputs.VERSION }}
+          name: ${{ needs.init_build_version.outputs.VERSION }}
+          draft: true
+          prerelease: false
+          files: |
+            ${{ github.workspace }}/devops/${{ needs.init_build_version.outputs.devopsName }}
+
+  build_docker_image:
+    name: build Docker Image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - init_build_version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Generate Git Info File
+        uses: ./.github/actions/git-info
+      - name: setup-buildx
+        uses: docker/setup-buildx-action@v3
+      - name: build backend docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ github.workspace }}
+          tags: ${{ needs.init_build_version.outputs.dockerImageTag }}
+          outputs: type=docker,dest=/tmp/${{ needs.init_build_version.outputs.artifactName }}
+
+      - name: upload docker image artifacts to the prerelease
+        id: upload_devops_prerelease
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ needs.init_build_version.outputs.VERSION }}
+          name: ${{ needs.init_build_version.outputs.VERSION }}
+          draft: true
+          prerelease: false
+          files: |
+            /tmp/${{ needs.init_build_version.outputs.artifactName }}
+
