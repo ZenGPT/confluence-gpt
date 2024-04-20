@@ -21,5 +21,5 @@ FROM node:20.11.1
 COPY --from=build /app/ /app
 
 WORKDIR /app
-EXPOSE 3001
+EXPOSE 8080
 CMD ["node", "-r", "esm", "app.js"]
