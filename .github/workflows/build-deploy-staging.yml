@@ -117,7 +117,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
           REMOTE_HOST: ${{ secrets.HOST_IP }}
           REMOTE_USER: ${{ secrets.HOST_USER }}
-          SOURCE: ${{ github.workspace }}/${{ needs.init_build_version.outputs.artifactName }}
+          SOURCE: ${{ needs.init_build_version.outputs.artifactName }}
           TARGET: /tmp/${{ needs.init_build_version.outputs.artifactName }}
           SCRIPT_AFTER: |
             cd /home/${{ secrets.HOST_USER }}/gpt-ace-server/
