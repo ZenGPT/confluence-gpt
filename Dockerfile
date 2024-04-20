@@ -15,11 +15,11 @@ RUN cd modules/confluence-plugin && yarn install && yarn build:full
 RUN npm run build
 
 # Stage 2: Production Stage
-FROM node:20.11.1-buster
+FROM node:20.11.1
 
 # Copy built files from the build stage to the production image
 COPY --from=build /app/ /app
 
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 3001
 CMD ["node", "-r", "esm", "app.js"]
