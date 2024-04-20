@@ -9,8 +9,7 @@ COPY . .
 
 # Install dependencies
 RUN npm install 
-RUN cd modules/confluence-plugin && yarn install && yarn build:full 
-RUN npm run build
+RUN cd modules/confluence-plugin && yarn install && yarn build:full && cd .. && npm run build
 
 # Stage 2: Production Stage
 FROM node:20.11.1
