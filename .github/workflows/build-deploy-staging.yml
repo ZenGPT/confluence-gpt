@@ -1,4 +1,4 @@
-name: Build Docker Image And Deploy to Staging
+name: Build image & Deploy to Staging
 run-name: ${{ github.run_number }} Build Docker Image ${{github.ref_name}} by @${{ github.actor }}
 
 on:
@@ -97,7 +97,7 @@ jobs:
         with:
           context: ${{ github.workspace }}
           tags: ${{ needs.init_build_version.outputs.dockerImageTag }}
-          outputs: type=docker,dest=/tmp/${{ needs.init_build_version.outputs.artifactName }}
+          outputs: type=docker,dest=${{ github.workspace }}/${{ needs.init_build_version.outputs.artifactName }}
 
       - name: upload docker image artifacts to the prerelease
         id: upload_devops_prerelease
@@ -109,7 +109,7 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            /tmp/${{ needs.init_build_version.outputs.artifactName }}
+            ${{ github.workspace }}/${{ needs.init_build_version.outputs.artifactName }}
 
       - name: Deploy to server
         uses: easingthemes/ssh-deploy@v4.1.8
@@ -117,7 +117,8 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
           REMOTE_HOST: ${{ secrets.HOST_IP }}
           REMOTE_USER: ${{ secrets.HOST_USER }}
-          SOURCE: /tmp/${{ needs.init_build_version.outputs.artifactName }}
+          SOURCE: ${{ github.workspace }}/${{ needs.init_build_version.outputs.artifactName }}
+          TARGET: /tmp/${{ needs.init_build_version.outputs.artifactName }}
           SCRIPT_AFTER: |
             cd /home/${{ secrets.HOST_USER }}/gpt-ace-server/
             sudo docker import /tmp/${{ needs.init_build_version.outputs.artifactName }}
