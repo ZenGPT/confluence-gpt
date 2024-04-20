@@ -40,7 +40,6 @@
         "apiSupport": {
           "bodyType": "raw",
           "supportedContainerTypes": [
-            "space",
             "page",
             "blogpost",
             "comment"
