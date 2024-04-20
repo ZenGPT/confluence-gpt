@@ -96,7 +96,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ github.workspace }}
-          tags: ${{ needs.init_build_version.outputs.dockerImageTag }}
+          # tags: ${{ needs.init_build_version.outputs.dockerImageTag }}
+          tags: latest
           outputs: type=docker,dest=${{ github.workspace }}/${{ needs.init_build_version.outputs.artifactName }}
 
       - name: upload docker image artifacts to the prerelease
@@ -121,7 +122,6 @@ jobs:
           TARGET: /tmp/${{ needs.init_build_version.outputs.artifactName }}
           SCRIPT_AFTER: |
             cd /home/${{ secrets.HOST_USER }}/gpt-ace-server/
-            sudo docker import - confluence-gpt:${{ needs.init_build_version.outputs.VERSION }} < /tmp/${{ needs.init_build_version.outputs.artifactName }}
-            sudo docker tag confluence-gpt:${{ needs.init_build_version.outputs.VERSION }} confluence-gpt:latest
+            sudo docker import /tmp/${{ needs.init_build_version.outputs.artifactName }} confluence-gpt:latest
             sudo app_version=latest docker compose restart
 
