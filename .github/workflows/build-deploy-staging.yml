@@ -82,6 +82,7 @@ jobs:
     name: build Docker Image and Deploy to Staging
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    environment: staging
     needs:
       - init_build_version
     steps:
