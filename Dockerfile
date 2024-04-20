@@ -8,11 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN npm install 
-RUN cd modules/confluence-plugin && yarn install && yarn build:full
-
-# Build the application
-RUN npm run build
+RUN npm install && cd modules/confluence-plugin && yarn install && yarn build:full && npm run build
 
 # Stage 2: Production Stage
 FROM node:20.11.1
