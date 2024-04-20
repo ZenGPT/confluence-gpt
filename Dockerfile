@@ -15,7 +15,7 @@ RUN cd modules/confluence-plugin && yarn install && yarn build:full
 RUN npm run build
 
 # Stage 2: Production Stage
-FROM node:20.11.1-buster-slim
+FROM node:20.11.1-buster
 
 # Copy built files from the build stage to the production image
 COPY --from=build /app/ /app
