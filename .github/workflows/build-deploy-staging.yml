@@ -121,6 +121,6 @@ jobs:
           TARGET: /tmp/${{ needs.init_build_version.outputs.artifactName }}
           SCRIPT_AFTER: |
             cd /home/${{ secrets.HOST_USER }}/gpt-ace-server/
-            sudo docker import /tmp/${{ needs.init_build_version.outputs.artifactName }}
+            sudo docker import - confluence-gpt:${{ needs.init_build_version.outputs.VERSION }} /tmp/${{ needs.init_build_version.outputs.artifactName }}
             sudo app_version=${{ needs.init_build_version.outputs.VERSION }} docker compose up -d
 
