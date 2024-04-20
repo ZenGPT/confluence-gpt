@@ -123,5 +123,5 @@ jobs:
             cd /home/${{ secrets.HOST_USER }}/gpt-ace-server/
             sudo docker import - confluence-gpt:${{ needs.init_build_version.outputs.VERSION }} < /tmp/${{ needs.init_build_version.outputs.artifactName }}
             sudo docker tag confluence-gpt:${{ needs.init_build_version.outputs.VERSION }} confluence-gpt:latest
-            sudo app_version=latest docker compose restart -d
+            sudo app_version=latest docker compose restart
 
