@@ -78,8 +78,8 @@ jobs:
           files: |
             ${{ github.workspace }}/devops/${{ needs.init_build_version.outputs.devopsName }}
 
-  build_docker_image:
-    name: build Docker Image
+  build_docker_image_deploy:
+    name: build Docker Image and Deploy to Staging
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs:
@@ -109,4 +109,16 @@ jobs:
           prerelease: false
           files: |
             /tmp/${{ needs.init_build_version.outputs.artifactName }}
+
+      - name: Deploy to server
+        uses: easingthemes/ssh-deploy@v4.1.8
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_IP }}
+          REMOTE_USER: ${{ secrets.HOST_USER }}
+          SOURCE: /tmp/${{ needs.init_build_version.outputs.artifactName }}
+          SCRIPT_AFTER: |
+            cd /home/${{ secrets.HOST_USER }}/gpt-ace-server/
+            sudo docker import /tmp/${{ needs.init_build_version.outputs.artifactName }}
+            sudo app_version=${{ needs.init_build_version.outputs.VERSION }} docker compose up -d
 
