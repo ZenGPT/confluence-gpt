@@ -244,13 +244,15 @@ export default function routes(app, addon) {
     }
 
     try {
-      const imageUrl = await uploadToS3({
+      const imageKey = await uploadToS3({
         name: req.file.originalname,
         type: req.file.mimetype,
         buffer: req.file.buffer,
+        clientDomain: req.query.clientDomain,
+        userAccountId: req.query.userAccountId,
       });
 
-      res.json({ imageUrl });
+      res.json({ imageKey });
     } catch (error) {
       console.error('Upload error:', error);
       res.status(500).json({ error: 'Error uploading file' });

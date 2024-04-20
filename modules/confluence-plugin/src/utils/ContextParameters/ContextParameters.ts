@@ -5,6 +5,14 @@ export function getClientDomain() {
   return getSubdomain(getBaseUrl());
 }
 
+export function getCurrentUserAccountId(): string {
+  return (
+    // @ts-ignore
+    window.globals?.apWrapper?.currentUser?.atlassianAccountId ||
+    "unknown_user_account_id"
+  );
+}
+
 export function getBaseUrl() {
   let url = getUrlParam('xdm_e');
 

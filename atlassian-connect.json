@@ -153,7 +153,7 @@
         "icon": {
           "width": 16,
           "height": 16,
-          "url": "image/app-logo.png"
+          "url": "images/app-logo.png"
         },
         "documentation": {
           "url": "https://zenuml.atlassian.net/wiki/spaces/Doc/overview"

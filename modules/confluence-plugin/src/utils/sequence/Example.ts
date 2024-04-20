@@ -23,7 +23,16 @@ OrderController.post(payload) {
   }
 }`;
 
-const Mermaid = 'graph TD; A-->B;';
+const Mermaid = `sequenceDiagram
+title This is an example sequence diagram
+participant A
+participant B
+participant C
+participant D
+A->>B: Normal line
+B-->>C: Dashed line
+C->>D: Open arrow
+D-->>A: Dashed open arrow`;
 
 export default {
     Sequence,

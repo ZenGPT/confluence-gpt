@@ -1,3 +1,8 @@
+import {
+  getClientDomain,
+  getCurrentUserAccountId
+} from "@/utils/ContextParameters/ContextParameters";
+
 export async function uploadImage(file) {
   if (!AP?.context) {
     console.debug('No AP.context, ignored image upload');
@@ -9,7 +14,7 @@ export async function uploadImage(file) {
 
   const token = await AP.context.getToken();
 
-  const response = await fetch(`/upload-image?jwt=${token}`, {
+  const response = await fetch(`/upload-image?jwt=${token}&clientDomain=${getClientDomain()}&userAccountId=${getCurrentUserAccountId()}`, {
     method: 'POST',
     body: formData,
   });
@@ -19,5 +24,6 @@ export async function uploadImage(file) {
     //TODO: track event
   } else {
     console.debug('Uploaded image:', file);
+    return await response.json();
   }
 }

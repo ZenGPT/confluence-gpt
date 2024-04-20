@@ -2,6 +2,7 @@ import { DiagramType } from "@/model/Diagram/Diagram";
 import {
   getClientDomain,
   getSpaceKey,
+  getCurrentUserAccountId
 } from "@/utils/ContextParameters/ContextParameters";
 import mixpanel from "mixpanel-browser";
 
@@ -9,6 +10,7 @@ mixpanel.init("0c62cea9ed2247f4824bf196f6817941", {
   debug: true,
   track_pageview: true,
   persistence: "localStorage",
+  ignore_dnt: true
 });
 
 let identified = false;
@@ -63,7 +65,7 @@ export function trackEvent(
 
     try {
       // Track an event. It can be anything, but in this example, we're tracking a Sign Up event.
-      // mixpanel.track(action, eventDetails);
+      mixpanel.track(action, eventDetails);
     } catch (e) {
       console.error("Error in calling mixpanel", e);
     }
@@ -82,14 +84,6 @@ export function trackEvent(
       e
     );
   }
-}
-
-function getCurrentUserAccountId(): string {
-  return (
-    // @ts-ignore
-    window.globals?.apWrapper?.currentUser?.atlassianAccountId ||
-    "unknown_user_account_id"
-  );
 }
 
 export function addonKey() {
