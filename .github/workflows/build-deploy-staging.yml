@@ -5,10 +5,10 @@ on:
   push:
     tags-ignore:
       - '**' # do not run on tags
-    branches: ['**']
+    branches: ['main', 'staging/**']
   pull_request:
-    branches: ['**']
-
+    branches: ['main', 'staging/**']
+    
 permissions:
   contents: write
 
