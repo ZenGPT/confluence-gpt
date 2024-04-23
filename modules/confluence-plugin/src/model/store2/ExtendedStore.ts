@@ -4,17 +4,31 @@ import {DiagramType, NULL_DIAGRAM} from "@/model/Diagram/Diagram";
 import globals from "@/model/globals";
 import EventBus from "@/EventBus";
 
+function parseTitle(code: string): string | undefined {
+  const lines = code?.split('\n');
+  const titleLine = lines?.find(l => l.startsWith('title '));
+  if (titleLine) {
+    return titleLine.substring(6).trim();
+  }
+}
+
 const ExtendedStore: StoreOptions<RootState> = {
   mutations: {
     updateCode2(state: any, payload: any) {
-      state.diagram.code = payload
-      // update title
-      if (state.diagram.code.split('\n')[0].startsWith('title ')) {
-        state.diagram.title = state.diagram.code.split('\n')[0].substring(6).trim()
+      state.diagram.code = payload;
+
+      if(!state.diagram.title && parseTitle(payload)) {
+        state.diagram.title = parseTitle(payload);
+        console.debug('ExtendedStore.updateCode2 - set state.diagram.title to', state.diagram.title);
       }
     },
     updateMermaidCode(state: any, payload: any) {
-      state.diagram.mermaidCode = payload
+      state.diagram.mermaidCode = payload;
+
+      if(!state.diagram.title && parseTitle(payload)) {
+        state.diagram.title = parseTitle(payload);
+        console.debug('ExtendedStore.updateMermaidCode - set state.diagram.title to', state.diagram.title);
+      }
     },
     updateDiagramType(state: any, payload: any) {
       state.diagram.diagramType = payload

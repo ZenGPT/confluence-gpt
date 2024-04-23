@@ -26,7 +26,7 @@ async function main() {
   if(doc === NULL_DIAGRAM) {
     console.log('document is null, loading example');
     doc = {
-      diagramType: DiagramType.Sequence,
+      diagramType: DiagramType.Mermaid,
       code: Example.Sequence,
       mermaidCode: Example.Mermaid
     }

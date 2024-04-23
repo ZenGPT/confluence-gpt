@@ -87,7 +87,7 @@
         placeholder="Title"
         :value="seqTitle"
         @input="handleTitleChange"
-        class="px-1 border-2 border-solid border-[#091e4224] rounded-[3px] focus:border-[#388bff] hover:border-[#388bff] outline-none transition-[border-color]"
+        class="px-1 border-2 border-solid border-[#091e4224] rounded-[3px] focus:border-[#388bff] hover:border-[#388bff] outline-none transition-[border-color] min-w-80"
         :class="{ 'border-[#c9372c]': titleError }"
       />
       <input
@@ -96,7 +96,7 @@
         placeholder="Title"
         :value="mermaidTitle"
         @input="handleTitleChange"
-        class="px-1 border-2 border-solid border-[#091e4224] rounded-[3px] focus:border-[#388bff] hover:border-[#388bff] outline-none transition-[border-color]"
+        class="px-1 border-2 border-solid border-[#091e4224] rounded-[3px] focus:border-[#388bff] hover:border-[#388bff] outline-none transition-[border-color] min-w-80"
         :class="{ 'border-[#c9372c]': titleError }"
       />
     </div>
