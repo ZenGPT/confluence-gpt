@@ -88,6 +88,10 @@ export default function routes(app, addon) {
     }
   });
 
+  app.get('/attachment', (req, res) => {
+    res.send(`<ac:image ac:width="950"> <ri:attachment ri:filename="zenuml-${req.query.uuid}.png" /> </ac:image>`);
+  });
+
   app.post('/conversations', addon.checkValidToken(), async (req, res) => {
       const { messages } = req.body;
 
