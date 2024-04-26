@@ -14,7 +14,7 @@ export function mountRoot(doc: Diagram, component: Component) {
   console.debug('Mounting root', doc);
   // extract title from diagram code
   if (!doc.title && (doc.diagramType === DiagramType.Sequence || doc.diagramType === DiagramType.Mermaid)) {
-    doc.title = parseTitle(doc.code);
+    doc.title = parseTitle(doc.diagramType === DiagramType.Sequence ? doc.code : doc.mermaidCode);
   }
   store.state.diagram = doc;
   if (document.getElementById('app')) {

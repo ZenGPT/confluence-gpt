@@ -23,15 +23,9 @@ async function main() {
   const compositeContentProvider = defaultContentProvider(globals.apWrapper as ApWrapper2);
   let {doc} = await compositeContentProvider.load();
   console.log('loaded document', doc);
-  if(doc === NULL_DIAGRAM) {
-    console.log('document is null, loading example');
-    doc = {
-      diagramType: DiagramType.Mermaid,
-      code: Example.Sequence,
-      mermaidCode: Example.Mermaid
-    }
-  }
-  mountRoot(doc, Workspace);
+
+  const document = (doc === NULL_DIAGRAM) ? { diagramType: DiagramType.Mermaid, mermaidCode: Example.Mermaid } : doc;
+  mountRoot(document, Workspace);
 
   if(await MacroUtil.isCreateNew()) {
     trackEvent('', 'create_macro_begin', 'sequence');
