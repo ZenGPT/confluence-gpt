@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: '20.11.1'
           cache: npm
       - name: Install dependencies
         run: npm install
@@ -31,8 +31,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_IP }}
           REMOTE_USER: ${{ secrets.HOST_USER }}
           TARGET: /home/${{ secrets.HOST_USER }}/ace-server/
-          EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /node_modules/'
+          EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, modules/confluence-plugin/node_modules/'
           SCRIPT_AFTER: |
             cd /home/${{ secrets.HOST_USER }}/ace-server/
-            npm install --production
-            sudo pm2 reload app #otherwise the server may cache the old version (e.g. atlassian-connect.json)
+            echo "DATABASE_URL=postgresql://${{ env.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{env.POSTGRESQL_BIND_INNER_IP }}:5432/${{ env.GPT_ACE_DB_NAME }} LOCAL_BASE_URL=${{ env.LOCAL_BASE_URL }} PORT=${{ env.APP_PORT }} NODE_ENV=production OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} CF_R2_ACCESS_KEY=${{ env.CF_R2_ACCESS_KEY }} CF_R2_SECRET_KEY=${{ secrets.CF_R2_SECRET_KEY }} pm2 reload app --update-env" > /tmp/github-action-cmd.txt
