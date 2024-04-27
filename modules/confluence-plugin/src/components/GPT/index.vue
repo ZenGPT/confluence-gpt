@@ -3,7 +3,7 @@
     <div id="generation-container" class="generation-container" v-if="open">
       <div id="generation-form" class="generation-form">
         <div style="display: flex; justify-content: space-between;">
-          <p class="font-bold text-lg">Generate Diagram</p>
+          <p class="font-bold text-lg">Generate Sequence Diagram</p>
           <button type="button" class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
             @click="handleCloseClick">
             <span class="sr-only">Close menu</span>
@@ -13,7 +13,7 @@
           </button>
         </div>
       
-        <textarea class="styled-textarea" placeholder="Enter an image URL here or upload an image" 
+        <textarea class="styled-textarea" placeholder="Please enter a URL for a sequence diagram image or upload one" 
           v-model="inputText" @change="handlInputTextChange"></textarea>
         <img id="userInputImage" :src="inputText" style="max-width: 200px;" v-show="inputText && !inputValidationError && !isUserInputGenerated()"/>
         <div v-if="inputValidationError">{{ inputValidationError }}</div>
