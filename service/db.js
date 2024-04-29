@@ -1,8 +1,11 @@
 const {Sequelize} = require('sequelize');
 
+const storage = `${process.env.ACE_SERVER_DB_DIR || '.'}/database.sqlite`;
+console.log(`Using database file: ${storage}`);
+
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: 'database.sqlite'
+  storage
 });
 
 export const Client = sequelize.define('gpt_dock_client_data', {
