@@ -10,4 +10,4 @@ jobs:
     environment: production
     steps:
       - name: Print env variable
-        run: echo "DATABASE_URL=postgresql://$GPT_ACE_DB_USERNAME:${{ secrets.GPT_ACE_DB_PASSWORD }}@$POSTGRESQL_BIND_INNER_IP:5432/$GPT_ACE_DB_NAME LOCAL_BASE_URL=$LOCAL_BASE_URL PORT=$APP_PORT NODE_ENV=production OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} CF_R2_ACCESS_KEY=$CF_R2_ACCESS_KEY CF_R2_SECRET_KEY=${{ secrets.CF_R2_SECRET_KEY }}"
+        run: echo "DATABASE_URL=postgresql://${{env.GPT_ACE_DB_USERNAME}}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{env.POSTGRESQL_BIND_INNER_IP}}:5432/$GPT_ACE_DB_NAME LOCAL_BASE_URL=${{env.LOCAL_BASE_URL}} PORT=${{env.APP_PORT}} NODE_ENV=production OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} CF_R2_ACCESS_KEY=${{env.CF_R2_ACCESS_KEY}} CF_R2_SECRET_KEY=${{ secrets.CF_R2_SECRET_KEY }}"
