@@ -67,8 +67,8 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
-      - name: package app
-        run: zip -qq -r /tmp/${{ needs.init_build_version.outputs.artifactName }} *  -x .cache/ .github/**\* .vscode/**\* .git/ 
+      # - name: package app
+      #   run: zip -qq -r /tmp/${{ needs.init_build_version.outputs.artifactName }} *  -x .cache/ .github/**\* .vscode/**\* .git/ 
         
       - name: create a prerelease
         id: createPrerelease
@@ -86,20 +86,20 @@ jobs:
         uses: ./.github/actions/git-info
         
         
-      - name: Deploy to server
-        uses: easingthemes/ssh-deploy@v4.1.8
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.HOST_IP }}
-          REMOTE_USER: ${{ secrets.HOST_USER }}
-          TARGET: /home/${{ secrets.HOST_USER }}/gpt_ace/
-          EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /devops/, config.json, credentials.json, modules/confluence-plugin/node_modules/'
-          SCRIPT_AFTER: |
-            VERSION=v20.11.1
-            DISTRO=linux-x64
-            export PATH=/usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin:$PATH
-            cd /home/${{ secrets.HOST_USER }}/gpt_ace/
-            DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }} LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com PORT=3000 NODE_ENV=production OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} CF_R2_ACCESS_KEY=${{ secrets.CF_R2_ACCESS_KEY }} CF_R2_SECRET_KEY=${{ secrets.CF_R2_SECRET_KEY }} pm2 reload app --update-env
+      # - name: Deploy to server
+      #   uses: easingthemes/ssh-deploy@v4.1.8
+      #   with:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+      #     REMOTE_HOST: ${{ secrets.HOST_IP }}
+      #     REMOTE_USER: ${{ secrets.HOST_USER }}
+      #     TARGET: /home/${{ secrets.HOST_USER }}/gpt_ace/
+      #     EXCLUDE: '/.cache/, /.github/, /.vscode/, /.git/, /devops/, config.json, credentials.json, modules/confluence-plugin/node_modules/'
+      #     SCRIPT_AFTER: |
+      #       VERSION=v20.11.1
+      #       DISTRO=linux-x64
+      #       export PATH=/usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin:$PATH
+      #       cd /home/${{ secrets.HOST_USER }}/gpt_ace/
+      #       DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }} LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com PORT=3000 NODE_ENV=production OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} CF_R2_ACCESS_KEY=${{ secrets.CF_R2_ACCESS_KEY }} CF_R2_SECRET_KEY=${{ secrets.CF_R2_SECRET_KEY }} pm2 reload app --update-env
 
   # staging-install:
   #   name: Install staging to Confluence
