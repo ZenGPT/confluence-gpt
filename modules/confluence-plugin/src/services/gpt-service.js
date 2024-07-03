@@ -1,6 +1,24 @@
 import mermaid from 'mermaid';
+import { isUrl } from "@/utils/web-utils";
 
-const USER_PROMPT = `Generate Mermaid DSL for the given sequence diagram image. Output the DSL in code block.`;
+const USER_PROMPT = `Based on information user provided, read the content and image(if provided), convert the information to mermaid sequence diagram in mermaid code.
+
+- First find the only and correct Starting Node
+- Words within shaped blocks or boxes are Nodes
+- Words on arrow lines are Online Comments
+- Do not have any special characters like quota,comma in Node Name between [ and ]
+- your output in markdown code block
+
+Example:
+
+\`\`\`mermaid
+%% TD for horizontal layout, LR for vertical. Choose same layout as original image
+flowchart TD
+
+A([Node Name with Only Alphabet]) -->|Online Comments| B[Node Name in Shaped Boxes]
+
+\`\`\`
+`;
 const MAX_RETRIES = 3;
 
 export async function retryableImageToDsl(imageUrl) {
@@ -11,9 +29,13 @@ export async function retryableImageToDsl(imageUrl) {
   } while(count++ < MAX_RETRIES && !(await validateMermaidDsl(dsl)));
 }
 
-export async function retryableImageToDsl2(imageUrl) {
+export async function retryableImageToDsl2(input) {
   let count = 1;
-  let messages = [{role: 'user', content: [{type: 'text', text: USER_PROMPT}, {type: 'image_url', image_url: imageUrl}]}];
+  const userPrompt = isUrl(input) ? USER_PROMPT : `${USER_PROMPT}\n\nAdditional instruction:\n${input}`;
+  let messages = [{role: 'user', content: [{type: 'text', text: userPrompt}]}];
+  if(isUrl(input)) {
+    messages[0].content.push({type: 'image_url', image_url: {url: input}});
+  }
 
   do {
     const data = await imageToDsl2(messages);

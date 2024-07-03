@@ -15,6 +15,6 @@ export function scrollToElement(elementId) {
   targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-export function isUrl (str) {
-  return str.toLowerCase().startsWith('http') || str.toLowerCase().startsWith('data:image');
+export function isUrl(str) {
+  return str && (str.toLowerCase().startsWith('http') || str.toLowerCase().startsWith('data:image'));
 }

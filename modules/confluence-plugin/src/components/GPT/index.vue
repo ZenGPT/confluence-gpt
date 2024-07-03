@@ -13,9 +13,9 @@
           </button>
         </div>
       
-        <textarea class="styled-textarea" placeholder="Please enter a URL for a sequence diagram image or upload one" 
+        <textarea class="styled-textarea" placeholder="Enter image URL or text prompt to describe your diagram" 
           v-model="inputText" @change="handlInputTextChange"></textarea>
-        <img id="userInputImage" :src="inputText" style="max-width: 200px;" v-show="inputText && !inputValidationError && !isUserInputGenerated()"/>
+        <img id="userInputImage" :src="inputText" style="max-width: 200px;" v-if="inputText && isUrl(inputText) && !inputValidationError && !isUserInputGenerated()"/>
         <div v-if="inputValidationError">{{ inputValidationError }}</div>
 
         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -46,7 +46,10 @@
               <select id="generatedVersions" v-model="currentVersion" @change="handleOptionChange">
                 <option v-for="(option, index) in versions" :key="index" :value="option">{{ option.label }}</option>
               </select>
-              <p><img :src=currentVersion.input class="image-preview" /></p>
+              <p>
+                <img :src=currentVersion.input class="image-preview" v-if="isUrl(currentVersion.input)" />
+                <span v-if="!isUrl(currentVersion.input)"> {{ currentVersion.input }} </span>
+              </p>
             </p>
         </div>
       </div>
@@ -115,12 +118,7 @@ const handleRemoveImage = () => {
 const handleGenerateClick = async () => {
   //@ts-ignore
   let input = inputText.value;
-  if(!(input) && !imageFile.value) return;
-
-  if(input && !isUrl(input)) {
-    inputValidationError.value = 'Invalid URL';
-    return;
-  }
+  if(!input && !imageFile.value) return;
 
   busy.value = true;
 
