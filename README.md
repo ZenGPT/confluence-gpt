@@ -59,6 +59,12 @@ With `ngrok` based [local environment setup](https://bitbucket.org/atlassian/atl
 * After that, start local server with `npm run watch`
 * Verify the atlassian descriptor at your public hostname, and ensure the `baseUrl` is correct
 
+## Local development of confluence-plugin module
+
+```
+cd modules/confluence-plugin
+yarn start:local
+```
 
 ## Reference
 * Getting set up with Atlassian Connect Express (ACE)

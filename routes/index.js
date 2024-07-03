@@ -205,7 +205,7 @@ export default function routes(app, addon) {
       const newMessages = [{role: 'system', content: SYSTEM_PROMPT}].concat(messages);
 
       const payload = {
-        model: 'gpt-4-vision-preview',
+        model: 'gpt-4o',
         messages: newMessages,
         max_tokens: 4096,
       };
