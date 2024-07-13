@@ -15,7 +15,10 @@
       
         <textarea class="styled-textarea" placeholder="Enter image URL or text prompt to describe your diagram" 
           v-model="inputText" @change="handlInputTextChange"></textarea>
-        <img id="userInputImage" :src="inputText" style="max-width: 200px;" v-if="inputText && isUrl(inputText) && !inputValidationError && !isUserInputGenerated()"/>
+
+        <img id="userInputImage" :src="inputText" style="max-width: 200px;" 
+          v-if="inputText && isUrl(inputText) && !inputValidationError && !isUserInputGenerated()"/>
+          
         <div v-if="inputValidationError">{{ inputValidationError }}</div>
 
         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -47,7 +50,8 @@
                 <option v-for="(option, index) in versions" :key="index" :value="option">{{ option.label }}</option>
               </select>
               <p>
-                <img :src=currentVersion.input class="image-preview" v-if="isUrl(currentVersion.input)" />
+                <img :src="currentVersion.imageFile" class="image-preview" v-if="currentVersion.imageFile" />
+                <img :src="currentVersion.input" class="image-preview" v-if="isUrl(currentVersion.input)" />
                 <span v-if="!isUrl(currentVersion.input)"> {{ currentVersion.input }} </span>
               </p>
             </p>
@@ -107,7 +111,6 @@ function handleOpenClick() {
 
 const handleImageSelected = (file) => {
   imageFile.value = file;
-  inputText.value = '';
   inputValidationError.value = '';
 }
 
@@ -122,14 +125,14 @@ const handleGenerateClick = async () => {
 
   busy.value = true;
 
-  let uploaded;
+  let uploaded, image;
   if (imageFile.value) {
     uploaded = await uploadImage(imageFile.value);
     console.log('uploaded image:', uploaded)
-    input = await convert2Base64(imageFile.value);
+    image = await convert2Base64(imageFile.value);
   }
 
-  const content = await retryableImageToDsl2(input);
+  const content = await retryableImageToDsl2(input, image);
 
   if(!content) {
     inputValidationError.value = 'Failed to generate';
@@ -142,9 +145,12 @@ const handleGenerateClick = async () => {
     EventBus.$emit('ExternalCodeChange', content);
 
     //@ts-ignore
-    currentVersion.value = {label: new Date().toISOString(), input, imageFile: imageFile.value, code: content};
+    currentVersion.value = {label: new Date().toISOString(), input, imageFile: image, code: content};
     //@ts-ignore
     versions.value.push(currentVersion.value);
+
+    inputText.value = '';
+    imageFile.value = null;
   }
 
   busy.value = false;
@@ -168,7 +174,6 @@ const handleOptionChange = () => {
 function handlInputTextChange() {
   if(inputText.value) {
     inputValidationError.value = '';
-    imageFile.value = null;
   }
 }
 </script>

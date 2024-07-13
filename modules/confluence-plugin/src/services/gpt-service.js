@@ -29,10 +29,14 @@ export async function retryableImageToDsl(imageUrl) {
   } while(count++ < MAX_RETRIES && !(await validateMermaidDsl(dsl)));
 }
 
-export async function retryableImageToDsl2(input) {
+export async function retryableImageToDsl2(input, image) {
   let count = 1;
   const userPrompt = isUrl(input) ? USER_PROMPT : `${USER_PROMPT}\n\nAdditional instruction:\n${input}`;
   let messages = [{role: 'user', content: [{type: 'text', text: userPrompt}]}];
+
+  if(image) {
+    messages[0].content.push({type: 'image_url', image_url: {url: image}});
+  }
   if(isUrl(input)) {
     messages[0].content.push({type: 'image_url', image_url: {url: input}});
   }
@@ -105,7 +109,7 @@ async function imageToDsl2(messages) {
 
   //local dev
   return {content: `sequenceDiagram
-    title Here is a generation for ${imageUrl.startsWith('data:image') ? 'uploaded image' : imageUrl}
+    title Here is a hard-coded example diagram
     participant A
     participant B
     participant C
