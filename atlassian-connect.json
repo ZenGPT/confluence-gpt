@@ -1,7 +1,7 @@
 {
   "key": "gptdock-confluence",
-  "name": "GPT for Confluence (AI Aide)",
-  "description": "GPT based assistant for Confluence",
+  "name": "Diagramly For Confluence: AI Diagram and GPT Aide",
+  "description": "AI-Based Mermaid/ZenUML Diagram Creation From Image, Or Documentation Content",
   "vendor": {
     "name": "P&D Vision",
     "url": "https://www.zenuml.com"
@@ -140,7 +140,7 @@
         },
         "url": "/confluence-plugin/viewer.html?version=__VERSION__&spaceKey={space.key}&pageId={page.id}&pageVersion={page.version}&macroId={macro.id}&uuid={uuid}&outputType={output.type}&addonKey=gptdock-confluence",
         "description": {
-          "value": "Create a AI Aide Diagram"
+          "value": "Create a AI powered Diagram"
         },
         "outputType": "block",
         "bodyType": "plain-text",
