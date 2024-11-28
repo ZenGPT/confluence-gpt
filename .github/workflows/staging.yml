@@ -101,19 +101,19 @@ jobs:
       #       cd /home/${{ secrets.HOST_USER }}/gpt_ace/
       #       DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }} LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com PORT=3000 NODE_ENV=production OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} CF_R2_ACCESS_KEY=${{ secrets.CF_R2_ACCESS_KEY }} CF_R2_SECRET_KEY=${{ secrets.CF_R2_SECRET_KEY }} pm2 reload app --update-env
 
-  # staging-install:
-  #   name: Install staging to Confluence
-  #   needs: staging-deploy
-  #   environment: staging
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Setup Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.10'
-  #     - name: Install
-  #       run: |
-  #         pip3 install pluploader
-  #         pluploader --base-url https://gpt-dock-stag.atlassian.net --user ${{ secrets.ZENUML_STAGE_GPT_ACE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_GPT_ACE_UPM_PASSWORD }} install --cloud --plugin-uri https://conf-gpt-stag.zenuml.com/atlassian-connect.json
+  staging-install:
+    name: Install staging to Confluence
+    needs: staging-deploy
+    environment: staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install
+        run: |
+          pip3 install pluploader
+          pluploader --base-url https://gpt-dock-stag.atlassian.net --user ${{ secrets.ZENUML_STAGE_GPT_ACE_UPM_USER }} --password ${{ secrets.ZENUML_STAGE_GPT_ACE_UPM_PASSWORD }} install --cloud --plugin-uri https://conf-gpt-stag.zenuml.com/atlassian-connect.json
