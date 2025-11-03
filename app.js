@@ -1,5 +1,9 @@
 // Entry point for the app
 
+// Load environment variables from .env file
+import dotenv from 'dotenv';
+dotenv.config();
+
 // Express is the underlying that atlassian-connect-express uses:
 // https://expressjs.com
 import express from 'express';

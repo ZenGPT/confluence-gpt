@@ -8,6 +8,8 @@
     "port": 3000,
     // Use views/unauthorized.hbs for error page.
     "errorTemplate": true,
+    // Public URL for development. Can also be set via AC_LOCAL_BASE_URL or LOCAL_BASE_URL env vars.
+    "localBaseUrl": "$AC_LOCAL_BASE_URL",
     // atlassian-connect-express currently integrates with Sequelize for
     // persistence to store the host client information (i.e. client key,
     // host public key etc.). When no adapter is specified, it defaults to
@@ -59,7 +61,7 @@
     // Use views/unauthorized.hbs for error page.
     "errorTemplate": true,
     // Public URL to production app.
-    "localBaseUrl": "$LOCAL_BASE_URL",
+    "localBaseUrl": "$AC_LOCAL_BASE_URL",
     "store": {
       // Don't use memory storage for production, otherwise
       // data in the storage will go away when the app server restarts.

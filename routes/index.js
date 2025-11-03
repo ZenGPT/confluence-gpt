@@ -1,17 +1,11 @@
 import fetch from 'node-fetch';
 import { findOrCreateClient, clientRunOutOfToken, deductClientToken } from '../service/client';
-import { uploadToS3 } from '../service/s3Service';
-
-const ASK_API_URL = 'http://localhost:5001/v1/ask';
 const ASK_API_AUTH_TOKEN = 'Bearer localhost';
 const CLIENT_INFO_API_URL = 'http://localhost:5001/v1/client/info';
 const OPENAI_BASEURL='https://gateway.ai.cloudflare.com/v1/8d5fc7ce04adc5096f52485cce7d7b3d/diagramly-ai/openai';
 const SYSTEM_PROMPT = `You're a Mermaid diagram expert.`;
 const USER_PROMPT = `Generate Mermaid DSL for the given sequence diagram image. Output the DSL in code block.`;
-
-const multer = require('multer');
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const GPTDOCK_SYSTEM_PROMPT = `You are an AI assistant called 'GPTDock'. Answer in well-formatted markdown. Use headings, lists, code blocks, and formatting to make responses readable.`;
 
 export default function routes(app, addon) {
   // Redirect root path to /atlassian-connect.json,
@@ -34,11 +28,6 @@ export default function routes(app, addon) {
       }
     );
   });
-
-  app.get('/dashboard', (req, res) => {
-    return res.render( 'dashboard.jsx', { title: 'AI Aide', browserOnly: true, } );
-  });
-
 
   app.get('/listView', (req, res) => {
     return res.render( 'listView.jsx', { title: 'Diagramly Dashboard', browserOnly: true, } );
@@ -94,34 +83,67 @@ export default function routes(app, addon) {
 
   app.post('/conversations', addon.checkValidToken(), async (req, res) => {
       const { messages } = req.body;
+      const userId = req.context.userAccountId;
+      const clientId = req.context.clientKey;
+      const productId = req.context.addonKey;
 
-      if (!messages) {
-        res.status(422).end();
+      console.log('Request to /conversations', messages, userId, clientId, productId);
+
+      if (!messages || !Array.isArray(messages) || messages.length === 0) {
+        res.status(422).json({ error: 'Messages array is required' });
         return;
       }
 
-      // TODO: improve the logic to pick value.
-      const question = messages[0].content.parts[0];
+      try {
+        // Transform ChatGPT message format to OpenAI format
+        // ChatGPT format: {author: {role: 'user'}, content: {parts: ['text']}}
+        // OpenAI format: {role: 'user', content: 'text'}
+        const openAIMessages = messages.map(msg => {
+          const role = (msg.author && msg.author.role) || msg.role || 'user';
+          const content = (msg.content && msg.content.parts && msg.content.parts[0]) || msg.content || '';
+          return { role, content };
+        });
 
-      const data = {
-        question: question,
-        product_id: req.context.addonKey, // e.g. 'gptdock-confluence'
-        user_id: req.context.userAccountId, // e.g. '557058:3731f189-7e58-46c0-b5c7-697c5a021aee'
-        client_id: req.context.clientKey, // e.g. 'aa4a743a-201f-38c4-b7fd-d7f8f68ec685'
-        license: req.context.license, // could be undefined in local dev env
-        stream: true,
-      };
-      console.log(`Calling ${ASK_API_URL} with`, data);
-      const response = await fetch(ASK_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: ASK_API_AUTH_TOKEN,
-        },
-        body: JSON.stringify(data),
-      });
+        // Add GPTDock system prompt at the beginning
+        const allMessages = [
+          { role: 'system', content: GPTDOCK_SYSTEM_PROMPT },
+          ...openAIMessages
+        ];
 
-      return response.body.pipe(res);
+        const payload = {
+          model: 'gpt-3.5-turbo',
+          messages: allMessages,
+          max_tokens: 4096,
+          stream: true,
+        };
+
+        console.log('OpenAI streaming request:', JSON.stringify(payload));
+
+        const response = await fetch(`${OPENAI_BASEURL}/chat/completions`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY,
+          },
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          console.error('OpenAI API error:', response.status, response.statusText);
+          return res.status(response.status).json({ error: 'OpenAI API error' });
+        }
+
+        // Set headers for SSE streaming
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+
+        // Pipe the streaming response directly to the client
+        return response.body.pipe(res);
+      } catch (error) {
+        console.error('Error in /conversations:', error);
+        return res.status(500).json({ error: error.message || 'Internal server error' });
+      }
     }
   );
 
@@ -240,28 +262,6 @@ export default function routes(app, addon) {
       }
     }
   );
-
-  // Upload image to S3
-  app.post('/upload-image', addon.checkValidToken(), upload.single('image'), async (req, res) => {
-    if (!req.file) {
-      return res.status(422).json({ error: 'A file is required' });
-    }
-
-    try {
-      const imageKey = await uploadToS3({
-        name: req.file.originalname,
-        type: req.file.mimetype,
-        buffer: req.file.buffer,
-        clientDomain: req.query.clientDomain,
-        userAccountId: req.query.userAccountId,
-      });
-
-      res.json({ imageKey });
-    } catch (error) {
-      console.error('Upload error:', error);
-      res.status(500).json({ error: 'Error uploading file' });
-    }
-  });
 
   // Add additional route handlers here...
   app.get('/ai-aide', addon.authenticate(), function (req, res) {

@@ -1,86 +1,116 @@
-Installing GPT for Confluence:
+# Diagramly For Confluence
 
-- Log into your Confluence instance as **administrator**.
-- Click the **Apps** dropdown and choose **Find new apps**. The _Find new apps_ screen loads.
-- Search for **GPT for Confluence** and click on the app tile.The _App Details_ screen loads.
-- Click **Try it free** to start installing your app.
-- You're all set!Click **Close** in the _Installed and ready to go_ dialog.
+AI-powered diagram generation and content assistance for Confluence Cloud. Built with Atlassian Connect Express.
 
-Using GPT for Confluence as a user:
+## Features
 
-- Step 1: Once the installation is complete, go to the Confluence page where you want to generate text.
-- Step 2: Click on the "Aide" link at the top of your article (byline).
-- Step 3: A dialog box will appear, prompting you to enter some details about the text you want to generate.
-- Step 4: Enter the necessary details, such as the type of content you want to generate, the language, and any other relevant information.
-- Step 5: Click "Generate", and the text will appear on the page.
-- Step 6: Review the generated text and make any necessary edits or adjustments.
-- Step 7: Copy the text as needed as use it anywhere in Confluence.
+- **AI Chat Assistant**: GPTDock provides conversational AI assistance with streaming responses
+- **Image-to-Diagram**: Convert diagram images to Mermaid DSL using GPT-4 Vision
+- **Multi-turn Conversations**: Context-aware chat with conversation history
+- **Token Management**: Client-based quota tracking and usage monitoring
 
-Tips for using GPT for Confluence:
+## Quick Start
 
-- Keep your requests as specific as possible to get the most accurate results.
-- Don't rely solely on generated text - always review and edit to ensure it meets your needs.
-- Experiment with different types of content and formats to fully take advantage of the tool's flexibility.
+```bash
+# Install dependencies
+npm install
 
-Develop:
--   VSCode (recommended)
--   node v16.\*
--   Set up Ngrok: use [VSCode extendsion](https://ngrok.com/blog-post/integrating-vscode-and-ngrok) or ngrok command to setup your own API key
--   Crends **Credentials.json** based on **Credentials.json.sample**. [api-token Reference](https://id.atlassian.com/manage-profile/security/api-tokens)
-- Start pg db: `make pg`. It'll init db automantically.
-- Set local environment:
-  ```
-  export DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5438/gpt_ace
-  export LOCAL_BASE_URL=https://{your custom domain}
-  export PORT=3000
-  export NODE_ENV=production
-  export OPENAI_API_KEY=....
-  export CF_R2_ACCESS_KEY=....
-  export CF_R2_SECRET_KEY=....
-  ```
-- copy .env.sample to .env
--   > npm install
--   > npm run build
--   > npm run start
-- install your own app into your Confluence instance at the first time of setting up the local env.
+# Copy environment template
+cp .env.sample .env
 
+# Configure required environment variables (see below)
 
-## Set up local development environment using Cloudflare Tunnel
-
-With `ngrok` based [local environment setup](https://bitbucket.org/atlassian/atlassian-connect-express/src/master/), one known issue is `Failed to start ngrok tunnel` on hot reloads. To address this, one alternative is Cloudflare Tunnel.
-
-* Follow [this guide](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/get-started/create-remote-tunnel/) to set up the tunnel
-* Set up local environment variable for ACE local base url using your public hostname
-
-  e.g.
-  ```bash
-  export AC_LOCAL_BASE_URL=https://yanhui3000.zenuml.com
-  ```
-* After that, start local server with `npm run watch`
-* Verify the atlassian descriptor at your public hostname, and ensure the `baseUrl` is correct
-
-## Local development of confluence-plugin module
-
+# Build and start
+npm run build
+npm start
 ```
+
+## Environment Variables
+
+### Required
+```bash
+OPENAI_API_KEY=sk-...              # OpenAI API key
+```
+
+### Optional (with defaults)
+```bash
+DATABASE_URL=postgres://...        # PostgreSQL URL (production); default: SQLite
+AC_LOCAL_BASE_URL=https://...      # Public URL for local dev (Ngrok/Cloudflare Tunnel)
+PORT=3000                          # Server port
+NODE_ENV=production                # Environment mode
+```
+
+## Database
+
+- **ORM**: Sequelize
+- **Production**: PostgreSQL (via `DATABASE_URL`)
+- **Development**: SQLite (`./database.sqlite`)
+- **Local PostgreSQL**: `make pg` (auto-initializes)
+
+### Tables
+- `gpt_dock_client_data`: client_id, product_id, max_quota, token_quota
+- `gpt_dock_user_data`: user_id, org_id, token_used
+
+## Production Release
+
+### Automated Deployment (Recommended)
+
+1. **Create and push version tag**:
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+2. **GitHub Actions workflow** (`.github/workflows/release.yml`) automatically:
+   - Builds the application
+   - Deploys to production server via SSH
+   - Restarts PM2 process with environment variables
+
+### Manual Deployment
+
+```bash
+# On production server
+git pull origin main
+npm install
+npm run build
+pm2 restart diagramly-ai --update-env
+```
+
+## Development
+
+### Prerequisites
+- Node.js v20.11.1
+- VSCode (recommended)
+
+### Local Setup with Cloudflare Tunnel
+
+1. [Create Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/get-started/create-remote-tunnel/)
+2. Set public hostname:
+   ```bash
+   export AC_LOCAL_BASE_URL=https://your-tunnel.zenuml.com
+   ```
+3. Start dev server:
+   ```bash
+   npm run watch
+   ```
+4. Install app to your Confluence instance (first time only)
+
+### Local Setup with Ngrok
+
+1. Install [Ngrok VSCode extension](https://ngrok.com/blog-post/integrating-vscode-and-ngrok)
+2. Configure API key and start tunnel
+3. Start dev server: `npm run watch`
+
+### Confluence Plugin Module
+
+```bash
 cd modules/confluence-plugin
 yarn start:local
 ```
 
-## Reference
-* Getting set up with Atlassian Connect Express (ACE)
-: https://developer.atlassian.com/cloud/confluence/getting-set-up-with-ace/
-* atlassian-connect-express source code: https://bitbucket.org/atlassian/atlassian-connect-express/src/master/
+## References
 
-## DB ORM
-
-* Sequelize: https://sequelize.org/docs/v6/getting-started/
-* Tables:
-  * gpt_dock_client_data
-    * client_id
-    * product_id
-    * max_quota
-    * token_quota
-  * gpt_dock_user_data
-    * user_id
-    * org_id
-    * token_used
+- [Atlassian Connect Express (ACE)](https://developer.atlassian.com/cloud/confluence/getting-set-up-with-ace/)
+- [ACE Source Code](https://bitbucket.org/atlassian/atlassian-connect-express/src/master/)
+- [Sequelize ORM](https://sequelize.org/docs/v6/getting-started/)
+- [OpenAI API](https://platform.openai.com/docs/api-reference/chat)

@@ -99,7 +99,7 @@ jobs:
       #       DISTRO=linux-x64
       #       export PATH=/usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin:$PATH
       #       cd /home/${{ secrets.HOST_USER }}/gpt_ace/
-      #       DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }} LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com PORT=3000 NODE_ENV=production OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} CF_R2_ACCESS_KEY=${{ secrets.CF_R2_ACCESS_KEY }} CF_R2_SECRET_KEY=${{ secrets.CF_R2_SECRET_KEY }} pm2 reload app --update-env
+      #       DATABASE_URL=postgresql://${{ secrets.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{secrets.POSTGRESQL_BIND_INNER_IP }}:5432/${{ secrets.GPT_ACE_DB_NAME }} LOCAL_BASE_URL=https://conf-gpt-stag.zenuml.com PORT=3000 NODE_ENV=production OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} pm2 reload app --update-env
 
   # staging-install:
   #   name: Install staging to Confluence
