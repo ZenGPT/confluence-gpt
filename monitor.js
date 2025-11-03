@@ -25,7 +25,7 @@ export default function monitor(app) {
         next();
     });
 
-    app.get('/client/info', (req, res, next) => {
+    app.get('/v2/client/info', (req, res, next) => {
         ingest_client_info(req.context);
         next();
     });

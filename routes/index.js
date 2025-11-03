@@ -1,7 +1,5 @@
 import fetch from 'node-fetch';
 import { findOrCreateClient, clientRunOutOfToken, deductClientToken } from '../service/client';
-const ASK_API_AUTH_TOKEN = 'Bearer localhost';
-const CLIENT_INFO_API_URL = 'http://localhost:5001/v1/client/info';
 const OPENAI_BASEURL='https://gateway.ai.cloudflare.com/v1/8d5fc7ce04adc5096f52485cce7d7b3d/diagramly-ai/openai';
 const SYSTEM_PROMPT = `You're a Mermaid diagram expert.`;
 const USER_PROMPT = `Generate Mermaid DSL for the given sequence diagram image. Output the DSL in code block.`;
@@ -31,23 +29,6 @@ export default function routes(app, addon) {
 
   app.get('/listView', (req, res) => {
     return res.render( 'listView.jsx', { title: 'Diagramly Dashboard', browserOnly: true, } );
-  });
-
-  app.get('/client/info', addon.checkValidToken(), async (req, res) => {
-    const product_id = req.context.addonKey;
-    const client_id = req.context.clientKey;
-
-    const response = await fetch(
-      `${CLIENT_INFO_API_URL}?client_id=${client_id}&product_id=${product_id}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: ASK_API_AUTH_TOKEN,
-        },
-      }
-    );
-    return response.body.pipe(res);
   });
 
   app.get('/v2/client/info', addon.checkValidToken(), async (req, res) => {

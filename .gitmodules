@@ -1,3 +1,0 @@
-[submodule "api-server"]
-	path = api-server
-	url = git@github.com:ZenGPT/api-server.git
