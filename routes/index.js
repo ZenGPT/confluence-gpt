@@ -1,7 +1,5 @@
 import fetch from 'node-fetch';
 import { findOrCreateClient, clientRunOutOfToken, deductClientToken } from '../service/client';
-
-const ASK_API_URL = 'http://localhost:5001/v1/ask';
 const ASK_API_AUTH_TOKEN = 'Bearer localhost';
 const CLIENT_INFO_API_URL = 'http://localhost:5001/v1/client/info';
 const OPENAI_BASEURL='https://gateway.ai.cloudflare.com/v1/8d5fc7ce04adc5096f52485cce7d7b3d/diagramly-ai/openai';
