@@ -30,8 +30,6 @@ npm start
 ### Required
 ```bash
 OPENAI_API_KEY=sk-...              # OpenAI API key
-CF_R2_ACCESS_KEY=...               # Cloudflare R2 storage
-CF_R2_SECRET_KEY=...               # Cloudflare R2 storage
 ```
 
 ### Optional (with defaults)

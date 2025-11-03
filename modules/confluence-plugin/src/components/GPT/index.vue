@@ -74,7 +74,6 @@ import EventBus from '@/EventBus';
 import store from "@/model/store2";
 import { convert2Base64, scrollToElement, isUrl } from "@/utils/web-utils";
 import { retryableImageToDsl2 } from "@/services/gpt-service";
-import { uploadImage } from "@/services/upload-service";
 import { trackEvent } from "@/utils/window";
 
 const versions = ref([]);
@@ -125,10 +124,8 @@ const handleGenerateClick = async () => {
 
   busy.value = true;
 
-  let uploaded, image;
+  let image;
   if (imageFile.value) {
-    uploaded = await uploadImage(imageFile.value);
-    console.log('uploaded image:', uploaded)
     image = await convert2Base64(imageFile.value);
   }
 
@@ -137,10 +134,10 @@ const handleGenerateClick = async () => {
   if(!content) {
     inputValidationError.value = 'Failed to generate';
 
-    trackEvent(uploaded?.imageKey || input, 'Generate', 'Generation failure', {displayProductName: 'AI Aide'});
-    
+    trackEvent(input, 'Generate', 'Generation failure', {displayProductName: 'AI Aide'});
+
   } else {
-    trackEvent(uploaded?.imageKey || input, 'Generate', 'Generation success', {displayProductName: 'AI Aide'});
+    trackEvent(input, 'Generate', 'Generation success', {displayProductName: 'AI Aide'});
 
     EventBus.$emit('ExternalCodeChange', content);
 
