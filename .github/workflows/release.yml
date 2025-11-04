@@ -43,4 +43,11 @@ jobs:
             NODE_ENV=production
             OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             EOF
-#            pm2 reload app
+            if pm2 describe app > /dev/null 2>&1; then
+              echo "App exists, restarting..."
+              pm2 restart app
+            else
+              echo "App doesn't exist, starting fresh..."
+              pm2 start npm --name app -- start
+              pm2 save
+            fi
