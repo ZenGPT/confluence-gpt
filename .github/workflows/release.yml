@@ -35,4 +35,12 @@ jobs:
           SCRIPT_AFTER: |
             mkdir -p /home/${{ secrets.HOST_USER }}/.ace-server-db
             cd /home/${{ secrets.HOST_USER }}/ace-server/
-            ACE_SERVER_DB_DIR=/home/${{ secrets.HOST_USER }}/.ace-server-db DATABASE_URL="postgresql://${{ vars.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{ vars.POSTGRESQL_BIND_INNER_IP }}:5432/${{ vars.GPT_ACE_DB_NAME }}" LOCAL_BASE_URL="${{ vars.LOCAL_BASE_URL }}" PORT=${{ vars.APP_PORT }} NODE_ENV=production OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo pm2 reload app --update-env
+            cat > .env << EOF
+            ACE_SERVER_DB_DIR=/home/${{ secrets.HOST_USER }}/.ace-server-db
+            DATABASE_URL=postgresql://${{ vars.GPT_ACE_DB_USERNAME }}:${{ secrets.GPT_ACE_DB_PASSWORD }}@${{ vars.POSTGRESQL_BIND_INNER_IP }}:5432/${{ vars.GPT_ACE_DB_NAME }}
+            AC_LOCAL_BASE_URL=${{ vars.LOCAL_BASE_URL }}
+            PORT=${{ vars.APP_PORT }}
+            NODE_ENV=production
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            EOF
+#            pm2 reload app
