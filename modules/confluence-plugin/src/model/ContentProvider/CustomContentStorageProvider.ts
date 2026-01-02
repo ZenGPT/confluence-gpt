@@ -35,7 +35,7 @@ export class CustomContentStorageProvider implements StorageProvider {
     if (diagram?.source === 'custom-content' && diagram?.id && !diagram?.isCopy) {
       customContent = await this.apWrapper.saveCustomContentV2(diagram.id, diagram);
     } else {
-      customContent = await this.apWrapper.createCustomContent(diagram);
+      customContent = await this.apWrapper.createCustomContentV2(diagram);
     }
     return String(customContent.id);
   }
