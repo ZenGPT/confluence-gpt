@@ -62,7 +62,9 @@
     "sequelize": "^6.19.1",
     "split.js": "^1.6.5",
     "styled-components": "^5.2.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "@forge/api": "^2.11.0",
+    "@forge/resolver": "^1.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
@@ -83,9 +85,9 @@
     "yarn": "^1.22.22"
   },
   "engines": {
-    "node": "20.11.1"
+    "node": "20.19.5"
   },
   "volta": {
-    "node": "20.11.1"
+    "node": "20.19.5"
   }
 }

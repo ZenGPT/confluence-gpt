@@ -1,0 +1,131 @@
+app:
+  id: ari:cloud:ecosystem::app/01ede8b1-4e88-451a-b9ef-89eeef93afaf
+  connect:
+    key: gptdock-confluence
+    remote: connect
+    authentication: jwt
+  runtime:
+    name: nodejs20.x
+  licensing:
+    enabled: true
+remotes:
+  - key: connect
+    baseUrl: https://conf-gpt.zenuml.com/
+connectModules:
+  confluence:lifecycle:
+    - key: lifecycle-events
+      installed: /installed
+      uninstalled: /uninstalled
+  confluence:customContent:
+    - uiSupport:
+        contentViewComponent:
+          moduleKey: gpt-custom-content-view-module-key
+        listViewComponent:
+          moduleKey: gpt-custom-content-list-view-module-key
+        icons:
+          item:
+            width: 16
+            height: 16
+            url: image/zenuml_logo.png
+      apiSupport:
+        bodyType: raw
+        supportedContainerTypes:
+          - page
+          - blogpost
+          - comment
+        supportedChildTypes:
+          - attachment
+          - comment
+        indexing:
+          enabled: true
+      name:
+        value: Ai Aide
+      key: gpt-custom-content-key
+  confluence:dialogs:
+    - url: /hello-world?contentId={content.id}
+      options:
+        height: 100%
+        width: 100%
+        chrome: false
+        header:
+          value: AI Aide Dialog
+      key: ai-aide-dialog-key
+  confluence:contentBylineItems:
+    - context: addon
+      target:
+        type: dialogmodule
+        options:
+          key: ai-aide-dialog-key
+      tooltip:
+        value: AI Aide
+      icon:
+        url: /images/ai-aide-logo.png
+      name:
+        value: Aide
+      key: byline-item
+  confluence:generalPages:
+    - key: gpt-custom-content-list-view-module-key
+      location: none
+      url: /listView
+      name:
+        value: Diagramly Dashboard
+    - key: gpt-custom-content-view-module-key
+      location: none
+      url: >-
+        /hello-world?version=__VERSION__&spaceKey={space.key}&addonKey=gptdock-confluence&postInstallPageKey=__POST_INSTALL_KEY__
+      name:
+        value: ZenUML Dashboard
+    - key: zenuml-content-sequence-viewer-dialog
+      location: none
+      url: >-
+        /confluence-plugin/viewer-dialog.html?version=__VERSION__&addonKey=gptdock-confluence
+      name:
+        value: ZenUML Sequence Viewer Dialog
+    - key: zenuml-content-sequence-editor-dialog
+      location: none
+      url: >-
+        /confluence-plugin/editor-dialog.html?version=__VERSION__&spaceKey={space.key}&content.id={content.id}&content.version={content.version}&addonKey=gptdock-confluence
+      name:
+        value: ZenUML Sequence Editor
+  confluence:dynamicContentMacros:
+    - key: gpt-diagram-macro
+      name:
+        value: Diagramly
+      renderModes:
+        default:
+          url: >-
+            /attachment?version=__VERSION__&spaceKey={space.key}&pageId={page.id}&pageVersion={page.version}&macroId={macro.id}&uuid={uuid}&addonKey=gptdock-confluence
+      url: >-
+        /confluence-plugin/viewer.html?version=__VERSION__&spaceKey={space.key}&pageId={page.id}&pageVersion={page.version}&macroId={macro.id}&uuid={uuid}&outputType={output.type}&addonKey=gptdock-confluence
+      description:
+        value: Create a AI powered Diagram
+      outputType: block
+      bodyType: plain-text
+      editor:
+        url: >-
+          /confluence-plugin/editor.html?version=__VERSION__&update=20240309&addonKey=gptdock-confluence
+        width: 100%
+        height: 100%
+        cacheable: true
+      icon:
+        width: 16
+        height: 16
+        url: images/app-logo.png
+      documentation:
+        url: https://zenuml.atlassian.net/wiki/spaces/Doc/overview
+      categories:
+        - visuals
+      featured: true
+      parameters:
+        - identifier: diagramName
+          name:
+            value: Diagram name (do not change)
+            i18n: diagramName
+          type: string
+          required: true
+          multiple: false
+          defaultValue: None
+permissions:
+  scopes:
+    - read:connect-confluence
+    - write:connect-confluence
